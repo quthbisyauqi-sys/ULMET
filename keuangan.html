@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <title>Keuangan Kos - ULMET</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Plus Jakarta Sans", sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-box { animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+        .quick-btn { transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+        .quick-btn:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3); }
+        .quick-btn:active { transform: translateY(0) scale(0.95); }
+        .progress-bar-fill { transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+        
+        /* Health pulse animation for critical status */
+        @keyframes heartbeat { 0% { transform: scale(1); } 14% { transform: scale(1.05); } 28% { transform: scale(1); } 42% { transform: scale(1.05); } 70% { transform: scale(1); } }
+        .critical-pulse { animation: heartbeat 1.5s infinite; }
+
+        /* Bottom nav mobile */
+        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
+        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
+        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
+        .bnav-icon { font-size: 20px; line-height: 1; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white flex h-screen overflow-hidden">
+
+<!-- SIDEBAR NAVIGASI UTAMA -->
+<aside class="w-60 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0 z-10">
+    <div>
+        <div class="h-16 flex items-center px-6 border-b border-blue-800/40">
+            <div class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center shadow-lg mr-3">U</div>
+            <span class="text-xl font-extrabold tracking-wider text-yellow-400">ULMET</span>
+        </div>
+        <nav class="p-3 space-y-1 mt-2">
+            <a href="dashboard.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128202;</span><span class="font-medium text-sm">Dashboard</span>
+            </a>
+            <a href="jadwal.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128197;</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
+            </a>
+            <a href="materi.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128218;</span><span class="font-medium text-sm">Materi Dosen</span>
+            </a>
+            <a href="ai.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI Asisten</span>
+            </a>
+            <a href="keuangan.html" class="flex items-center gap-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50">
+                <span>&#128184;</span><span class="font-semibold text-sm">Keuangan Kos</span>
+            </a>
+        </nav>
+    </div>
+    <div class="p-4 border-t border-blue-800/40">
+        <div class="flex items-center gap-3 px-2 py-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0">A</div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate">Anak Sastra</p>
+                <p class="text-xs text-blue-300">Semester 5</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT AREA -->
+<div class="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/10 to-slate-900 relative">
+    
+    <!-- HEADER -->
+    <header class="h-14 md:h-16 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm flex-shrink-0 z-10">
+        <div class="flex items-center gap-3">
+            <h1 class="text-lg font-extrabold text-white">Keuangan Kos</h1>
+            <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded-md border border-blue-800/50">Bulan Ini</span>
+        </div>
+        <button onclick="openSetupModal()" class="flex items-center gap-2 bg-blue-900/40 hover:bg-blue-800 border border-blue-700/50 px-4 py-2 rounded-xl text-xs font-bold text-blue-200 transition">
+            &#9881;&#65039; Atur Budget
+        </button>
+    </header>
+
+    <!-- MOBILE TAB SWITCHER (Keuangan / Tabungan) -->
+    <div class="md:hidden flex border-b border-blue-800/40 flex-shrink-0">
+        <button onclick="switchKeuTab('main')" id="keu-tab-main" class="flex-1 py-2.5 text-xs font-bold text-yellow-400 border-b-2 border-yellow-400 bg-blue-950/30">&#128176; Keuangan</button>
+        <button onclick="switchKeuTab('side')" id="keu-tab-side" class="flex-1 py-2.5 text-xs font-bold text-blue-400 border-b-2 border-transparent">&#129309; Patungan & Nabung</button>
+    </div>
+
+    <!-- 2 COLUMNS LAYOUT -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- KOLOM KIRI (Main) -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8 relative pb-24 md:pb-8" id="keu-panel-main">
+            
+            <!-- HEALTH BAR DOMPET -->
+            <div class="relative bg-gradient-to-br from-blue-900/40 to-slate-900/80 border border-blue-700/50 rounded-3xl p-6 shadow-xl overflow-hidden">
+                <!-- Background decoration -->
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl"></div>
+                
+                <div class="flex justify-between items-end mb-4 relative z-10">
+                    <div>
+                        <p class="text-sm font-bold text-blue-300 mb-1">Sisa Uang Bulanan</p>
+                        <h2 class="text-4xl font-extrabold text-white tracking-tight" id="saldo-text">Rp 0</h2>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-blue-400 mb-1">Jatah Hari Ini</p>
+                        <p class="text-lg font-bold text-yellow-400" id="jatah-harian-text">Rp 0</p>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="h-4 bg-slate-800 rounded-full overflow-hidden border border-blue-900/50 relative z-10 mb-2">
+                    <div id="health-bar-fill" class="progress-bar-fill h-full bg-gradient-to-r from-green-500 to-emerald-400 w-full"></div>
+                </div>
+                
+                <div class="flex justify-between items-center relative z-10">
+                    <p class="text-xs font-semibold text-blue-200" id="health-status-text">Semangat! Uang masih aman. 👍</p>
+                    <p class="text-[10px] text-blue-400">Dari total: <span id="total-budget-text">Rp 0</span></p>
+                </div>
+            </div>
+
+            <!-- TOP EXPENSE WIDGET (PENGELUARAN TERBESAR) -->
+            <div id="top-expense-widget" class="hidden bg-gradient-to-r from-red-950/40 to-slate-900/40 border-l-4 border-red-500 rounded-r-2xl p-4 shadow-lg mb-8">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-xl flex-shrink-0">⚠️</div>
+                    <div>
+                        <h4 class="text-sm font-extrabold text-white mb-1">Warning: Pengeluaran Terbesar!</h4>
+                        <p class="text-xs text-blue-200" id="top-expense-text">Kamu menghabiskan Rp 0 untuk <b>-</b> bulan ini.</p>
+                        <p class="text-[11px] text-red-400 mt-1 font-semibold" id="top-expense-advice">Mulai kurangi jatah pengeluaran untuk hal ini ya!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div>
+                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2">&#9889; Catat Cepat 3 Detik</h3>
+                <div class="grid grid-cols-3 lg:grid-cols-6 gap-3" id="categories-grid">
+                    <!-- Categories will be rendered here dynamically -->
+                </div>
+            </div>
+
+            <!-- RIWAYAT PENGELUARAN -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-extrabold text-white flex items-center gap-2">&#128466;&#65039; Riwayat Pengeluaran</h3>
+                    <div class="flex gap-2 items-center">
+                        <button onclick="openAnalysisModal()" class="text-[10px] font-bold text-yellow-400 bg-yellow-900/40 hover:bg-yellow-400 hover:text-blue-950 px-2 py-1.5 rounded border border-yellow-700/50 transition shadow-lg">&#128200; Analisis</button>
+                        <span class="text-[11px] text-blue-400 bg-blue-950/50 px-2 py-1.5 rounded border border-blue-800/30" id="today-total-text">Hari ini: Rp 0</span>
+                    </div>
+                </div>
+                <div class="bg-blue-950/20 border border-blue-800/30 rounded-3xl p-2 space-y-1" id="history-list">
+                    <!-- History items will be injected here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- KOLOM KANAN (Sidebar Widget) -->
+        <div class="w-full md:w-80 bg-slate-900 md:border-l border-blue-800/40 p-4 md:p-6 flex-col gap-6 overflow-y-auto hidden md:flex pb-24 md:pb-8" id="keu-panel-side">
+            
+            <!-- WIDGET PATUNGAN -->
+            <div class="bg-gradient-to-b from-blue-950 to-slate-900 border border-blue-700/50 rounded-2xl p-5 relative overflow-hidden shadow-xl">
+                <div class="absolute top-0 right-0 p-3 opacity-10 text-4xl">&#129309;</div>
+                <h4 class="text-sm font-extrabold text-white mb-1">Kas &amp; Patungan Kos</h4>
+                <p class="text-[10px] text-blue-400 mb-4">Catat urusan uang galon, listrik, dll.</p>
+                
+                <div class="space-y-3 mb-4" id="patungan-list">
+                    <!-- Patungan items -->
+                </div>
+                <button onclick="addPatungan()" class="w-full py-2 border border-dashed border-blue-600 rounded-xl text-xs font-bold text-blue-400 hover:bg-blue-900/50 hover:text-white transition">
+                    + Tambah Catatan Patungan
+                </button>
+            </div>
+
+            <!-- WIDGET WISHLIST / NABUNG -->
+            <div class="bg-gradient-to-b from-slate-800 to-slate-900 border border-blue-700/50 rounded-2xl p-5 relative overflow-hidden flex-1 shadow-xl">
+                <div class="absolute top-0 right-0 p-3 opacity-10 text-4xl">&#127919;</div>
+                <h4 class="text-sm font-extrabold text-white mb-1">Target Nabung</h4>
+                <p class="text-[10px] text-blue-400 mb-4">Sisa uang akhir bulan akan masuk sini.</p>
+                
+                <div id="wishlist-container" class="space-y-4">
+                    <!-- Wishlist items -->
+                </div>
+                
+                <button onclick="addWishlist()" class="w-full mt-4 py-2 border border-dashed border-yellow-600/50 rounded-xl text-xs font-bold text-yellow-500 hover:bg-yellow-900/20 hover:text-yellow-400 transition">
+                    + Buat Target Baru
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CATAT PENGELUARAN -->
+<div id="modal-expense" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[80] flex items-center justify-center p-4">
+    <div class="modal-box bg-slate-900 border border-blue-700/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative">
+        <button onclick="closeExpenseModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
+        
+        <div class="flex items-center gap-3 mb-6">
+            <div id="expense-icon-bg" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 border">
+                <span id="expense-icon">🍔</span>
+            </div>
+            <div>
+                <h3 class="text-white font-bold text-lg leading-tight">Catat <span id="expense-title">Makan</span></h3>
+                <p class="text-xs text-blue-400 mt-0.5" id="expense-subtitle">Pengeluaran hari ini</p>
+            </div>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <div>
+                <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 block">Nominal (Ketik 15 untuk 15.000)</label>
+                <input type="text" id="expense-amount" placeholder="Cth: 15, 20K, 1.5J" class="w-full bg-blue-950/50 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-3 text-lg font-bold text-white placeholder-blue-700 outline-none transition" autofocus>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1 block">Keterangan (Opsional)</label>
+                <input type="text" id="expense-note" placeholder="Nasi padang ayam bakar..." class="w-full bg-blue-950/50 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-3 text-sm text-white placeholder-blue-700 outline-none transition" onkeydown="if(event.key==='Enter') saveExpense()">
+            </div>
+        </div>
+
+        <button onclick="saveExpense()" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20">
+            &#10004;&#65039; Simpan Pengeluaran
+        </button>
+    </div>
+</div>
+
+<!-- MODAL: SETUP BUDGET -->
+<div id="modal-setup" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+    <div class="modal-box bg-slate-900 border border-blue-700/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
+        <div class="w-16 h-16 bg-blue-900/50 border border-blue-700/50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">&#128176;</div>
+        <h3 class="text-white font-bold text-xl mb-1">Atur Budget Bulanan</h3>
+        
+        <p class="text-xs text-blue-300 mb-2 mt-4">Total uang / kiriman kamu sekarang?</p>
+        <input type="text" id="setup-budget-amount" placeholder="Cth: 1500 (utk 1.5 Juta) atau 1.5J" class="w-full bg-blue-950/50 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-4 text-center text-2xl font-extrabold text-yellow-400 placeholder-blue-800 outline-none transition mb-4">
+        
+        <p class="text-xs text-blue-300 mb-2">Uang ini harus cukup untuk berapa hari ke depan?</p>
+        <input type="number" id="setup-budget-days" placeholder="Misal: 30" value="30" class="w-full bg-blue-950/50 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-3 text-center text-lg font-bold text-white placeholder-blue-800 outline-none transition mb-6" onkeydown="if(event.key==='Enter') saveBudget()">
+        
+        <button onclick="saveBudget()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-blue-500/20 mb-2">
+            Mulai Kelola Uang
+        </button>
+        <button onclick="closeSetupModal()" class="text-xs text-blue-400 hover:text-white font-semibold py-2">Batal</button>
+    </div>
+</div>
+
+<!-- MODAL: ANALISIS (Diagram) -->
+<div id="modal-analysis" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[85] flex items-center justify-center p-4">
+    <div class="modal-box bg-slate-900 border border-blue-700/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative">
+        <button onclick="closeAnalysisModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
+        
+        <h3 class="text-white font-bold text-xl mb-1 flex items-center gap-2">&#128200; Ranking Pengeluaran</h3>
+        <p class="text-[10px] text-blue-300 mb-6">Uangmu bulan ini paling banyak habis untuk apa?</p>
+        
+        <div id="analysis-list" class="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Diagram akan dimuat di sini -->
+        </div>
+        
+        <button onclick="resetData()" class="w-full bg-red-950/60 hover:bg-red-900 border border-red-800/50 text-red-400 hover:text-white font-bold py-3 rounded-xl text-xs transition">
+            &#128465;&#65039; Mulai Bulan Baru (Reset Riwayat)
+        </button>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[100] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs transition-all"></div>
+
+<script>
+// === STATE & DATA ===
+let budget = parseInt(localStorage.getItem("ulmet_keuangan_budget") || "0");
+let budgetEndDate = parseInt(localStorage.getItem("ulmet_keuangan_budget_end_date") || "0");
+let expenses = JSON.parse(localStorage.getItem("ulmet_keuangan_expenses") || "[]");
+let patungan = JSON.parse(localStorage.getItem("ulmet_keuangan_patungan") || "[]");
+let wishlist = JSON.parse(localStorage.getItem("ulmet_keuangan_wishlist") || "[]");
+let categories = JSON.parse(localStorage.getItem("ulmet_keuangan_categories") || "null");
+
+let currentExpenseCategory = "";
+
+function formatRupiah(angka) {
+    if (angka === 0) return "Rp 0";
+    const abs = Math.abs(angka);
+    const sign = angka < 0 ? "-" : "";
+    if (abs >= 1000000) {
+        return sign + "Rp " + (abs / 1000000).toFixed(1).replace(/\.0$/, "") + "J";
+    } else if (abs >= 1000) {
+        return sign + "Rp " + (abs / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    }
+    return sign + "Rp " + abs;
+}
+
+function parseInputNominal(valStr) {
+    if (!valStr) return 0;
+    valStr = valStr.toString().trim().toUpperCase().replace(/,/g, '.');
+    
+    let multiplier = 1;
+    if (valStr.endsWith("K")) {
+        multiplier = 1000;
+        valStr = valStr.replace("K", "");
+    } else if (valStr.endsWith("J") || valStr.endsWith("M")) { // J = Juta, M = Million (sama saja)
+        multiplier = 1000000;
+        valStr = valStr.replace("J", "").replace("M", "");
+    }
+    
+    let num = parseFloat(valStr);
+    if (isNaN(num)) return 0;
+    
+    // Auto-multiplier pintar: 
+    // Jika user hanya ketik angka kecil (contoh 15 atau 200) tanpa huruf di belakangnya, 
+    // otomatis kita anggap itu dalam ribuan (15.000 atau 200.000).
+    // Tapi jika mereka rajin mengetik lengkap "15000", kita biarkan saja (karena >= 1000).
+    if (multiplier === 1 && num > 0 && num < 1000) {
+        num = num * 1000; // Asumsi ketik '15' = 15.000
+    } else {
+        num = num * multiplier;
+    }
+    
+    return num;
+}
+
+function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.className = "fixed bottom-6 right-6 z-[100] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs " + (type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white");
+    t.textContent = msg;
+    t.classList.remove("hidden");
+    setTimeout(() => t.classList.add("hidden"), 3000);
+}
+
+// === HEALTH BAR LOGIC ===
+function updateDashboard() {
+    if (budget === 0) {
+        openSetupModal();
+        return;
+    }
+    
+    // Hitung total pengeluaran
+    const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
+    const sisa = budget - totalExpense;
+    
+    // Hitung jatah harian (berdasarkan target hari yang ditentukan mahasiswa)
+    let remainingDays = 1;
+    const date = new Date();
+    
+    if (budgetEndDate > 0) {
+        remainingDays = Math.ceil((budgetEndDate - date.getTime()) / (1000 * 60 * 60 * 24));
+        if (remainingDays < 1) remainingDays = 1; // Jangan sampai dibagi 0 atau minus
+    } else {
+        // Fallback aman jika dulu sempat set budget tanpa mengatur hari (pakai akhir bulan)
+        const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        remainingDays = daysInMonth - date.getDate() + 1;
+    }
+    
+    const jatahHarian = Math.max(0, sisa / remainingDays);
+    
+    // Update Teks
+    document.getElementById("saldo-text").textContent = formatRupiah(sisa);
+    document.getElementById("total-budget-text").textContent = formatRupiah(budget);
+    document.getElementById("jatah-harian-text").textContent = formatRupiah(jatahHarian);
+    
+    // Hitung persentase Health
+    const healthPercent = Math.max(0, Math.min(100, (sisa / budget) * 100));
+    const bar = document.getElementById("health-bar-fill");
+    const statusText = document.getElementById("health-status-text");
+    
+    bar.style.width = healthPercent + "%";
+    
+    // Ganti warna sesuai health
+    bar.className = "progress-bar-fill h-full w-full " + 
+        (healthPercent > 50 ? "bg-gradient-to-r from-green-500 to-emerald-400" :
+         healthPercent > 20 ? "bg-gradient-to-r from-yellow-400 to-amber-500" : 
+         "bg-gradient-to-r from-red-500 to-rose-600");
+         
+    if (healthPercent > 50) {
+        statusText.innerHTML = "&#128526; Uang masih sangat aman! Gas terus.";
+        statusText.className = "text-xs font-semibold text-green-400";
+        document.getElementById("saldo-text").parentElement.parentElement.parentElement.classList.remove("critical-pulse");
+    } else if (healthPercent > 20) {
+        statusText.innerHTML = "&#129320; Mulai menipis. Hati-hati nongkrongnya.";
+        statusText.className = "text-xs font-semibold text-yellow-400";
+        document.getElementById("saldo-text").parentElement.parentElement.parentElement.classList.remove("critical-pulse");
+    } else {
+        statusText.innerHTML = "&#128680; KRITIS! Waktunya mode bertahan hidup (Indomie).";
+        statusText.className = "text-xs font-bold text-red-400";
+        document.getElementById("saldo-text").parentElement.parentElement.parentElement.classList.add("critical-pulse");
+    }
+    
+    calculateTopExpense();
+    renderHistory();
+    renderPatungan();
+    renderWishlist();
+}
+
+// === PENGELUARAN TERBESAR (TOP EXPENSE) ===
+function calculateTopExpense() {
+    if (expenses.length === 0) {
+        document.getElementById("top-expense-widget").classList.add("hidden");
+        return;
+    }
+    
+    // Group by category
+    const categoryTotals = {};
+    expenses.forEach(exp => {
+        if (!categoryTotals[exp.category]) categoryTotals[exp.category] = 0;
+        categoryTotals[exp.category] += exp.amount;
+    });
+    
+    // Find highest
+    let topCategory = "";
+    let topAmount = 0;
+    for (const cat in categoryTotals) {
+        if (categoryTotals[cat] > topAmount) {
+            topAmount = categoryTotals[cat];
+            topCategory = cat;
+        }
+    }
+    
+    if (topAmount > 0) {
+        document.getElementById("top-expense-widget").classList.remove("hidden");
+        document.getElementById("top-expense-text").innerHTML = `Kamu menghabiskan <b>${formatRupiah(topAmount)}</b> untuk <b>${topCategory}</b>.`;
+        
+        // Pesan teguran custom
+        let advice = "Mulai kurangi jatah pengeluaran untuk hal ini ya!";
+        const catLower = topCategory.toLowerCase();
+        if (catLower.includes("rokok")) advice = "Merokok merusak dompet dan paru-paru! Kurang-kurangin ya 🚭";
+        else if (catLower.includes("nongkrong") || catLower.includes("ngopi")) advice = "Awas, jangan kebanyakan ngopi di kafe mahal! ☕💸";
+        else if (catLower.includes("makan")) advice = "Makan memang penting, tapi coba mulai masak sendiri biar lebih hemat 🍳";
+        else if (catLower.includes("skincare") || catLower.includes("makeup")) advice = "Skincare emang perlu, tapi jangan overbudget sis! ✨";
+        else if (catLower.includes("game") || catLower.includes("top up")) advice = "Wah nge-game mulu, ingat tugas kuliah dan dompet! 🎮";
+        
+        document.getElementById("top-expense-advice").textContent = advice;
+    } else {
+        document.getElementById("top-expense-widget").classList.add("hidden");
+    }
+}
+
+// === MODAL SETUP BUDGET ===
+function openSetupModal() {
+    const inp = document.getElementById("setup-budget-amount");
+    const inpDays = document.getElementById("setup-budget-days");
+    
+    inp.value = budget > 0 ? (budget / 1000) : "";
+    
+    let remaining = 30;
+    if (budgetEndDate > 0) {
+        remaining = Math.max(1, Math.ceil((budgetEndDate - Date.now()) / (1000 * 60 * 60 * 24)));
+    }
+    inpDays.value = remaining;
+    
+    document.getElementById("modal-setup").classList.remove("hidden");
+    setTimeout(() => inp.focus(), 100);
+}
+function closeSetupModal() {
+    if (budget === 0) {
+        showToast("Kamu harus mengatur budget dulu!", "error");
+        return;
+    }
+    document.getElementById("modal-setup").classList.add("hidden");
+}
+function saveBudget() {
+    const val = parseInputNominal(document.getElementById("setup-budget-amount").value);
+    const days = parseInt(document.getElementById("setup-budget-days").value) || 30;
+    
+    if (!val || val <= 0) {
+        showToast("Masukkan nominal yang valid!", "error");
+        return;
+    }
+    budget = val;
+    localStorage.setItem("ulmet_keuangan_budget", budget);
+    
+    // Set target hari
+    const msInDay = 24 * 60 * 60 * 1000;
+    budgetEndDate = Date.now() + (days * msInDay);
+    localStorage.setItem("ulmet_keuangan_budget_end_date", budgetEndDate);
+    
+    document.getElementById("modal-setup").classList.add("hidden");
+    updateDashboard();
+    showToast("Budget & Target Hari berhasil diatur!");
+}
+
+// === MODAL ANALISIS & RESET ===
+function openAnalysisModal() {
+    const container = document.getElementById("analysis-list");
+    if (expenses.length === 0) {
+        container.innerHTML = "<p class='text-center text-xs text-blue-400 py-4'>Belum ada data pengeluaran sama sekali.</p>";
+    } else {
+        const totals = {};
+        let grandTotal = 0;
+        expenses.forEach(exp => {
+            if (exp.category === "Nabung") return; // Jangan masukkan nabung ke diagram pemborosan
+            if (!totals[exp.category]) totals[exp.category] = 0;
+            totals[exp.category] += exp.amount;
+            grandTotal += exp.amount;
+        });
+        
+        const sorted = Object.keys(totals).map(cat => ({ category: cat, amount: totals[cat] })).sort((a,b) => b.amount - a.amount);
+        
+        if (sorted.length === 0) {
+            container.innerHTML = "<p class='text-center text-xs text-blue-400 py-4'>Hanya ada riwayat nabung.</p>";
+        } else {
+            container.innerHTML = sorted.map((item, index) => {
+                const pct = (item.amount / grandTotal) * 100;
+                const rankStr = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `<span class="text-blue-500">${index+1}.</span>`;
+                const color = index === 0 ? "bg-red-500" : index === 1 ? "bg-orange-500" : index === 2 ? "bg-yellow-500" : "bg-blue-500";
+                
+                return `
+                <div class="mb-2">
+                    <div class="flex justify-between items-end mb-1">
+                        <p class="text-xs font-bold text-white">${rankStr} ${item.category}</p>
+                        <p class="text-[10px] text-yellow-400 font-bold">${formatRupiah(item.amount)}</p>
+                    </div>
+                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-blue-900/50">
+                        <div class="h-full ${color}" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+                `;
+            }).join("");
+        }
+    }
+    document.getElementById("modal-analysis").classList.remove("hidden");
+}
+
+function closeAnalysisModal() {
+    document.getElementById("modal-analysis").classList.add("hidden");
+}
+
+function resetData() {
+    if (!confirm("Yakin ingin menghapus SEMUA riwayat pengeluaran dan memulai catatan bulan baru?")) return;
+    
+    expenses = [];
+    localStorage.setItem("ulmet_keuangan_expenses", "[]");
+    
+    closeAnalysisModal();
+    updateDashboard();
+    showToast("Riwayat pengeluaran telah di-reset! Selamat memulai bulan baru.");
+}
+
+// === KATEGORI DINAMIS ===
+function initCategories() {
+    if (!categories) {
+        // Seed default categories
+        categories = [
+            { id: 1, name: 'Makan', icon: '🍜', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+            { id: 2, name: 'Nongkrong', icon: '☕', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+            { id: 3, name: 'Bensin', icon: '🛵', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+            { id: 4, name: 'Kos', icon: '🧻', color: 'bg-teal-500/20 text-teal-400 border-teal-500/30' }
+        ];
+        localStorage.setItem("ulmet_keuangan_categories", JSON.stringify(categories));
+    }
+    renderCategories();
+}
+
+function renderCategories() {
+    const grid = document.getElementById("categories-grid");
+    grid.innerHTML = categories.map(cat => `
+        <div class="relative group">
+            <button onclick="event.stopPropagation(); deleteCategory(${cat.id})" class="absolute -top-2 -right-2 z-10 opacity-0 group-hover:opacity-100 bg-red-900 border border-red-500/50 text-red-300 hover:text-white hover:bg-red-600 w-6 h-6 rounded-full text-[10px] font-bold flex items-center justify-center transition shadow-lg">&#10006;</button>
+            <button onclick="openExpenseModal('${cat.name}', '${cat.icon}', '${cat.color}')" class="w-full quick-btn bg-slate-900/60 border border-blue-800/40 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group-hover:border-blue-600/50">
+                <div class="w-12 h-12 ${cat.color} rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">${cat.icon}</div>
+                <span class="text-[11px] font-bold text-blue-200 group-hover:text-white truncate w-full text-center">${cat.name}</span>
+            </button>
+        </div>
+    `).join("") + `
+        <button onclick="addCategory()" class="quick-btn bg-blue-950/30 border-2 border-dashed border-blue-800/60 hover:bg-blue-900/40 hover:border-blue-500 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition">
+            <div class="w-12 h-12 bg-blue-900/20 rounded-xl flex items-center justify-center text-2xl text-blue-400 transition">+</div>
+            <span class="text-[11px] font-bold text-blue-400 truncate w-full text-center">Tambah</span>
+        </button>
+    `;
+}
+
+function addCategory() {
+    const name = prompt("Masukkan nama pengeluaran (Contoh: Skincare, Rokok, Mainan):");
+    if (!name || name.trim() === "") return;
+    const icon = prompt("Masukkan satu Emoji untuk ikon (Contoh: 💄, 🚬, 🎮):") || "📦";
+    
+    // Pick a random color theme
+    const colors = [
+        'bg-pink-500/20 text-pink-400 border-pink-500/30',
+        'bg-green-500/20 text-green-400 border-green-500/30',
+        'bg-purple-500/20 text-purple-400 border-purple-500/30',
+        'bg-slate-500/20 text-slate-300 border-slate-500/30',
+        'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+    ];
+    const randColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    categories.push({
+        id: Date.now(),
+        name: name.trim().substring(0, 15),
+        icon: icon.substring(0, 2),
+        color: randColor
+    });
+    localStorage.setItem("ulmet_keuangan_categories", JSON.stringify(categories));
+    renderCategories();
+    showToast(`Kategori ${name} berhasil ditambahkan!`);
+}
+
+function deleteCategory(id) {
+    if (!confirm("Hapus kategori ini? (Riwayat pengeluaran yang sudah ada tidak akan hilang)")) return;
+    categories = categories.filter(c => c.id !== id);
+    localStorage.setItem("ulmet_keuangan_categories", JSON.stringify(categories));
+    renderCategories();
+}
+
+// === MODAL CATAT PENGELUARAN ===
+function openExpenseModal(category, icon, colorClass) {
+    if (budget === 0) { openSetupModal(); return; }
+    currentExpenseCategory = category;
+    
+    document.getElementById("expense-title").textContent = category;
+    document.getElementById("expense-icon").textContent = icon;
+    document.getElementById("expense-icon-bg").className = "w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 border " + colorClass;
+    
+    document.getElementById("expense-amount").value = "";
+    document.getElementById("expense-note").value = "";
+    
+    document.getElementById("modal-expense").classList.remove("hidden");
+    setTimeout(() => document.getElementById("expense-amount").focus(), 100);
+}
+function closeExpenseModal() {
+    document.getElementById("modal-expense").classList.add("hidden");
+}
+function saveExpense() {
+    const amount = parseInputNominal(document.getElementById("expense-amount").value);
+    const note = document.getElementById("expense-note").value.trim() || currentExpenseCategory;
+    
+    if (!amount || amount <= 0) {
+        showToast("Nominal tidak valid!", "error");
+        return;
+    }
+    
+    const newExpense = {
+        id: "exp_" + Date.now(),
+        category: currentExpenseCategory,
+        amount: amount,
+        note: note,
+        date: new Date().toISOString()
+    };
+    
+    expenses.unshift(newExpense);
+    localStorage.setItem("ulmet_keuangan_expenses", JSON.stringify(expenses));
+    
+    closeExpenseModal();
+    updateDashboard();
+    showToast("Pengeluaran berhasil dicatat!");
+}
+
+// === RENDER HISTORY ===
+function renderHistory() {
+    const container = document.getElementById("history-list");
+    if (expenses.length === 0) {
+        container.innerHTML = "<div class='text-center py-6'><p class='text-2xl mb-1'>&#129335;</p><p class='text-xs text-blue-400'>Belum ada pengeluaran.</p></div>";
+        document.getElementById("today-total-text").textContent = "Hari ini: Rp 0";
+        return;
+    }
+    
+    // Filter history for today
+    const today = new Date().toDateString();
+    let todayTotal = 0;
+    
+    const getIconInfo = (cat) => {
+        // Cek apakah ada di kategori custom
+        const customCat = categories.find(c => c.name === cat);
+        if (customCat) {
+            return { i: customCat.icon, c: customCat.color };
+        }
+        // Fallback untuk history lama
+        if(cat==='Makan') return { i:'🍜', c:'bg-orange-500/20 text-orange-400 border-orange-500/30' };
+        if(cat==='Nongkrong') return { i:'☕', c:'bg-amber-500/20 text-amber-400 border-amber-500/30' };
+        if(cat==='Transportasi') return { i:'🛵', c:'bg-blue-500/20 text-blue-400 border-blue-500/30' };
+        if(cat==='Tugas/Print') return { i:'🖨️', c:'bg-purple-500/20 text-purple-400 border-purple-500/30' };
+        if(cat==='Keperluan Kos') return { i:'🧻', c:'bg-teal-500/20 text-teal-400 border-teal-500/30' };
+        return { i:'📦', c:'bg-slate-500/20 text-slate-300 border-slate-500/30' };
+    };
+
+    container.innerHTML = expenses.slice(0, 10).map(exp => {
+        const d = new Date(exp.date);
+        const isToday = d.toDateString() === today;
+        if (isToday) todayTotal += exp.amount;
+        
+        const info = getIconInfo(exp.category);
+        const timeStr = isToday ? d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : d.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+        
+        return `
+            <div class="flex items-center justify-between p-3 bg-slate-900/40 hover:bg-slate-900/80 rounded-2xl transition border border-transparent hover:border-blue-800/30 group">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 border ${info.c}">${info.i}</div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-white truncate">${exp.note}</p>
+                        <p class="text-[10px] text-blue-400">${exp.category} &bull; ${timeStr}</p>
+                    </div>
+                </div>
+                <div class="text-right flex-shrink-0 flex items-center gap-2">
+                    <p class="text-sm font-bold text-red-400">-${formatRupiah(exp.amount)}</p>
+                    <button onclick="deleteExpense('${exp.id}')" class="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:text-red-300 transition" title="Hapus">&#10006;</button>
+                </div>
+            </div>
+        `;
+    }).join("");
+    
+    document.getElementById("today-total-text").textContent = "Hari ini: " + formatRupiah(todayTotal);
+}
+
+function deleteExpense(id) {
+    if(!confirm("Hapus catatan ini?")) return;
+    expenses = expenses.filter(e => e.id !== id);
+    localStorage.setItem("ulmet_keuangan_expenses", JSON.stringify(expenses));
+    updateDashboard();
+}
+
+// === WIDGET PATUNGAN (Dummy Data/Logic for Demo) ===
+function renderPatungan() {
+    const container = document.getElementById("patungan-list");
+    if (patungan.length === 0) {
+        container.innerHTML = "<p class='text-[10px] text-blue-500 text-center py-2'>Belum ada catatan.</p>";
+        return;
+    }
+    
+    container.innerHTML = patungan.map(p => `
+        <div class="group relative flex items-center justify-between p-3 bg-blue-950/40 border border-blue-800/50 rounded-xl">
+            <button onclick="deletePatungan(${p.id})" class="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-red-950/80 text-red-500 hover:text-red-300 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center transition border border-red-900/50" title="Hapus">&#10006;</button>
+            <div class="min-w-0">
+                <p class="text-xs font-bold text-white truncate">${p.name}</p>
+                <p class="text-[10px] ${p.type==='out' ? 'text-red-400' : 'text-green-400'}">
+                    ${p.type==='out' ? 'Harus Bayar:' : 'Akan Menerima:'} ${formatRupiah(p.amount)}
+                </p>
+            </div>
+            <button onclick="togglePatungan(${p.id})" class="text-[10px] px-2 py-1 rounded bg-blue-900 text-blue-200 hover:bg-yellow-400 hover:text-blue-900 font-bold transition flex-shrink-0 ml-2">Lunas</button>
+        </div>
+    `).join("");
+}
+function addPatungan() {
+    const name = prompt("Nama patungan/utang (Contoh: Uang WiFi, Patungan Galon):");
+    if(!name) return;
+    const type = confirm("Klik 'OK' jika kamu BERHUTANG (Harus bayar). Klik 'Cancel' jika teman BERHUTANG padamu (Akan menerima).") ? "out" : "in";
+    const amt = parseInputNominal(prompt("Nominal (Contoh: 15, 20K, 1.5J):"));
+    if(!amt || amt <= 0) return;
+    patungan.push({ id: Date.now(), name, amount: amt, status: "Belum", type: type });
+    localStorage.setItem("ulmet_keuangan_patungan", JSON.stringify(patungan));
+    
+    // POTONG BUDGET OTOMATIS JIKA BERHUTANG
+    if (type === "out") {
+        expenses.unshift({
+            id: "exp_" + Date.now(),
+            category: "Patungan",
+            amount: amt,
+            note: `Patungan/Utang: ${name}`,
+            date: new Date().toISOString()
+        });
+        localStorage.setItem("ulmet_keuangan_expenses", JSON.stringify(expenses));
+        showToast(`Sisa uangmu otomatis dipotong ${formatRupiah(amt)}.`);
+        updateDashboard();
+    } else {
+        renderPatungan();
+    }
+}
+function togglePatungan(id) {
+    const p = patungan.find(x => x.id === id);
+    if (!p) return;
+    
+    // Jika type == "in" (teman bayar utang), saat lunas uang kita nambah
+    if (p.type === "in") {
+        budget += p.amount;
+        localStorage.setItem("ulmet_keuangan_budget", budget);
+        showToast("Teman bayar utang! Budget bertambah.");
+        updateDashboard();
+    } else {
+        showToast("Utang lunas!");
+    }
+    
+    patungan = patungan.filter(x => x.id !== id);
+    localStorage.setItem("ulmet_keuangan_patungan", JSON.stringify(patungan));
+    renderPatungan();
+}
+function deletePatungan(id) {
+    if(!confirm("Hapus catatan ini?")) return;
+    patungan = patungan.filter(p => p.id !== id);
+    localStorage.setItem("ulmet_keuangan_patungan", JSON.stringify(patungan));
+    renderPatungan();
+}
+
+// === WIDGET WISHLIST ===
+function renderWishlist() {
+    const container = document.getElementById("wishlist-container");
+    if (wishlist.length === 0) {
+        container.innerHTML = "<p class='text-[10px] text-blue-500 text-center py-2'>Belum ada target nabung.</p>";
+        return;
+    }
+    
+    container.innerHTML = wishlist.map(w => {
+        const pct = Math.min(100, (w.current / w.target) * 100);
+        return `
+        <div class="group relative bg-blue-950/20 p-2 rounded-xl border border-transparent hover:border-blue-800/30 transition">
+            <button onclick="deleteWishlist(${w.id})" class="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-red-950/80 text-red-500 hover:text-red-300 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center transition border border-red-900/50 z-10" title="Hapus">&#10006;</button>
+            <div class="flex justify-between items-end mb-1">
+                <p class="text-xs font-bold text-white">${w.name}</p>
+                <div class="flex items-center gap-2">
+                    <button onclick="addWishlistSaldo(${w.id})" class="text-[9px] bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-blue-900 px-2 py-0.5 rounded font-bold transition">+ Isi Saldo</button>
+                    <p class="text-[10px] text-yellow-400 font-bold">${Math.round(pct)}%</p>
+                </div>
+            </div>
+            <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-blue-900">
+                <div class="h-full bg-yellow-400" style="width: ${pct}%"></div>
+            </div>
+            <p class="text-[9px] text-blue-400 mt-1 text-right">${formatRupiah(w.current)} / ${formatRupiah(w.target)}</p>
+        </div>
+    `}).join("");
+}
+function addWishlist() {
+    const name = prompt("Nama barang/target:");
+    if(!name) return;
+    const target = parseInputNominal(prompt("Target nominal (Contoh: 150, 700K, 1J):"));
+    if(!target || target <= 0) return;
+    wishlist.push({ id: Date.now(), name, target: target, current: 0 });
+    localStorage.setItem("ulmet_keuangan_wishlist", JSON.stringify(wishlist));
+    renderWishlist();
+}
+function addWishlistSaldo(id) {
+    const w = wishlist.find(x => x.id === id);
+    if (!w) return;
+    const add = parseInputNominal(prompt(`Berapa nominal yang ingin ditabung untuk ${w.name}? (Contoh: 20, 50K):`));
+    if (!add || add <= 0) return;
+    
+    w.current += add;
+    if (w.current > w.target) w.current = w.target;
+    localStorage.setItem("ulmet_keuangan_wishlist", JSON.stringify(wishlist));
+    
+    // Otomatis potong sisa uang bulanan dengan mencatatnya sebagai pengeluaran
+    expenses.unshift({
+        id: "exp_" + Date.now(),
+        category: "Nabung",
+        amount: add,
+        note: `Tabung: ${w.name}`,
+        date: new Date().toISOString()
+    });
+    localStorage.setItem("ulmet_keuangan_expenses", JSON.stringify(expenses));
+    
+    showToast(`Berhasil menabung ${formatRupiah(add)}! Sisa uangmu telah dipotong.`);
+    updateDashboard(); // ini juga akan memanggil renderWishlist dan renderHistory
+}
+function deleteWishlist(id) {
+    if(!confirm("Hapus wishlist ini?")) return;
+    wishlist = wishlist.filter(w => w.id !== id);
+    localStorage.setItem("ulmet_keuangan_wishlist", JSON.stringify(wishlist));
+    renderWishlist();
+}
+
+// === INIT ===
+document.addEventListener("DOMContentLoaded", () => {
+    initCategories();
+    updateDashboard();
+    
+    // Close modals on Escape
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            closeExpenseModal();
+            closeAnalysisModal();
+            // Don't close setup if budget is 0
+            if (budget > 0) closeSetupModal();
+        }
+    });
+});
+</script>
+
+<!-- BOTTOM NAVIGATION (Mobile Only) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+    <a href="dashboard.html" class="bnav-item">
+        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item">
+        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item">
+        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="profil.html" class="bnav-item">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">Profil</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item active">
+        <span class="bnav-icon">&#128184;</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+</nav>
+
+<script>
+function switchKeuTab(tab) {
+    if (window.innerWidth >= 768) return;
+    const mainPanel = document.getElementById('keu-panel-main');
+    const sidePanel = document.getElementById('keu-panel-side');
+    const tabMain = document.getElementById('keu-tab-main');
+    const tabSide = document.getElementById('keu-tab-side');
+    if (tab === 'main') {
+        mainPanel.classList.remove('hidden');
+        mainPanel.classList.add('flex');
+        sidePanel.classList.add('hidden');
+        sidePanel.classList.remove('flex');
+        tabMain.className = 'flex-1 py-2.5 text-xs font-bold text-yellow-400 border-b-2 border-yellow-400 bg-blue-950/30';
+        tabSide.className = 'flex-1 py-2.5 text-xs font-bold text-blue-400 border-b-2 border-transparent';
+    } else {
+        mainPanel.classList.add('hidden');
+        mainPanel.classList.remove('flex');
+        sidePanel.classList.remove('hidden');
+        sidePanel.classList.add('flex');
+        tabMain.className = 'flex-1 py-2.5 text-xs font-bold text-blue-400 border-b-2 border-transparent';
+        tabSide.className = 'flex-1 py-2.5 text-xs font-bold text-yellow-400 border-b-2 border-yellow-400 bg-blue-950/30';
+    }
+}
+</script>
+<!-- PULL TO REFRESH SCRIPT -->
+<script>
+let ptrStartY = 0;
+let ptrIsAtTop = true;
+document.addEventListener('touchstart', (e) => {
+    ptrStartY = e.touches[0].clientY;
+    const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
+    ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    if (ptrIsAtTop && endY > ptrStartY + 150) {
+        const ptrInd = document.createElement('div');
+        ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
+        document.body.appendChild(ptrInd);
+        setTimeout(() => window.location.reload(), 500);
+    }
+}, {passive: true});
+</script>
+</body>
+</html>

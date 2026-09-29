@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ULMET - Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+
+        /* Bottom nav mobile active state */
+        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
+        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
+        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
+        .bnav-icon { font-size: 20px; line-height: 1; }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-white flex h-screen overflow-hidden selection:bg-yellow-400 selection:text-blue-950">
+
+    <!-- SIDEBAR (Navigasi Kiri) -->
+    <aside
+        class="w-64 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between">
+        <div>
+            <!-- Logo ULMET -->
+            <div class="h-20 flex items-center px-8 border-b border-blue-800/40">
+                <div
+                    class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center shadow-lg mr-3">
+                    U</div>
+                <span class="text-xl font-extrabold tracking-wider text-yellow-400">ULMET</span>
+            </div>
+
+            <!-- Menu Navigasi -->
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="dashboard.html" class="flex items-center space-x-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50">
+                    <span>📊</span><span class="font-semibold text-sm">Dashboard</span>
+                </a>
+                <a href="jadwal.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span>📅</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
+                </a>
+                <a href="materi.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span>📚</span><span class="font-medium text-sm">Materi Dosen</span>
+                </a>
+                <a href="ai.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI Asisten</span>
+                </a>
+                <a href="keuangan.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Profil User Bawah -->
+        <div class="p-4 border-t border-blue-800/40">
+            <div class="flex items-center space-x-3 px-4 py-2">
+                <div id="sidebar-avatar"
+                    class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold">
+                    A
+                </div>
+                <div>
+                    <p id="sidebar-nama" class="text-sm font-bold text-white">Mahasiswa</p>
+                    <p id="sidebar-semester" class="text-xs text-blue-300">Semester -</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- KONTEN UTAMA KANAN -->
+    <div
+        class="flex-1 flex flex-col h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-950/20 to-slate-900">
+
+        <!-- Header Atas -->
+        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-white">Halo, <span id="welcome-name">Mahasiswa</span>! 👋</h1>
+                <p class="text-xs md:text-sm text-blue-300">Pantau tugas dan file kuliahmu.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleAlarmModal()" class="bg-blue-900/50 p-2.5 rounded-xl border border-blue-700/50 hover:bg-blue-800 transition relative">
+                    🔔
+                    <span id="alarm-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">!</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Area Dashboard -->
+        <main class="p-4 md:p-8 space-y-5 md:space-y-8 pb-24 md:pb-8">
+
+            <!-- QUICK INFO CHIPS (mobile: horizontal scroll) -->
+            <div class="flex gap-3 overflow-x-auto pb-1 snap-x scrollbar-hide" style="scrollbar-width:none">
+                <!-- Chip: Tugas Aktif -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-blue-900/50 border border-blue-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[130px]">
+                    <div class="text-2xl">📋</div>
+                    <div>
+                        <p class="text-[10px] text-blue-400 font-semibold uppercase tracking-wide">Tugas Aktif</p>
+                        <p class="text-xl font-extrabold text-white leading-tight" id="chip-tugas">0</p>
+                    </div>
+                </div>
+                <!-- Chip: Selesai -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-green-900/30 border border-green-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-green-400/50 transition min-w-[130px]">
+                    <div class="text-2xl">✅</div>
+                    <div>
+                        <p class="text-[10px] text-green-400 font-semibold uppercase tracking-wide">Selesai</p>
+                        <p class="text-xl font-extrabold text-green-400 leading-tight" id="chip-selesai">0</p>
+                    </div>
+                </div>
+                <!-- Chip: Saldo -->
+                <div onclick="window.location.href='keuangan.html'" class="flex-shrink-0 snap-start bg-yellow-900/20 border border-yellow-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[150px]">
+                    <div class="text-2xl">💸</div>
+                    <div>
+                        <p class="text-[10px] text-yellow-400 font-semibold uppercase tracking-wide">Saldo</p>
+                        <p class="text-base font-extrabold text-yellow-400 leading-tight" id="dash-balance-amount">Rp 0</p>
+                    </div>
+                </div>
+                <!-- Chip: File -->
+                <div onclick="window.location.href='materi.html'" class="flex-shrink-0 snap-start bg-indigo-900/30 border border-indigo-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-indigo-400/50 transition min-w-[130px]">
+                    <div class="text-2xl">📚</div>
+                    <div>
+                        <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wide">File Tersimpan</p>
+                        <p class="text-xl font-extrabold text-white leading-tight"><span id="dash-files-count">0</span></p>
+                    </div>
+                </div>
+                <!-- Chip: Streak -->
+                <div class="flex-shrink-0 snap-start bg-orange-900/30 border border-orange-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 min-w-[130px]">
+                    <div class="text-2xl">🔥</div>
+                    <div>
+                        <p class="text-[10px] text-orange-400 font-semibold uppercase tracking-wide">Streak</p>
+                        <p class="text-xl font-extrabold text-orange-400 leading-tight" id="chip-streak">0</p>
+                    </div>
+                </div>
+                <!-- Chip: Overdue -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-red-900/30 border border-red-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-red-400/50 transition min-w-[130px]">
+                    <div class="text-2xl">⚠️</div>
+                    <div>
+                        <p class="text-[10px] text-red-400 font-semibold uppercase tracking-wide">Overdue</p>
+                        <p class="text-xl font-extrabold text-red-400 leading-tight" id="chip-overdue">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bagian Bawah: Tugas & Pengeluaran -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
+
+                <!-- KIRI: Jadwal & Tugas -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>📝</span> Tugas Terdekat
+                        </h2>
+                        <a href="jadwal.html" class="text-xs font-semibold text-yellow-400 hover:underline">Lihat Jadwal</a>
+                    </div>
+
+                    <div class="space-y-4" id="dash-tasks-list">
+                        <!-- Tasks will be loaded here dynamically -->
+                        <p class="text-center text-blue-400 py-4 text-sm">Memuat tugas...</p>
+                    </div>
+                </div>
+
+                <!-- KANAN: Pengeluaran Terbesar -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>💸</span> Pengeluaran Terbesar
+                        </h2>
+                        <a href="keuangan.html" class="text-xs font-semibold text-yellow-400 hover:underline">Keuangan</a>
+                    </div>
+
+                    <div class="space-y-4 flex-1" id="dash-expenses-list">
+                        <!-- Expenses will be loaded here dynamically -->
+                        <p class="text-center text-blue-400 py-4 text-sm">Memuat pengeluaran...</p>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl flex items-start gap-3">
+                        <span class="text-xl">💡</span>
+                        <div>
+                            <p class="text-sm text-red-200 font-semibold mb-1">Terlalu boros bulan ini?</p>
+                            <p class="text-xs text-red-300/80 mb-2">Cek kembali pengeluaran terbesar Anda dan potong langganan yang tidak perlu.</p>
+                            <button onclick="window.location.href='keuangan.html'" class="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg transition font-bold">
+                                Evaluasi Pengeluaran
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL ALARM ULMET -->
+    <div id="modal-alarm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+        <div class="modal-box bg-slate-900 border border-blue-700/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
+            <button onclick="toggleAlarmModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
+            <div class="w-20 h-20 bg-red-500/20 border border-red-500/50 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-pulse">
+                ⏰
+            </div>
+            <h3 class="text-white font-extrabold text-xl mb-1">Alarm Pengingat</h3>
+            <p class="text-xs text-blue-300 mb-6">Jangan sampai lupa tugas dan jadwal kuliahmu hari ini, pejuang!</p>
+            
+            <button onclick="playUlmetAlarm()" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20 mb-3 flex justify-center items-center gap-2">
+                ▶️ Test Suara Alarm ULMET
+            </button>
+            
+            <button onclick="toggleAlarmModal()" class="w-full bg-blue-900/40 hover:bg-blue-800 border border-blue-700/50 text-white font-bold py-3 rounded-xl text-sm transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Helper Format Rupiah
+            const formatRupiah = (angka) => {
+                if (angka === undefined || angka === null || isNaN(angka)) return 'Rp 0';
+                const abs = Math.abs(Math.round(Number(angka)));
+                const sign = Number(angka) < 0 ? '- ' : '';
+                return sign + 'Rp ' + abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            };
+
+            // Helper Format Deadline Date
+            const formatDeadlineDisplay = (dateStr) => {
+                if (!dateStr) return 'TBA';
+                try {
+                    const d = new Date(dateStr);
+                    if (isNaN(d.getTime())) return dateStr;
+                    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                } catch (e) {
+                    return dateStr;
+                }
+            };
+
+            // Helper Calculate Urgency
+            const getUrgencyInfo = (dateStr) => {
+                if (!dateStr) return { text: 'TBA', class: 'bg-slate-800 text-slate-300 border-slate-700' };
+                try {
+                    const now = new Date();
+                    const deadline = new Date(dateStr);
+                    const diff = deadline - now;
+                    if (diff <= 0) {
+                        return { text: 'Mendesak / Lewat', class: 'bg-red-500/20 text-red-400 border-red-500/30' };
+                    }
+                    const days = Math.floor(diff / 86400000);
+                    const hours = Math.floor((diff % 86400000) / 3600000);
+                    if (days === 0) {
+                        return { text: hours > 0 ? `${hours} jam lagi` : 'Mendesak', class: 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse' };
+                    } else if (days <= 3) {
+                        return { text: `${days} hari lagi`, class: 'bg-amber-500/20 text-yellow-400 border-amber-500/30' };
+                    } else {
+                        return { text: `${days} hari lagi`, class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+                    }
+                } catch (e) {
+                    return { text: 'Menunggu', class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+                }
+            };
+
+            // 1. LOAD TASKS
+            try {
+                let tasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
+
+                const activeTasks = tasks.filter(t => t.status !== 'selesai' && t.status !== 'completed');
+                const completedTasks = tasks.filter(t => t.status === 'selesai' || t.status === 'completed');
+                const now2 = new Date();
+                const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now2);
+
+                document.getElementById('chip-tugas').innerText = activeTasks.length;
+                document.getElementById('chip-selesai').innerText = completedTasks.length;
+                document.getElementById('chip-overdue').innerText = overdueTasks.length;
+
+                // Streak from jadwal page storage
+                const streak = parseInt(localStorage.getItem('ulmet_streak') || '0');
+                document.getElementById('chip-streak').innerText = streak;
+
+                const tasksListContainer = document.getElementById('dash-tasks-list');
+                if (activeTasks.length === 0) {
+                    tasksListContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-3xl mb-2">🎉</p>
+                            <p class="text-blue-300 font-semibold text-sm">Semua tugas selesai!</p>
+                            <p class="text-xs text-blue-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
+                            <a href="jadwal.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
+                        </div>
+                    `;
+                } else {
+                    // Urutkan deadline terdekat
+                    activeTasks.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
+                    const topTasks = activeTasks.slice(0, 4);
+
+                    tasksListContainer.innerHTML = topTasks.map(t => {
+                        const title = t.nama || t.title || 'Tugas Kuliah';
+                        const course = t.matkul || t.course || 'Umum';
+                        const deadlineRaw = t.deadline || t.date || '';
+                        const urgency = getUrgencyInfo(deadlineRaw);
+                        const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
+
+                        return `
+                        <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-white text-sm group-hover:text-yellow-400 transition flex items-center gap-2">
+                                    <span>📌</span> ${title}
+                                </h4>
+                                <div class="flex items-center gap-2 text-xs text-blue-300">
+                                    <span class="bg-blue-900/50 px-2 py-0.5 rounded text-[11px] text-blue-200 border border-blue-700/40">${course}</span>
+                                </div>
+                            </div>
+                            <div class="text-right flex flex-col items-end space-y-1.5">
+                                <span class="${urgency.class} px-2.5 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
+                                <span class="text-xs text-blue-300/90 font-medium">📅 ${deadlineFormatted}</span>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Gagal memuat tugas:", err);
+                document.getElementById('dash-tasks-list').innerHTML = '<p class="text-center text-red-400 text-xs py-4">Gagal memuat tugas.</p>';
+            }
+
+            // 2. LOAD FILES (MATERI)
+            try {
+                let files = JSON.parse(localStorage.getItem('ulmet_files') || '[]');
+                document.getElementById('dash-files-count').innerText = files.length;
+            } catch (err) {
+                console.error("Gagal memuat file materi:", err);
+            }
+
+            // 3. LOAD KEUANGAN & TOP EXPENSES
+            try {
+                let budget = parseInt(localStorage.getItem('ulmet_keuangan_budget') || '0');
+                let expenses = JSON.parse(localStorage.getItem('ulmet_keuangan_expenses') || '[]');
+
+                // Hitung Sisa Saldo
+                const totalSpent = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+                const remaining = budget > 0 ? (budget - totalSpent) : 0;
+                document.getElementById('dash-balance-amount').innerText = formatRupiah(remaining);
+
+                // Render Diagram Batang Pengeluaran Terbesar
+                const expensesListContainer = document.getElementById('dash-expenses-list');
+                if (expenses.length === 0) {
+                    expensesListContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <p class="text-3xl mb-2">💸</p>
+                            <p class="text-blue-300 font-semibold text-sm">Belum ada catatan pengeluaran.</p>
+                            <p class="text-xs text-blue-400/80 mt-1">Catat pengeluaran harianmu agar keuangan terkontrol.</p>
+                            <a href="keuangan.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Catat Pengeluaran</a>
+                        </div>
+                    `;
+                } else {
+                    // Urutkan pengeluaran terbesar
+                    const sortedExpenses = [...expenses].sort((a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0));
+                    const topExpenses = sortedExpenses.slice(0, 4);
+                    const maxAmount = Number(topExpenses[0].amount) || 1;
+
+                    expensesListContainer.innerHTML = topExpenses.map(exp => {
+                        const amount = Number(exp.amount) || 0;
+                        const note = exp.note || exp.category || 'Pengeluaran Lainnya';
+                        const category = exp.category || 'Umum';
+                        // Persentase lebar diagram batang (minimal 18% agar tetap estetik dan teks terlihat jelas)
+                        const widthPercent = Math.max(18, Math.round((amount / maxAmount) * 100));
+
+                        return `
+                        <div onclick="window.location.href='keuangan.html'" class="space-y-1.5 group cursor-pointer p-2.5 rounded-xl hover:bg-slate-900/40 transition">
+                            <div class="flex justify-between items-center text-xs">
+                                <div class="flex items-center gap-2 overflow-hidden pr-2">
+                                    <span class="text-white font-semibold truncate group-hover:text-yellow-400 transition">${note}</span>
+                                    <span class="text-[10px] text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-700/30">${category}</span>
+                                </div>
+                                <span class="text-yellow-400 font-extrabold whitespace-nowrap">${formatRupiah(amount)}</span>
+                            </div>
+                            <div class="w-full bg-slate-900 rounded-full h-3.5 border border-slate-700/50 p-0.5 overflow-hidden flex items-center">
+                                <div class="bg-gradient-to-r from-red-500 via-orange-400 to-amber-300 h-full rounded-full transition-all duration-700 ease-out relative group-hover:brightness-125" style="width: ${widthPercent}%"></div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Gagal memuat data keuangan:", err);
+                document.getElementById('dash-expenses-list').innerHTML = '<p class="text-center text-red-400 text-xs py-4">Gagal memuat data keuangan.</p>';
+            }
+        });
+    </script>
+
+    <!-- BOTTOM NAVIGATION (Mobile Only) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+    <a href="dashboard.html" class="bnav-item active">
+        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item">
+        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item">
+        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="profil.html" class="bnav-item">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">Profil</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">&#128184;</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+</nav>
+<!-- PULL TO REFRESH SCRIPT -->
+<script>
+let ptrStartY = 0;
+let ptrIsAtTop = true;
+document.addEventListener('touchstart', (e) => {
+    ptrStartY = e.touches[0].clientY;
+    const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
+    ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    if (ptrIsAtTop && endY > ptrStartY + 150) {
+        const ptrInd = document.createElement('div');
+        ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
+        document.body.appendChild(ptrInd);
+        setTimeout(() => window.location.reload(), 500);
+    }
+}, {passive: true});
+</script>
+</body>
+</html>
+<script>
+// Menambahkan fungsi klik pada profil bawah kiri untuk logout
+document.querySelector('.profile-section').style.cursor = 'pointer';
+document.querySelector('.profile-section').addEventListener('click', async () => {
+    if (confirm('Apakah kamu yakin ingin keluar (Logout)?')) {
+        localStorage.clear();
+        if (window.supabase) {
+            await window.supabase.createClient('https://xpvwedzljeeasdorigko.supabase.co', 'sb_publishable_FcerT5DGq2vhdefNqeztqA_y8dYG-BH').auth.signOut();
+        }
+        window.location.href = 'login.html';
+    }
+});
+</script>
+<script>
+// Load profile
+document.addEventListener("DOMContentLoaded", () => {
+    const profileStr = localStorage.getItem('ulmet_profile');
+    if (profileStr) {
+        try {
+            const profile = JSON.parse(profileStr);
+            const namaPanggilan = profile.panggilan || (profile.nama ? profile.nama.split(' ')[0] : 'Mahasiswa');
+            const welcomeEl = document.getElementById('welcome-name');
+            if (welcomeEl) welcomeEl.innerText = namaPanggilan;
+
+            if (profile.nama) {
+                document.getElementById('sidebar-nama').innerText = profile.nama;
+            }
+            if (profile.semester) {
+                document.getElementById('sidebar-semester').innerText = 'Semester ' + profile.semester;
+            }
+            if (profile.avatar) {
+                document.getElementById('sidebar-avatar').innerText = profile.avatar;
+            }
+        } catch (e) {}
+    }
+});
+
+let audioCtx;
+function playUlmetAlarm() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const playTone = (freq, type, startTime, duration, vol) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(vol, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+    };
+
+    const now = audioCtx.currentTime;
+    // Ciri khas ULMET: 2 beat pendek, 1 panjang
+    playTone(880, 'square', now, 0.1, 0.1);
+    playTone(880, 'square', now + 0.15, 0.1, 0.1);
+    playTone(1320, 'sine', now + 0.3, 0.4, 0.15);
+    
+    // Ulangi
+    playTone(880, 'square', now + 0.8, 0.1, 0.1);
+    playTone(880, 'square', now + 0.95, 0.1, 0.1);
+    playTone(1320, 'sine', now + 1.1, 0.4, 0.15);
+}
+
+function toggleAlarmModal(customMessage = null) {
+    const modal = document.getElementById('modal-alarm');
+    if (modal.classList.contains('hidden')) {
+        if (customMessage) {
+            const msgEl = modal.querySelector('p');
+            if (msgEl) msgEl.textContent = customMessage;
+        }
+        modal.classList.remove('hidden');
+        // Auto play saat dibuka
+        setTimeout(playUlmetAlarm, 300);
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
+// Fitur Alarm Pengingat Berkala (Gaya Duolingo)
+// Akan muncul setiap 30 menit jika aplikasi terbuka
+setInterval(() => {
+    toggleAlarmModal("Waktunya cek jadwal dan cicil tugasmu sedikit demi sedikit! Konsistensi adalah kunci lulus tepat waktu, pejuang! 💪");
+}, 30 * 60 * 1000); // 30 menit
+</script>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mengalihkan...</title>
+    <script>
+        // Pindahkan semua parameter error atau hash Supabase ke login.html
+        if (window.location.search || window.location.hash) {
+            window.location.replace('login.html' + window.location.search + window.location.hash);
+        } else {
+            window.location.replace('login.html');
+        }
+    </script>
+</head>
+<body style="background-color: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
+    <h2>Memuat ULMET... ⏳</h2>
+</body>
+</html>

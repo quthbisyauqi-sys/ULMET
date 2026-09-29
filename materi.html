@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <title>Materi Dosen - ULMET</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Plus Jakarta Sans", sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+        @keyframes pageFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .page-fade { animation: pageFade 0.35s ease forwards; }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-box { animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+        .folder-item { transition: all 0.18s ease; }
+        .folder-item:hover { transform: translateX(2px); }
+        .file-card { transition: all 0.18s ease; }
+        .file-card:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.15); }
+        /* Modal input focus glow */
+        .modal-input:focus { box-shadow: 0 0 0 3px rgba(250,204,21,0.25); }
+        /* Drive step indicator */
+        .drive-step { counter-increment: drive-step; }
+        .drive-step::before { content: counter(drive-step); @apply flex-shrink-0; }
+        /* Shake animation for validation */
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+        .shake { animation: shake 0.35s ease; }
+
+        /* Bottom nav mobile */
+        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
+        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
+        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
+        .bnav-icon { font-size: 20px; line-height: 1; }
+
+        /* Mobile folder drawer */
+        #mobile-folder-drawer { transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1); }
+        #mobile-folder-drawer.open { transform: translateX(0) !important; }
+    </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-slate-900 text-white flex h-screen overflow-hidden">
+
+<!-- SIDEBAR NAVIGASI UTAMA -->
+<aside class="w-60 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0">
+    <div>
+        <div class="h-16 flex items-center px-6 border-b border-blue-800/40">
+            <div class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center shadow-lg mr-3">U</div>
+            <span class="text-xl font-extrabold tracking-wider text-yellow-400">ULMET</span>
+        </div>
+        <nav class="p-3 space-y-1 mt-2">
+            <a href="dashboard.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128202;</span><span class="font-medium text-sm">Dashboard</span>
+            </a>
+            <a href="jadwal.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128197;</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
+            </a>
+            <a href="materi.html" class="flex items-center gap-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50">
+                <span>&#128218;</span><span class="font-semibold text-sm">Materi Dosen</span>
+            </a>
+            <a href="ai.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI Asisten</span>
+            </a>
+            <a href="keuangan.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128184;</span><span class="font-medium text-sm">Keuangan Kos</span>
+            </a>
+            <a href="profil.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <span>&#128100;</span><span class="font-medium text-sm">Profil Saya</span>
+            </a>
+        </nav>
+    </div>
+    <div class="p-4 border-t border-blue-800/40">
+        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">A</div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate" id="sidebar-nama">Memuat...</p>
+                <p class="text-xs text-blue-300" id="sidebar-semester">Semester -</p>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN AREA -->
+<div class="flex-1 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR FOLDER MATA KULIAH (Desktop only) -->
+    <div class="w-72 bg-blue-950/50 border-r border-blue-800/40 flex-col flex-shrink-0 overflow-hidden hidden md:flex">
+        <div class="px-5 py-4 border-b border-blue-800/40 flex-shrink-0">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-sm font-extrabold text-white tracking-wide">&#128194; Mata Kuliah</h2>
+                <button onclick="openGDriveModal()" class="flex items-center gap-1.5 bg-blue-900/60 hover:bg-blue-800 border border-blue-700/50 px-2.5 py-1.5 rounded-lg transition cursor-pointer">
+                    <span class="text-[10px]" id="drive-icon-sidebar">&#9729;&#65039;</span>
+                    <span class="text-[10px] font-bold text-blue-400" id="drive-text-sidebar">Drive</span>
+                </button>
+            </div>
+            <p class="text-[11px] text-blue-400">Pilih folder untuk melihat &amp; upload file</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3 space-y-1" id="course-list-container"></div>
+        <div class="p-3 border-t border-blue-800/40 flex-shrink-0">
+            <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border-2 border-dashed border-blue-700/60 rounded-xl text-xs font-bold text-blue-400 hover:bg-blue-900/40 hover:border-blue-500 transition cursor-pointer flex items-center justify-center gap-2">
+                <span class="text-base leading-none">+</span> Tambah Folder Baru
+            </button>
+        </div>
+    </div>
+
+    <!-- AREA FILE -->
+    <div class="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/10 to-slate-900">
+        <header class="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm flex-shrink-0">
+            <!-- Mobile: folder button -->
+            <button onclick="toggleMobileDrawer()" class="md:hidden mr-2 bg-blue-900/50 p-2 rounded-lg border border-blue-700/40 text-blue-300 flex-shrink-0 text-lg">
+                📂
+            </button>
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="text-xl">&#128193;</span>
+                <div class="min-w-0">
+                    <h1 class="text-lg font-extrabold text-white truncate" id="active-course-title">Materi Dosen</h1>
+                    <p class="text-[11px] text-blue-400" id="active-course-subtitle">Pilih folder di kiri untuk melihat file</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="relative inline-block overflow-hidden rounded-xl">
+                    <button type="button" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-yellow-400/20 pointer-events-none" tabindex="-1">
+                        &#128228; Upload File
+                    </button>
+                    <input type="file" id="upload-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.gif" 
+                           onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); event.preventDefault(); return false; }"
+                           onchange="handleFileUpload(event)" 
+                           style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.01;cursor:pointer;z-index:10;">
+                </div>
+            </div>
+        </header>
+
+        <div id="materi-dropzone" class="mx-4 md:mx-6 mt-4 md:mt-5 border-2 border-dashed border-blue-800/60 hover:border-yellow-400/50 bg-blue-950/10 rounded-2xl p-4 md:p-5 text-center transition cursor-pointer flex-shrink-0" 
+             onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); } else { document.getElementById('upload-input').click(); }">
+            <span class="text-3xl mb-1 block">&#11015;&#65039;</span>
+            <p class="text-sm text-white font-bold">Tarik file ke sini atau klik untuk upload</p>
+            <p class="text-xs text-blue-400 mt-0.5">PDF, Word, PPT, Excel, Foto - Otomatis masuk ke folder aktif</p>
+        </div>
+
+        <div id="no-course-selected" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+            <p class="text-5xl mb-4">&#128072;</p>
+            <p class="font-bold text-lg text-blue-200">Pilih Folder Mata Kuliah</p>
+            <p class="text-sm text-blue-400 mt-2">Klik salah satu folder di sebelah kiri untuk melihat dan mengelola file di dalamnya.</p>
+        </div>
+
+        <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-6 pb-6 mt-4">
+            <div id="file-list-container" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: FILE VIEWER -->
+<div id="modal-viewer" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col">
+    <div class="flex-shrink-0 flex items-center justify-between bg-slate-900/95 border-b border-blue-800/60 px-6 py-4">
+        <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 bg-blue-950 border border-blue-800 rounded-xl flex items-center justify-center text-xl flex-shrink-0" id="viewer-icon">&#128196;</div>
+            <div class="min-w-0">
+                <h3 class="text-white font-bold text-base leading-tight truncate" id="viewer-title">File</h3>
+                <p class="text-[10px] text-blue-400 mt-0.5" id="viewer-meta">...</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="downloadFile(currentViewingFileId)" class="bg-blue-900/50 hover:bg-blue-800 text-blue-200 border border-blue-700/50 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">&#11015;&#65039; Unduh</button>
+            <button onclick="document.getElementById('modal-viewer').classList.add('hidden')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 font-bold p-2 px-4 rounded-xl text-sm transition">x Tutup</button>
+        </div>
+    </div>
+    <div class="flex-1 p-6 flex justify-center items-center overflow-auto" id="viewer-container"></div>
+</div>
+
+<!-- MODAL: TAMBAH FOLDER BARU -->
+<div id="modal-add-folder" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-[80] flex items-center justify-center p-4" onclick="handleFolderModalBackdrop(event)">
+    <div class="modal-box bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-700/60 rounded-3xl p-7 max-w-sm w-full shadow-2xl" id="modal-add-folder-box">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-11 h-11 bg-yellow-400/20 border border-yellow-400/40 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">&#128193;</div>
+            <div>
+                <h3 class="text-white font-bold text-lg leading-tight">Folder Mata Kuliah Baru</h3>
+                <p class="text-xs text-blue-400 mt-0.5">Buat folder untuk menyimpan materi</p>
+            </div>
+            <button onclick="closeAddFolderModal()" class="ml-auto text-blue-500 hover:text-white transition text-xl leading-none flex-shrink-0">&times;</button>
+        </div>
+        <div class="space-y-2 mb-5">
+            <label class="text-xs font-bold text-blue-300 uppercase tracking-wider">Nama Mata Kuliah / Folder</label>
+            <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base">&#128193;</span>
+                <input
+                    type="text"
+                    id="new-folder-input"
+                    placeholder="Contoh: Ilmu Balaghah, Nahwu Sharaf..."
+                    maxlength="60"
+                    class="modal-input w-full bg-slate-950/70 border border-blue-700/50 focus:border-yellow-400 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-blue-600/70 outline-none transition"
+                    onkeydown="if(event.key==='Enter') confirmAddFolder()"
+                >
+            </div>
+            <p class="text-[10px] text-blue-500" id="folder-input-hint">Tekan Enter atau klik Buat Folder untuk menyimpan</p>
+        </div>
+        <div class="mb-5">
+            <p class="text-[10px] text-blue-500 mb-2 font-semibold uppercase tracking-wider">Saran Cepat:</p>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="setFolderSuggestion('Nahwu &amp; Sharaf')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Nahwu &amp; Sharaf</button>
+                <button onclick="setFolderSuggestion('Ilmu Balaghah')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Ilmu Balaghah</button>
+                <button onclick="setFolderSuggestion('Tafsir Al-Quran')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Tafsir Al-Quran</button>
+                <button onclick="setFolderSuggestion('Hadits')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Hadits</button>
+                <button onclick="setFolderSuggestion('Metodologi Penelitian')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Met. Penelitian</button>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="confirmAddFolder()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-400/15">
+                &#10024; Buat Folder
+            </button>
+            <button onclick="closeAddFolderModal()" class="px-5 bg-blue-950/60 hover:bg-blue-900 border border-blue-700/50 text-blue-300 font-semibold py-3 rounded-xl text-sm transition">Batal</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: GOOGLE DRIVE -->
+<div id="modal-gdrive" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4" onclick="handleDriveModalBackdrop(event)">
+    <div class="modal-box bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-800/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center relative" id="modal-gdrive-box">
+        
+        <!-- Close Button -->
+        <button onclick="closeGDriveModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none transition">&times;</button>
+
+        <!-- Icon & Header -->
+        <div class="w-20 h-20 bg-blue-900/40 border border-blue-700/50 rounded-3xl flex items-center justify-center text-5xl mx-auto mb-5 shadow-inner">&#9729;&#65039;</div>
+        <h3 class="text-white font-bold text-xl mb-1">Google Drive</h3>
+        <p class="text-xs text-blue-300 px-4 leading-relaxed mb-6">Hubungkan akun Google kamu agar semua materi kuliah otomatis tersimpan dan tertata rapi di Drive.</p>
+
+        <!-- Status -->
+        <div class="bg-blue-950/50 border border-blue-800/50 rounded-2xl p-4 mb-6" id="gdrive-status-banner">
+            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
+                <span id="gdrive-status-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse flex-shrink-0"></span>
+                <span id="gdrive-status-label">Belum Terhubung</span>
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-3">
+            <button onclick="connectGoogleAccount()" id="btn-login-gdrive" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-400/20">
+                &#128272; Hubungkan Sekarang
+            </button>
+            <button onclick="disconnectDrive()" id="btn-disconnect-drive" class="hidden w-full py-3 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-950/30 rounded-xl transition">
+                Putuskan Koneksi
+            </button>
+        </div>
+        
+        <p class="text-[10px] text-blue-500 mt-5">Folder akan dibuat otomatis: <br>Drive &rarr; ULMET &rarr; [Nama Mata Kuliah]</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs"></div>
+
+<script>
+// === RESET DUMMY DATA LAMA (wajib reset sekali untuk bersihkan dummy) ===
+const DATA_VERSION = "v5"; // naik versi = hapus semua dummy lama
+if (localStorage.getItem("ulmet_data_version") !== DATA_VERSION) {
+    localStorage.removeItem("ulmet_courses");
+    localStorage.removeItem("ulmet_files");
+    localStorage.removeItem("ulmet_data_version");
+    // JANGAN hapus gdrive token supaya drive tetap terhubung
+    localStorage.setItem("ulmet_data_version", DATA_VERSION);
+    console.log("[ULMET] Dummy data dihapus, versi:", DATA_VERSION);
+}
+
+let currentCourse = null;
+let currentViewingFileId = null;
+let gdriveToken = localStorage.getItem("ulmet_gdrive_token") || null;
+let gdriveAccount = localStorage.getItem("ulmet_gdrive_account") ? JSON.parse(localStorage.getItem("ulmet_gdrive_account")) : null;
+let gdriveClientId = localStorage.getItem("ulmet_gdrive_client_id") || "";
+let tokenClient = null;
+
+// Data kosong — mahasiswa yang mengisi sendiri!
+let userCourses = JSON.parse(localStorage.getItem("ulmet_courses") || "null");
+if (!Array.isArray(userCourses)) {
+    userCourses = [];
+    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+}
+
+let userFiles = JSON.parse(localStorage.getItem("ulmet_files") || "null");
+if (!Array.isArray(userFiles)) {
+    userFiles = [];
+    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+}
+
+// === Load profil ke sidebar ===
+(function() {
+    try {
+        const p = JSON.parse(localStorage.getItem('ulmet_profile') || '{}');
+        if (p.nama) {
+            const nm = document.getElementById('sidebar-nama');
+            const sm = document.getElementById('sidebar-semester');
+            const av = document.getElementById('sidebar-avatar');
+            if (nm) nm.textContent = p.nama;
+            if (sm) sm.textContent = 'Semester ' + (p.semester || '-');
+            if (av) av.textContent = p.nama.charAt(0).toUpperCase();
+        }
+    } catch(e) {}
+})();
+
+// Fungsi reset darurat
+function hardResetData() {
+    if (!confirm("Reset semua data ULMET? Folder dan file yang tersimpan akan hilang.")) return;
+    ["ulmet_courses","ulmet_files","ulmet_gdrive_token","ulmet_gdrive_client_id","ulmet_data_version"].forEach(k => localStorage.removeItem(k));
+    location.reload();
+}
+
+// Fungsi trigger upload — buka dialog pilih file
+function triggerUpload() {
+    var inp = document.getElementById('upload-input');
+    if (inp) inp.click();
+}
+
+function showToast(msg, type) {
+    const t = document.getElementById("toast");
+    t.className = "fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs " + (type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white");
+    t.textContent = msg;
+    t.classList.remove("hidden");
+    setTimeout(() => t.classList.add("hidden"), 3000);
+}
+
+function renderCourseFolders() {
+    var container = document.getElementById("course-list-container");
+    if (!container) return;
+    container.innerHTML = "";
+    if (!userCourses.length) {
+        var emptyP = document.createElement("p");
+        emptyP.className = "text-xs text-blue-500 text-center py-4 italic";
+        emptyP.textContent = "Belum ada folder. Tambahkan di bawah.";
+        container.appendChild(emptyP);
+        return;
+    }
+    userCourses.forEach(function(name) {
+        var count = userFiles.filter(function(f) { return f.course === name; }).length;
+        var isActive = name === currentCourse;
+
+        var div = document.createElement("div");
+        div.className = "folder-item flex items-center gap-3 p-3 rounded-xl cursor-pointer group " +
+            (isActive ? "bg-blue-900/60 border border-blue-700/50" : "hover:bg-blue-900/30 border border-transparent");
+        div.setAttribute("onclick", "if(typeof toggleMobileDrawer === 'function') toggleMobileDrawer(); selectCourse('" + name.replace(/'/g, "\\'") + "')");
+
+        var iconSpan = document.createElement("span");
+        iconSpan.className = "text-xl flex-shrink-0";
+        iconSpan.textContent = isActive ? "📂" : "📁";
+        div.appendChild(iconSpan);
+
+        var infoDiv = document.createElement("div");
+        infoDiv.className = "min-w-0 flex-1";
+
+        var nameP = document.createElement("p");
+        nameP.className = "text-sm font-bold " + (isActive ? "text-white" : "text-blue-200") + " leading-tight";
+        nameP.textContent = name;
+        infoDiv.appendChild(nameP);
+
+        var countP = document.createElement("p");
+        countP.className = "text-[10px] " + (isActive ? "text-blue-300" : "text-blue-500");
+        countP.textContent = count > 0 ? count + " file" : "Kosong";
+        infoDiv.appendChild(countP);
+
+        div.appendChild(infoDiv);
+
+        var delBtn = document.createElement("button");
+        delBtn.className = "flex-shrink-0 text-red-500/40 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition opacity-0 group-hover:opacity-100";
+        delBtn.title = "Hapus Folder";
+        delBtn.textContent = "🗑️";
+        delBtn.setAttribute("onclick", "event.stopPropagation(); deleteCourseFolder('" + name.replace(/'/g, "\\'") + "')");
+        div.appendChild(delBtn);
+
+        container.appendChild(div);
+    });
+}
+
+function selectCourse(courseName) {
+    currentCourse = courseName;
+    document.getElementById("active-course-title").textContent = courseName;
+    const count = userFiles.filter(f => f.course === courseName).length;
+    document.getElementById("active-course-subtitle").textContent = count + " file tersimpan";
+    document.getElementById("no-course-selected").classList.add("hidden");
+    document.getElementById("file-list-wrapper").classList.remove("hidden");
+    renderCourseFolders();
+    renderFilesList();
+}
+
+function deleteCourseFolder(courseName) {
+    const count = userFiles.filter(f => f.course === courseName).length;
+    if (!confirm((count > 0 ? "Hapus folder \"" + courseName + "\" beserta " + count + " file?" : "Hapus folder \"" + courseName + "\"?"))) return;
+    userCourses = userCourses.filter(c => c !== courseName);
+    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+    userFiles = userFiles.filter(f => f.course !== courseName);
+    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+    if (currentCourse === courseName) {
+        currentCourse = null;
+        document.getElementById("no-course-selected").classList.remove("hidden");
+        document.getElementById("file-list-wrapper").classList.add("hidden");
+        document.getElementById("active-course-title").textContent = "Materi Dosen";
+        document.getElementById("active-course-subtitle").textContent = "Pilih folder di kiri untuk melihat file";
+    }
+    renderCourseFolders();
+    showToast("Folder \"" + courseName + "\" dihapus");
+}
+
+// === MODAL TAMBAH FOLDER BARU ===
+function addNewCoursePrompt() {
+    const inp = document.getElementById("new-folder-input");
+    if (inp) inp.value = "";
+    const hint = document.getElementById("folder-input-hint");
+    if (hint) { hint.textContent = "Tekan Enter atau klik Buat Folder untuk menyimpan"; hint.className = "text-[10px] text-blue-500"; }
+    document.getElementById("modal-add-folder").classList.remove("hidden");
+    setTimeout(() => { if (inp) inp.focus(); }, 150);
+}
+
+function closeAddFolderModal() {
+    document.getElementById("modal-add-folder").classList.add("hidden");
+}
+
+function handleFolderModalBackdrop(e) {
+    if (e.target === document.getElementById("modal-add-folder")) closeAddFolderModal();
+}
+
+function setFolderSuggestion(name) {
+    const inp = document.getElementById("new-folder-input");
+    if (inp) { inp.value = name; inp.focus(); }
+}
+
+function confirmAddFolder() {
+    const inp = document.getElementById("new-folder-input");
+    const hint = document.getElementById("folder-input-hint");
+    const name = inp ? inp.value.trim() : "";
+
+    if (!name) {
+        // Shake animation untuk validasi kosong
+        inp.classList.add("shake", "border-red-500");
+        setTimeout(() => { inp.classList.remove("shake"); inp.classList.remove("border-red-500"); }, 400);
+        if (hint) { hint.textContent = "⚠ Nama folder tidak boleh kosong!"; hint.className = "text-[10px] text-red-400 font-semibold"; }
+        inp.focus();
+        return;
+    }
+
+    if (userCourses.some(c => c.toLowerCase() === name.toLowerCase())) {
+        inp.classList.add("shake", "border-red-500");
+        setTimeout(() => { inp.classList.remove("shake"); inp.classList.remove("border-red-500"); }, 400);
+        if (hint) { hint.textContent = "⚠ Folder \"" + name + "\" sudah ada!"; hint.className = "text-[10px] text-red-400 font-semibold"; }
+        inp.focus();
+        return;
+    }
+
+    // Tambahkan folder baru
+    userCourses.push(name);
+    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+    renderCourseFolders();
+    selectCourse(name);
+    closeAddFolderModal();
+    showToast("📁 Folder \"" + name + "\" berhasil dibuat!");
+
+    // Jika Drive terhubung, buat folder di Drive juga
+    if (gdriveToken) {
+        getOrCreateDriveFolder("ULMET").then(id => {
+            if (id) getOrCreateDriveFolder(name, id).then(() => showToast("☁️ Folder juga dibuat di Google Drive!"));
+        }).catch(() => {});
+    }
+}
+
+function renderFilesList() {
+    const container = document.getElementById("file-list-container");
+    if (!container || !currentCourse) return;
+    const files = userFiles.filter(f => f.course === currentCourse);
+    if (!files.length) {
+        container.innerHTML = "<div class='text-center py-20'><p class='text-5xl mb-3'>&#128235;</p><p class='font-bold text-base text-blue-200'>Folder ini masih kosong</p><p class='text-xs text-blue-400 mt-1'>Klik Upload File atau tarik file ke area di atas</p></div>";
+        return;
+    }
+    const getTheme = ext => {
+        if (ext === "pdf") return { bg:"bg-red-950/50", border:"border-red-800/50", text:"text-red-400", badge:"PDF" };
+        if (["doc","docx"].includes(ext)) return { bg:"bg-blue-900/40", border:"border-blue-700/50", text:"text-blue-400", badge:"DOC" };
+        if (["ppt","pptx"].includes(ext)) return { bg:"bg-orange-950/40", border:"border-orange-800/50", text:"text-orange-400", badge:"PPT" };
+        if (["xls","xlsx"].includes(ext)) return { bg:"bg-green-950/40", border:"border-green-800/50", text:"text-green-400", badge:"XLS" };
+        if (["png","jpg","jpeg","webp","gif"].includes(ext)) return { bg:"bg-purple-950/40", border:"border-purple-800/50", text:"text-purple-400", badge:"&#128247;" };
+        return { bg:"bg-yellow-950/40", border:"border-yellow-800/50", text:"text-yellow-500", badge:ext.toUpperCase() };
+    };
+    container.innerHTML = files.map(file => {
+        const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
+        const theme = getTheme(ext);
+        const isGDrive = !!file.gdriveId;
+        const safeName = file.name.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+        return "<div class='file-card flex items-center justify-between p-4 bg-slate-900/60 border border-blue-800/40 hover:border-blue-600/60 rounded-2xl group cursor-pointer' draggable='true' ondragstart=\"if(window.aiHandleDragStart) aiHandleDragStart(event, '" + file.id + "')\" onclick=\"openFileViewer('" + file.id + "')\">" +
+            "<div class='flex items-center gap-4 min-w-0 flex-1'>" +
+                "<div class='w-11 h-11 " + theme.bg + " border " + theme.border + " rounded-xl flex items-center justify-center " + theme.text + " font-bold text-xs uppercase flex-shrink-0'>" + theme.badge + "</div>" +
+                "<div class='min-w-0 flex-1'>" +
+                    "<p class='text-sm font-bold text-white group-hover:text-yellow-400 transition truncate'>" + file.name + "</p>" +
+                    "<div class='flex items-center gap-2 mt-0.5'>" +
+                        "<span class='text-[10px] text-blue-400'>" + file.size + "</span>" +
+                        "<span class='w-1 h-1 rounded-full bg-blue-800'></span>" +
+                        "<span class='text-[10px] " + (isGDrive ? "text-green-400 font-semibold" : "text-blue-400") + "'>" + (isGDrive ? "&#9729;&#65039; Tersimpan di Google Drive" : (file.date || "Tersimpan")) + "</span>" +
+                    "</div>" +
+                "</div>" +
+            "</div>" +
+            "<div class='flex items-center gap-2 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-3'>" +
+                "<button class='bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-2 rounded-lg' title='Download' onclick=\"event.stopPropagation(); downloadFile('" + file.id + "')\">&#11015;&#65039;</button>" +
+                "<button class='bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 text-red-400 p-2 rounded-lg' title='Hapus' onclick=\"event.stopPropagation(); deleteFileItem('" + file.id + "', '" + safeName + "')\">&#128465;&#65039;</button>" +
+            "</div>" +
+        "</div>";
+    }).join("");
+    document.getElementById("active-course-subtitle").textContent = files.length + " file tersimpan";
+}
+
+async function getOrCreateDriveFolder(folderName, parentId) {
+    if (!gdriveToken) return null;
+    
+    // Bypass untuk mode simulasi (Demo)
+    if (gdriveToken.startsWith("SIMULATED_TOKEN_")) {
+        return "simulated_folder_id_" + folderName.replace(/\s+/g, '_');
+    }
+
+    let query = "mimeType='application/vnd.google-apps.folder' and name='" + folderName.replace(/'/g, "\\'") + "' and trashed=false";
+    if (parentId) query += " and '" + parentId + "' in parents";
+    const rs = await fetch("https://www.googleapis.com/drive/v3/files?q=" + encodeURIComponent(query) + "&fields=files(id,name)", { headers: { "Authorization": "Bearer " + gdriveToken } });
+    
+    if (rs.status === 401 || rs.status === 403) throw new Error("Sesi Google Drive kedaluwarsa. Silakan hubungkan ulang!");
+    
+    if (rs.ok) { const d = await rs.json(); if (d.files && d.files.length) return d.files[0].id; }
+    const meta = { name: folderName, mimeType: "application/vnd.google-apps.folder" };
+    if (parentId) meta.parents = [parentId];
+    const rc = await fetch("https://www.googleapis.com/drive/v3/files", { method: "POST", headers: { "Authorization": "Bearer " + gdriveToken, "Content-Type": "application/json" }, body: JSON.stringify(meta) });
+    if (rc.ok) { const d = await rc.json(); return d.id; }
+    return null;
+}
+
+async function uploadFileToGoogleDriveDirect(file, folderId) {
+    if (!gdriveToken) return null;
+    
+    // Bypass untuk mode simulasi (Demo)
+    if (gdriveToken.startsWith("SIMULATED_TOKEN_")) {
+        return new Promise(resolve => setTimeout(() => resolve("simulated_file_id_" + Date.now()), 800));
+    }
+
+    const meta = { name: file.name, mimeType: file.type || "application/octet-stream", description: "Materi ULMET - " + currentCourse };
+    if (folderId) meta.parents = [folderId];
+    const fd = new FormData();
+    fd.append("metadata", new Blob([JSON.stringify(meta)], { type: "application/json" }));
+    fd.append("file", file);
+    const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", { method: "POST", headers: { "Authorization": "Bearer " + gdriveToken }, body: fd });
+    if (res.ok) { const d = await res.json(); return d.id; }
+    if (res.status === 401 || res.status === 403) throw new Error("Sesi Google Drive kedaluwarsa. Silakan hubungkan ulang!");
+    const err = await res.json(); throw new Error(err.error ? err.error.message : "Upload gagal");
+}
+
+async function handleFileUpload(fileOrEvent) {
+    var file = fileOrEvent;
+    if (fileOrEvent && fileOrEvent.target && fileOrEvent.target.files) {
+        file = fileOrEvent.target.files[0];
+    }
+    if (!file || !(file instanceof File)) return;
+    if (!currentCourse) {
+        alert("⚠️ PERHATIAN: Pilih folder Mata Kuliah dulu!");
+        return;
+    }
+    const ext = file.name.split(".").pop().toLowerCase();
+    const size = file.size > 1048576 ? (file.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(file.size/1024)) + " KB";
+    showToast("Menyimpan \"" + file.name + "\"...");
+    const reader = new FileReader();
+    reader.onload = async evt => {
+        const obj = { id: "file-" + Date.now(), name: file.name, course: currentCourse, size, ext, date: "Baru saja", dataUrl: evt.target.result, gdriveId: null };
+        if (gdriveToken) {
+            showToast("Mengatur folder Drive & mengunggah...");
+            try {
+                const ulmetId = await getOrCreateDriveFolder("ULMET");
+                let courseId = ulmetId;
+                if (ulmetId && currentCourse) courseId = await getOrCreateDriveFolder(currentCourse, ulmetId);
+                const gId = await uploadFileToGoogleDriveDirect(file, courseId);
+                if (gId) { obj.gdriveId = gId; showToast("Tersimpan di Drive: ULMET / " + currentCourse); }
+            } catch(err) { 
+                console.warn(err); 
+                if (err.message.includes("kedaluwarsa")) {
+                    gdriveToken = null;
+                    localStorage.removeItem("ulmet_gdrive_token");
+                    updateSidebarDriveStatus();
+                    updateModalStatusUI();
+                    showToast(err.message, "error");
+                } else {
+                    showToast("Gagal ke Drive, disimpan lokal.", "error"); 
+                }
+            }
+        } else {
+            showToast("Berhasil disimpan di ULMET!");
+        }
+        userFiles.unshift(obj);
+        localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+        renderCourseFolders();
+        renderFilesList();
+    };
+    reader.readAsDataURL(file);
+    const input = document.getElementById("upload-input");
+    if (input) input.value = "";
+}
+
+function downloadFile(fileId) {
+    const file = userFiles.find(f => f.id === fileId);
+    if (!file) return;
+    if (file.dataUrl) {
+        const a = document.createElement("a"); a.href = file.dataUrl; a.download = file.name;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        showToast("Mengunduh " + file.name);
+    } else { showToast("File tidak tersedia untuk diunduh", "error"); }
+}
+
+function deleteFileItem(fileId, fileName) {
+    if (!confirm("Hapus berkas \"" + fileName + "\" dari ULMET?")) return;
+    userFiles = userFiles.filter(f => f.id !== fileId);
+    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+    renderCourseFolders();
+    renderFilesList();
+    showToast("File dihapus");
+}
+
+function openFileViewer(fileId) {
+    const file = userFiles.find(f => f.id === fileId);
+    if (!file) return;
+    currentViewingFileId = fileId;
+    const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
+    document.getElementById("viewer-title").textContent = file.name;
+    document.getElementById("viewer-meta").textContent = file.course + " - " + file.size + (file.gdriveId ? " - Google Drive" : "");
+    const icon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["png","jpg","jpeg","webp","gif"].includes(ext) ? "&#128247;" : "&#128196;";
+    document.getElementById("viewer-icon").innerHTML = icon;
+    const container = document.getElementById("viewer-container");
+    if (["png","jpg","jpeg","webp","gif","svg"].includes(ext)) {
+        container.innerHTML = "<div class='flex flex-col items-center justify-center max-w-5xl w-full p-2'><img src='" + (file.dataUrl || "") + "' alt='" + file.name + "' class='max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40'><p class='text-xs text-blue-300 mt-3'>Pratinjau Gambar (" + file.size + ")</p></div>";
+    } else if (ext === "pdf" && file.dataUrl) {
+        // Native PDF rendering using PDF.js to avoid download prompts on mobile
+        container.innerHTML = `
+            <div class='w-full max-w-4xl h-[85vh] flex flex-col bg-slate-900 border border-blue-800/40 rounded-3xl overflow-hidden shadow-2xl relative'>
+                <div class='flex-1 overflow-y-auto bg-slate-800/80 flex flex-col items-center gap-6 p-4 md:p-8' id='pdf-render-container'>
+                    <div class='text-blue-400 mt-20 animate-pulse text-sm font-bold flex flex-col items-center gap-3' id='pdf-loading-indicator'>
+                        <div class='w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin'></div>
+                        Memuat PDF...
+                    </div>
+                </div>
+            </div>`;
+        renderLocalPDF(file.dataUrl);
+    } else {
+        const docIcon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["ppt","pptx"].includes(ext) ? "&#128217;" : ["xls","xlsx"].includes(ext) ? "&#128215;" : "&#128196;";
+        const descText = file.gdriveId ? "Tersimpan aman di Google Drive." : "Berkas lokal tersimpan di memori perangkat.";
+        container.innerHTML = `
+        <div class='bg-slate-900/90 border border-blue-800/60 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center space-y-6'>
+            <div class='w-24 h-24 bg-blue-950/80 border border-blue-800/50 rounded-3xl flex items-center justify-center text-5xl mx-auto shadow-inner'>
+                ${docIcon}
+            </div>
+            <div>
+                <h4 class='text-lg font-bold text-white break-words leading-tight'>${file.name}</h4>
+                <p class='text-xs text-blue-400 mt-2 font-medium'>${file.course} • ${file.size}</p>
+            </div>
+            <p class='text-[11px] text-slate-300 bg-blue-950/40 p-3 rounded-xl border border-blue-800/30'>${descText}</p>
+            <button onclick="downloadFile('${file.id}')" class='w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 active:scale-95 text-blue-950 font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2'>
+                &#128194; Buka Berkas
+            </button>
+        </div>`;
+    }
+    document.getElementById("modal-viewer").classList.remove("hidden");
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.getElementById("modal-viewer").classList.add("hidden"); });
+
+// PDF.js State
+let pdfDoc = null;
+let pdfScale = 1.3;
+
+function renderPage(num, container) {
+    pdfDoc.getPage(num).then(page => {
+        // Adjust scale for mobile screens to fit width nicely
+        const isMobile = window.innerWidth < 768;
+        const mobileScale = (window.innerWidth / page.getViewport({scale:1.0}).width) * 0.95;
+        // Increase resolution by 1.5x on top of the fit scale to ensure crispness even when zoomed
+        const baseScale = isMobile ? mobileScale * 1.5 : pdfScale;
+        const viewport = page.getViewport({ scale: baseScale });
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // High DPI (Retina) support for razor-sharp text
+        const outputScale = window.devicePixelRatio || 1;
+        
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        
+        // Tentukan CSS size asli (sebelum outputScale)
+        canvas.style.width = Math.floor(viewport.width) + 'px';
+        canvas.style.height = Math.floor(viewport.height) + 'px';
+        canvas.className = 'max-w-full h-auto bg-white rounded-lg shadow-xl shrink-0';
+
+        // Scale context
+        const transform = outputScale !== 1 
+            ? [outputScale, 0, 0, outputScale, 0, 0] 
+            : null;
+
+        const renderCtx = { 
+            canvasContext: ctx, 
+            transform: transform,
+            viewport: viewport 
+        };
+        
+        page.render(renderCtx);
+        container.appendChild(canvas);
+    });
+}
+
+function renderLocalPDF(dataUrl) {
+    pdfDoc = null;
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const array = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+    
+    pdfjsLib.getDocument(array).promise.then(doc => {
+        pdfDoc = doc;
+        const container = document.getElementById('pdf-render-container');
+        if (!container) return;
+        
+        const loader = document.getElementById('pdf-loading-indicator');
+        if (loader) loader.remove();
+        
+        // Loop through all pages and render them for continuous scrolling
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            renderPage(i, container);
+        }
+    }).catch(err => {
+        document.getElementById('pdf-render-container').innerHTML = "<p class='text-red-400 mt-10 font-bold'>Gagal memuat PDF. Format mungkin tidak didukung.</p>";
+    });
+}
+
+function initDropZone() {
+    const dz = document.getElementById("materi-dropzone");
+    if (!dz || dz.dataset.bound) return;
+    dz.dataset.bound = "true";
+    ["dragenter","dragover"].forEach(n => dz.addEventListener(n, e => { e.preventDefault(); dz.classList.add("border-yellow-400","bg-blue-900/20"); }));
+    ["dragleave","drop"].forEach(n => dz.addEventListener(n, e => { e.preventDefault(); dz.classList.remove("border-yellow-400","bg-blue-900/20"); }));
+    dz.addEventListener("drop", e => { e.preventDefault(); dz.classList.remove("border-yellow-400","bg-blue-900/20"); if (e.dataTransfer && e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]); });
+}
+
+// === MODAL GOOGLE DRIVE ===
+function openGDriveModal() {
+    updateModalStatusUI();
+    document.getElementById("modal-gdrive").classList.remove("hidden");
+}
+
+function closeGDriveModal() { document.getElementById("modal-gdrive").classList.add("hidden"); }
+
+function handleDriveModalBackdrop(e) {
+    if (e.target === document.getElementById("modal-gdrive")) closeGDriveModal();
+}
+
+function updateModalStatusUI() {
+    const banner = document.getElementById("gdrive-status-banner");
+    const disconnectBtn = document.getElementById("btn-disconnect-drive");
+    if (gdriveToken) {
+        let accountHtml = "";
+        if (gdriveAccount) {
+            accountHtml = `
+                <div class="mt-4 pt-4 border-t border-green-700/30 flex items-center gap-3 text-left">
+                    <img src="${gdriveAccount.picture || 'https://ui-avatars.com/api/?name=' + gdriveAccount.name + '&background=0D8ABC&color=fff'}" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-green-500/50">
+                    <div class="min-w-0">
+                        <p class="text-white text-sm font-bold truncate">${gdriveAccount.name}</p>
+                        <p class="text-green-300 text-[11px] truncate">${gdriveAccount.email}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        banner.innerHTML = `
+            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>
+                <span>Terhubung ke Google Drive</span>
+            </p>
+            ${accountHtml}
+        `;
+        banner.className = "bg-green-950/30 border border-green-700/50 rounded-2xl p-4 mb-6";
+        document.getElementById("btn-login-gdrive").innerHTML = "&#128472; Ganti Akun";
+        if (disconnectBtn) disconnectBtn.classList.remove("hidden");
+    } else {
+        banner.innerHTML = `
+            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse flex-shrink-0"></span>
+                <span>Belum Terhubung</span>
+            </p>
+        `;
+        banner.className = "bg-blue-950/50 border border-blue-800/50 rounded-2xl p-4 mb-6";
+        document.getElementById("btn-login-gdrive").innerHTML = "&#128272; Hubungkan Sekarang";
+        if (disconnectBtn) disconnectBtn.classList.add("hidden");
+    }
+}
+
+function updateSidebarDriveStatus() {
+    const icon = document.getElementById("drive-icon-sidebar");
+    const text = document.getElementById("drive-text-sidebar");
+    if (gdriveToken) {
+        if (icon) icon.textContent = "🟢";
+        if (text) { text.textContent = "Drive Aktif"; text.className = "text-[10px] font-bold text-green-400"; }
+    } else {
+        if (icon) icon.innerHTML = "&#9729;&#65039;";
+        if (text) { text.textContent = "Drive"; text.className = "text-[10px] font-bold text-blue-400"; }
+    }
+}
+
+function disconnectDrive() {
+    if (!confirm("Putuskan koneksi Google Drive? File yang sudah diupload tetap ada.")) return;
+    gdriveToken = null;
+    gdriveAccount = null;
+    localStorage.removeItem("ulmet_gdrive_token");
+    localStorage.removeItem("ulmet_gdrive_account");
+    updateSidebarDriveStatus();
+    updateModalStatusUI();
+    showToast("Drive diputus. File tetap tersimpan lokal.");
+}
+
+// Mode simulasi Drive untuk keperluan demo di localhost
+function simulateDriveConnect() {
+    gdriveToken = "SIMULATED_TOKEN_" + Date.now();
+    gdriveAccount = {
+        name: "Mahasiswa ULMET",
+        email: "mahasiswa.demo@ulmet.ac.id",
+        picture: ""
+    };
+    localStorage.setItem("ulmet_gdrive_token", gdriveToken);
+    localStorage.setItem("ulmet_gdrive_account", JSON.stringify(gdriveAccount));
+    updateSidebarDriveStatus();
+    updateModalStatusUI();
+    closeGDriveModal();
+    showToast("☁️ Mode Simulasi Drive aktif! (Demo)");
+}
+
+function connectGoogleAccount() {
+    // Gunakan client ID bawaan secara transparan
+    gdriveClientId = "1010901741046-v4b9d5a0mlc91bpskqlfffmjre7777rn.apps.googleusercontent.com";
+    localStorage.setItem("ulmet_gdrive_client_id", gdriveClientId);
+
+    // Deteksi localhost - otomatis pakai mode simulasi agar mahasiswa tidak bingung/error
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "";
+    if (isLocalhost) {
+        simulateDriveConnect();
+        return;
+    }
+
+    if (typeof google === "undefined" || !google.accounts || !google.accounts.oauth2) {
+        showToast("Pustaka Google sedang dimuat, coba lagi sebentar.", "error"); return;
+    }
+
+    const btn = document.getElementById("btn-login-gdrive");
+    if (btn) { btn.innerHTML = "⏳ Memuat popup Google..."; btn.disabled = true; }
+
+    try {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: gdriveClientId,
+            scope: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
+            callback: async r => {
+                if (btn) { btn.disabled = false; }
+                if (r && r.access_token) {
+                    gdriveToken = r.access_token;
+                    localStorage.setItem("ulmet_gdrive_token", gdriveToken);
+                    
+                    // Fetch user email and profile info
+                    try {
+                        if (btn) btn.innerHTML = "⏳ Mengambil data akun...";
+                        const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                            headers: { "Authorization": "Bearer " + gdriveToken }
+                        });
+                        if (infoRes.ok) {
+                            gdriveAccount = await infoRes.json();
+                            localStorage.setItem("ulmet_gdrive_account", JSON.stringify(gdriveAccount));
+                        }
+                    } catch (e) {
+                        console.warn("Gagal mengambil info profil Google", e);
+                    }
+
+                    updateSidebarDriveStatus(); updateModalStatusUI(); closeGDriveModal();
+                    showToast("✅ Berhasil terhubung ke Google Drive!");
+                } else {
+                    updateModalStatusUI();
+                    showToast("Login dibatalkan atau gagal.", "error");
+                }
+            },
+            error_callback: err => {
+                if (btn) { btn.disabled = false; updateModalStatusUI(); }
+                showToast("Gagal: " + (err.type || "Error tidak diketahui"), "error");
+            }
+        });
+        tokenClient.requestAccessToken({ prompt: "consent" });
+    } catch(err) {
+        if (btn) { btn.disabled = false; updateModalStatusUI(); }
+        showToast("Error: " + err.message, "error");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderCourseFolders();
+    updateSidebarDriveStatus();
+    initDropZone();
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+
+    // Keyboard shortcut: Escape tutup semua modal
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            document.getElementById("modal-viewer")?.classList.add("hidden");
+            closeAddFolderModal();
+            closeGDriveModal();
+        }
+    });
+});
+</script>
+
+<!-- MOBILE FOLDER DRAWER OVERLAY -->
+<div id="mobile-drawer-overlay" class="hidden md:hidden fixed inset-0 bg-black/60 z-[70] backdrop-blur-sm" onclick="toggleMobileDrawer()"></div>
+
+<!-- MOBILE FOLDER DRAWER -->
+<div id="mobile-folder-drawer" class="md:hidden fixed left-0 top-0 bottom-0 w-72 bg-blue-950 border-r border-blue-800/50 flex flex-col z-[75] overflow-hidden" style="transform: translateX(-100%)">
+    <div class="px-5 py-4 border-b border-blue-800/40 flex-shrink-0 flex items-center justify-between">
+        <div>
+            <h2 class="text-sm font-extrabold text-white tracking-wide">&#128194; Mata Kuliah</h2>
+            <p class="text-[11px] text-blue-400 mt-0.5">Pilih folder untuk melihat file</p>
+        </div>
+        <button onclick="toggleMobileDrawer()" class="text-blue-400 hover:text-white text-xl p-1">&times;</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-3 space-y-1" id="mobile-course-list-container"></div>
+    <div class="p-3 border-t border-blue-800/40 flex-shrink-0">
+        <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border-2 border-dashed border-blue-700/60 rounded-xl text-xs font-bold text-blue-400 hover:bg-blue-900/40 transition cursor-pointer flex items-center justify-center gap-2">
+            <span>+</span> Tambah Folder Baru
+        </button>
+    </div>
+</div>
+
+<!-- BOTTOM NAVIGATION (Mobile Only) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+    <a href="dashboard.html" class="bnav-item">
+        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item active">
+        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item">
+        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="profil.html" class="bnav-item">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">Profil</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">&#128184;</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+</nav>
+
+<script>
+// Mobile drawer toggle
+function toggleMobileDrawer() {
+    const drawer = document.getElementById('mobile-folder-drawer');
+    const overlay = document.getElementById('mobile-drawer-overlay');
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+        drawer.classList.remove('open');
+        overlay.classList.add('hidden');
+    } else {
+        // Sync mobile list from desktop list
+        const desktopList = document.getElementById('course-list-container');
+        const mobileList = document.getElementById('mobile-course-list-container');
+        if (desktopList && mobileList) mobileList.innerHTML = desktopList.innerHTML;
+        drawer.classList.add('open');
+        overlay.classList.remove('hidden');
+    }
+}
+</script>
+<!-- PULL TO REFRESH SCRIPT -->
+<script>
+let ptrStartY = 0;
+let ptrIsAtTop = true;
+document.addEventListener('touchstart', (e) => {
+    ptrStartY = e.touches[0].clientY;
+    const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
+    ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    if (ptrIsAtTop && endY > ptrStartY + 150) {
+        const ptrInd = document.createElement('div');
+        ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
+        document.body.appendChild(ptrInd);
+        setTimeout(() => window.location.reload(), 500);
+    }
+}, {passive: true});
+</script>
+</body>
+</html>

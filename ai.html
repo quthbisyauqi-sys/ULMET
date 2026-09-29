@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <title>AI Asisten Belajar - ULMET</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Marked.js untuk render Markdown dari AI -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { font-family: "Plus Jakarta Sans", sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+        .page-fade { animation: pageFade 0.35s ease forwards; }
+        @keyframes pageFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        /* Markdown Styles */
+        .prose p { margin-bottom: 0.5rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose strong { color: #fbbf24; }
+        .prose code { background: #1e293b; padding: 2px 4px; border-radius: 4px; font-size: 0.85em; color: #38bdf8; }
+        .prose pre { background: #0f172a; padding: 10px; border-radius: 8px; overflow-x: auto; margin-bottom: 0.5rem; border: 1px solid #1e3a8a; }
+
+        /* Bottom nav mobile */
+        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
+        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
+        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
+        .bnav-icon { font-size: 20px; line-height: 1; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white flex h-screen overflow-hidden">
+
+<!-- SIDEBAR NAVIGASI UTAMA -->
+<aside class="w-60 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0">
+    <div>
+        <div class="h-16 flex items-center px-6 border-b border-blue-800/40">
+            <div class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center mr-3 shadow-sm shadow-yellow-400/50">U</div>
+            <span class="text-xl font-extrabold tracking-wider text-yellow-400 drop-shadow-md">ULMET</span>
+        </div>
+        <nav class="p-3 space-y-1 mt-2">
+            <a href="dashboard.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition group">
+                <span class="text-lg group-hover:scale-110 transition-transform">📊</span>
+                <span class="font-medium text-sm">Dashboard</span>
+            </a>
+            <a href="jadwal.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition group">
+                <span class="text-lg group-hover:scale-110 transition-transform">📅</span>
+                <span class="font-medium text-sm">Jadwal & Tugas</span>
+            </a>
+            <a href="materi.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition group">
+                <span class="text-lg group-hover:scale-110 transition-transform">📚</span>
+                <span class="font-medium text-sm">Materi Dosen</span>
+            </a>
+            <a href="ai.html" class="flex items-center gap-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50 shadow-inner group">
+                <span class="text-lg animate-bounce">🤖</span>
+                <span class="font-semibold text-sm">AI Asisten</span>
+            </a>
+
+            <a href="keuangan.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition group">
+                <span class="text-lg group-hover:scale-110 transition-transform">&#128184;</span>
+                <span class="font-medium text-sm">Keuangan Kos</span>
+            </a>
+        </nav>
+    </div>
+    <div class="p-4 border-t border-blue-800/40 bg-blue-950/20">
+        <div class="flex items-center gap-3 px-2 py-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-yellow-200 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm shadow-md flex-shrink-0">A</div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate drop-shadow-sm">Anak Sastra</p>
+                <p class="text-[11px] text-blue-300 font-medium tracking-wide">Semester 5</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN AREA -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/20 to-slate-900">
+    <!-- Header -->
+    <header class="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm flex-shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+            <span class="text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">🤖</span>
+            <div class="min-w-0">
+                <h1 class="text-base md:text-lg font-extrabold text-white truncate tracking-wide">Teman Belajar AI</h1>
+                <p class="text-[10px] md:text-[11px] text-blue-400 font-medium hidden sm:block">Bahas materi, tanya fitur ULMET, atau minta jelaskan konsep</p>
+            </div>
+        </div>
+        <button onclick="document.getElementById('api-modal').classList.remove('hidden')" class="text-xs bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 text-blue-300 px-3 py-1.5 rounded-lg transition font-semibold flex items-center gap-1.5 flex-shrink-0">
+            <span>⚙️</span> <span class="hidden sm:inline">Pengaturan AI</span>
+        </button>
+    </header>
+
+    <!-- Chat Area -->
+    <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6 scroll-smooth pb-24 md:pb-6">
+        
+        <!-- Welcome Message -->
+        <div class="flex gap-4 max-w-3xl">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-lg shadow-lg flex-shrink-0 border border-blue-500/50">🤖</div>
+            <div class="bg-blue-950/50 border border-blue-800/60 rounded-2xl rounded-tl-sm p-4 text-sm text-blue-100 shadow-md">
+                <p class="font-bold text-white mb-1">Halo! Saya AI Asisten Belajar ULMET.</p>
+                <p class="text-blue-200/90 leading-relaxed">Saya siap menjadi teman diskusi belajarmu. Kamu bisa melakukan ini bersamaku:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1 text-blue-300/90">
+                    <li>Kirim file PDF/Word materi dosen untuk dirangkum atau dibahas bersama.</li>
+                    <li>Tanya tentang fitur-fitur di aplikasi ULMET jika kamu bingung.</li>
+                    <li>Minta jelaskan teori atau konsep perkuliahan yang rumit.</li>
+                </ul>
+                <p class="mt-3 text-xs italic text-blue-400/80">Tips: Pastikan kamu sudah memasukkan API Key Gemini di Pengaturan agar kita bisa mulai ngobrol!</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-4 bg-slate-900/80 border-t border-blue-800/40 flex-shrink-0 backdrop-blur-md pb-24 md:pb-4">
+        
+        <!-- File preview zone -->
+        <div id="file-preview-zone" class="hidden max-w-4xl mx-auto mb-3 flex items-center gap-3 flex-wrap"></div>
+
+        <div class="max-w-4xl mx-auto relative flex items-end gap-2 bg-blue-950/40 border border-blue-700/50 rounded-2xl p-2 transition-all focus-within:border-yellow-400/50 focus-within:bg-blue-950/60 shadow-lg">
+            
+            <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(event)">
+            
+            <button onclick="document.getElementById('file-upload').click()" class="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-blue-400 hover:text-white hover:bg-blue-800/50 transition" title="Lampirkan File/Materi">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+            </button>
+
+            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white text-sm px-2 py-2.5 resize-none outline-none max-h-32 placeholder-blue-600/70" placeholder="Tanya materi, fitur ULMET, atau perintah lainnya..." onkeydown="handleEnter(event)"></textarea>
+
+            <button id="send-btn" onclick="sendMessage()" class="w-10 h-10 flex-shrink-0 bg-yellow-400 hover:bg-yellow-300 text-blue-950 rounded-xl flex items-center justify-center transition shadow-md shadow-yellow-400/20 active:scale-95">
+                <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V6m0 0l-8 8m8-8l8 8"></path></svg>
+            </button>
+        </div>
+        <p class="text-center text-[10px] text-blue-500 mt-2">Didukung oleh Google Gemini Flash</p>
+    </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div id="api-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-700/60 rounded-3xl p-7 max-w-sm w-full shadow-2xl relative page-fade">
+        <button onclick="document.getElementById('api-modal').classList.add('hidden')" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
+        
+        <h3 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span>🔑</span> Kunci API Gemini</h3>
+        <p class="text-xs text-blue-300 mb-5 leading-relaxed">Untuk menjadikan AI ini super pintar dan gratis tanpa batas bagi Anda, Anda perlu memasukkan API Key Google Gemini milik Anda sendiri.</p>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">Masukkan API Key Anda</label>
+                <input type="password" id="api-key-input" placeholder="AIzaSyB..." class="w-full bg-slate-950/70 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-3 text-sm text-white placeholder-blue-700 outline-none transition">
+            </div>
+            
+            <div class="bg-blue-900/30 border border-blue-800/50 rounded-xl p-3 text-[11px] text-blue-200">
+                <p class="font-bold text-yellow-400 mb-1">Cara mendapatkan gratis:</p>
+                <ol class="list-decimal pl-4 space-y-1">
+                    <li>Buka <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-400 underline hover:text-blue-300">Google AI Studio</a></li>
+                    <li>Login dengan akun Google Anda</li>
+                    <li>Klik tombol "Create API key"</li>
+                    <li>Salin kode panjang tersebut dan tempel ke sini</li>
+                </ol>
+            </div>
+            
+            <button onclick="saveApiKey()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20">
+                Simpan API Key
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Context tentang ULMET agar AI tahu dirinya
+    const SYSTEM_PROMPT = `Kamu adalah teman belajar dan asisten pintar untuk aplikasi bernama ULMET (Aplikasi Manajemen Kuliah Mahasiswa).
+Karaktermu: Ramah, santai tapi cerdas, menggunakan bahasa Indonesia yang baik tapi tidak terlalu kaku (seperti teman kuliah yang jago banget). 
+Tugasmu:
+1. Membantu mahasiswa berdiskusi tentang materi kuliah (mereka bisa memberikan file teks materi).
+2. Menjelaskan fitur-fitur aplikasi ULMET jika mereka bingung.
+Penjelasan fitur ULMET:
+- Dashboard: Halaman utama melihat ringkasan tugas dan status.
+- Jadwal & Tugas: Tempat mengelola tugas kuliah, memiliki kalender, sistem alarm, Pomodoro timer (25 menit fokus, 5 menit istirahat), dan Kebiasaan Harian (Habit tracker). Catatan: ULMET tidak lagi menggunakan fitur Eisenhower matrix.
+- Materi Dosen: Tempat mahasiswa menyimpan file/PDF dari dosen. Sistem ini otomatis tersinkronisasi dua arah secara invisible (tanpa server backend) dengan Google Drive mahasiswa.
+- Keuangan Kos: Fitur tambahan.
+Jangan memberi penjelasan yang terlalu panjang kecuali diminta. Gunakan format markdown yang rapi.`;
+
+    let conversationHistory = [];
+    let pendingFileBase64 = null;
+    let pendingFileName = null;
+    let pendingFileMime = null;
+
+    // Load API Key
+    document.addEventListener("DOMContentLoaded", () => {
+        const key = localStorage.getItem("ulmet_gemini_api_key");
+        if (key) document.getElementById('api-key-input').value = key;
+        
+        // Auto resize textarea
+        const tx = document.getElementById('chat-input');
+        tx.addEventListener("input", function() {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+        });
+    });
+
+    function saveApiKey() {
+        const key = document.getElementById('api-key-input').value.trim();
+        if (key) {
+            localStorage.setItem("ulmet_gemini_api_key", key);
+            document.getElementById('api-modal').classList.add('hidden');
+            alert("API Key berhasil disimpan!");
+        } else {
+            alert("API Key tidak boleh kosong!");
+        }
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // For Gemini API, we currently support pdf, txt (can be expanded)
+        pendingFileName = file.name;
+        pendingFileMime = file.type || 'application/octet-stream';
+        
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            // Remove the data:mimetype;base64, prefix for API
+            const base64str = evt.target.result.split(',')[1]; 
+            pendingFileBase64 = base64str;
+            
+            // Show preview
+            const zone = document.getElementById('file-preview-zone');
+            zone.innerHTML = `
+                <div class="bg-blue-900/60 border border-blue-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
+                    <span class="text-yellow-400">📄</span>
+                    <span class="text-white truncate max-w-[150px] font-semibold">${file.name}</span>
+                    <button onclick="removeFile()" class="text-red-400 hover:text-red-300 ml-1 font-bold">&times;</button>
+                </div>
+            `;
+            zone.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeFile() {
+        pendingFileBase64 = null;
+        pendingFileName = null;
+        pendingFileMime = null;
+        document.getElementById('file-upload').value = '';
+        document.getElementById('file-preview-zone').classList.add('hidden');
+        document.getElementById('file-preview-zone').innerHTML = '';
+    }
+
+    function appendMessage(role, content, fileName = null) {
+        const container = document.getElementById('chat-container');
+        const div = document.createElement('div');
+        div.className = "flex gap-4 max-w-3xl " + (role === 'user' ? "ml-auto flex-row-reverse" : "");
+        
+        const avatar = document.createElement('div');
+        avatar.className = `w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-lg flex-shrink-0 border ${
+            role === 'user' ? "bg-gradient-to-tr from-yellow-500 to-yellow-300 border-yellow-400/50 text-blue-950 font-bold" 
+            : "bg-gradient-to-br from-blue-600 to-blue-800 border-blue-500/50"
+        }`;
+        avatar.textContent = role === 'user' ? "A" : "🤖"; // "A" for Anak Sastra
+
+        const msgBox = document.createElement('div');
+        msgBox.className = `border rounded-2xl p-4 text-sm shadow-md prose prose-invert max-w-full overflow-hidden ${
+            role === 'user' 
+            ? "bg-blue-900/40 border-blue-700/50 text-blue-50 rounded-tr-sm" 
+            : "bg-blue-950/50 border-blue-800/60 text-blue-100 rounded-tl-sm"
+        }`;
+
+        let finalHtml = "";
+        if (fileName) {
+            finalHtml += `<div class="mb-2 bg-blue-950/40 border border-blue-800/40 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 inline-flex items-center gap-2"><span class="text-yellow-400">📄</span> Dilampirkan: ${fileName}</div><br>`;
+        }
+        
+        if (role === 'user') {
+            // User message is plain text, escape HTML to prevent XSS
+            const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+            finalHtml += escapeHTML(content);
+        } else {
+            // AI message is markdown
+            finalHtml += marked.parse(content);
+        }
+        
+        msgBox.innerHTML = finalHtml;
+
+        div.appendChild(avatar);
+        div.appendChild(msgBox);
+        container.appendChild(div);
+        
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+        
+        return msgBox; // return so we can update it if it's a typing indicator
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        const apiKey = localStorage.getItem("ulmet_gemini_api_key");
+
+        if (!text && !pendingFileBase64) return;
+        if (!apiKey) {
+            document.getElementById('api-modal').classList.remove('hidden');
+            return;
+        }
+
+        // Add user message to UI
+        const fileAttached = pendingFileName;
+        appendMessage('user', text, fileAttached);
+        
+        // Setup payload for history
+        let userContent = [];
+        if (text) userContent.push({ "text": text });
+        if (pendingFileBase64) {
+            // Convert mime if doc/docx to simple pdf/txt for Gemini if needed, 
+            // but Gemini 1.5 Flash supports pdf, txt directly.
+            // For docx/etc it's better handled as plain text if possible, but let's send base64.
+            userContent.push({
+                "inline_data": {
+                    "mime_type": pendingFileMime === 'application/pdf' ? 'application/pdf' : 'text/plain', 
+                    "data": pendingFileBase64
+                }
+            });
+        }
+
+        conversationHistory.push({
+            "role": "user",
+            "parts": userContent
+        });
+
+        input.value = '';
+        input.style.height = "auto";
+        removeFile();
+
+        // Add loading indicator
+        const loadingBox = appendMessage('model', "⏳ Memikirkan jawaban...");
+
+        try {
+            let attempt = 0;
+            let success = false;
+            let data, aiText;
+            
+            while (attempt < 3 && !success) {
+                attempt++;
+                if (attempt > 1) {
+                    loadingBox.innerHTML = `⏳ AI sedang sibuk (Overload). Mencoba ulang otomatis (Percobaan ${attempt}/3)...`;
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "system_instruction": { "parts": [{ "text": SYSTEM_PROMPT }] },
+                        "contents": conversationHistory,
+                        "generationConfig": { "temperature": 0.7, "maxOutputTokens": 2048 }
+                    })
+                });
+
+                data = await response.json();
+                
+                if (response.ok) {
+                    success = true;
+                    aiText = data.candidates[0].content.parts[0].text;
+                } else {
+                    const errMsg = data.error?.message || "";
+                    if (!errMsg.toLowerCase().includes("high demand") && !errMsg.toLowerCase().includes("overloaded")) {
+                        throw new Error(errMsg || "Gagal menghubungi AI");
+                    }
+                    if (attempt === 3) throw new Error("Server AI masih kepenuhan setelah 3x percobaan. Coba beberapa menit lagi ya.");
+                }
+            }
+            
+            // Update history
+            conversationHistory.push({
+                "role": "model",
+                "parts": [{ "text": aiText }]
+            });
+
+            // Update UI
+            loadingBox.innerHTML = marked.parse(aiText);
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+
+        } catch (error) {
+            loadingBox.innerHTML = `<span class="text-red-400"><strong>Error:</strong> ${error.message}</span>`;
+            // Remove last user message from history so they can retry
+            conversationHistory.pop();
+        }
+    }
+</script>
+
+<!-- BOTTOM NAVIGATION (Mobile Only) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+    <a href="dashboard.html" class="bnav-item">
+        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item">
+        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item active">
+        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="profil.html" class="bnav-item">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">Profil</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">&#128184;</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+</nav>
+
+<!-- PULL TO REFRESH SCRIPT -->
+<script>
+let ptrStartY = 0;
+let ptrIsAtTop = true;
+document.addEventListener('touchstart', (e) => {
+    ptrStartY = e.touches[0].clientY;
+    const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
+    ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    if (ptrIsAtTop && endY > ptrStartY + 150) {
+        const ptrInd = document.createElement('div');
+        ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
+        document.body.appendChild(ptrInd);
+        setTimeout(() => window.location.reload(), 500);
+    }
+}, {passive: true});
+</script>
+</body>
+</html>
