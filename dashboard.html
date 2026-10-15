@@ -2,24 +2,109 @@
 <html lang="id">
 
 <head>
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Dashboard ULMET - Workspace</title>
+    <!-- Supabase SDK & Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
 
-        /* Bottom nav mobile active state */
-        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
-        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
-        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
-        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
-        .bnav-icon { font-size: 20px; line-height: 1; }
+        /* Mascot Widget Glows & Animations */
+        .glow-reward {
+            box-shadow: 0 0 25px -3px rgba(250, 204, 21, 0.45);
+            border-color: rgba(250, 204, 21, 0.8) !important;
+        }
+        .glow-angry {
+            box-shadow: 0 0 25px -3px rgba(239, 68, 68, 0.55);
+            border-color: rgba(239, 68, 68, 0.8) !important;
+            animation: pulse-angry 1.5s infinite;
+        }
+        .glow-worried {
+            box-shadow: 0 0 25px -3px rgba(249, 115, 22, 0.45);
+            border-color: rgba(249, 115, 22, 0.8) !important;
+        }
+        @keyframes pulse-angry {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shake-angry {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px) rotate(-1deg); }
+            40% { transform: translateX(4px) rotate(1deg); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+        .shake-animation {
+            animation: shake-angry 0.5s ease-in-out;
+        }
+        @keyframes bounce-reward {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px) scale(1.02); }
+        }
+        .bounce-animation {
+            animation: bounce-reward 0.6s ease-in-out;
+        }
+
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
     </style>
 </head>
 
@@ -54,21 +139,21 @@
                 <a href="keuangan.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
                     <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
                 </a>
+                <a href="profil.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span>👤</span><span class="font-medium text-sm">Profil Saya</span>
+                </a>
             </nav>
         </div>
 
         <!-- Profil User Bawah -->
         <div class="p-4 border-t border-blue-800/40">
-            <div class="flex items-center space-x-3 px-4 py-2">
-                <div id="sidebar-avatar"
-                    class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold">
-                    A
+            <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
+                <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0">A</div>
+                <div class="min-w-0">
+                    <p id="sidebar-nama" class="text-sm font-bold text-white truncate">Mahasiswa</p>
+                    <p id="sidebar-semester" class="text-xs text-blue-300 truncate">Semester -</p>
                 </div>
-                <div>
-                    <p id="sidebar-nama" class="text-sm font-bold text-white">Mahasiswa</p>
-                    <p id="sidebar-semester" class="text-xs text-blue-300">Semester -</p>
-                </div>
-            </div>
+            </a>
         </div>
     </aside>
 
@@ -77,30 +162,114 @@
         class="flex-1 flex flex-col h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-950/20 to-slate-900">
 
         <!-- Header Atas -->
-        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
-            <div>
-                <h1 class="text-xl md:text-2xl font-bold text-white">Halo, <span id="welcome-name">Mahasiswa</span>! 👋</h1>
-                <p class="text-xs md:text-sm text-blue-300">Pantau tugas dan file kuliahmu.</p>
+        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/70 backdrop-blur-md sticky top-0 z-20">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <a href="dashboard.html" class="md:hidden bg-yellow-400 text-blue-950 font-extrabold text-sm w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-yellow-400/20 flex-shrink-0">U</a>
+                <div class="min-w-0">
+                    <h1 class="text-base sm:text-lg md:text-2xl font-bold text-white truncate leading-tight">Halo, <span id="welcome-name">Mahasiswa</span>! 👋</h1>
+                    <p class="text-[11px] md:text-sm text-blue-300 truncate">Pantau tugas &amp; kuliahmu</p>
+                </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleAlarmModal()" class="bg-blue-900/50 p-2.5 rounded-xl border border-blue-700/50 hover:bg-blue-800 transition relative">
+            <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                <button onclick="toggleAlarmModal()" class="bg-blue-900/50 hover:bg-blue-800/60 p-2 sm:p-2.5 rounded-xl border border-blue-700/50 transition relative active:scale-95" title="Notifikasi Alarm">
                     🔔
-                    <span id="alarm-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">!</span>
+                    <span id="alarm-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow">!</span>
                 </button>
+                <a href="profil.html" class="md:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-yellow-200 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-xs shadow-md active:scale-95 flex-shrink-0" id="mobile-top-avatar">A</a>
             </div>
         </header>
 
         <!-- Area Dashboard -->
-        <main class="p-4 md:p-8 space-y-5 md:space-y-8 pb-24 md:pb-8">
+        <main class="p-4 md:p-8 space-y-5 md:space-y-8 pb-36 md:pb-8">
 
-            <!-- QUICK INFO CHIPS (mobile: horizontal scroll) -->
-            <div class="flex gap-3 overflow-x-auto pb-1 snap-x scrollbar-hide" style="scrollbar-width:none">
+            <!-- WIDGET SI ULMET (Karakter Maskot, Reward & Pengingat Tugas/Kebiasaan) -->
+            <div id="dash-mascot-widget" class="relative overflow-hidden rounded-3xl p-4 sm:p-5 bg-gradient-to-r from-slate-900/90 via-blue-950/80 to-slate-900/90 border border-blue-800/40 shadow-xl backdrop-blur-md transition-all duration-500">
+                <!-- Mood accent glow bar at top -->
+                <div id="dash-mascot-accent" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"></div>
+
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                    <!-- Mascot Avatar with Interactive Tap -->
+                    <div class="relative flex-shrink-0 cursor-pointer group" onclick="pokeDashboardMascot()" title="Ketuk Si Ulmet!">
+                        <div id="dash-mascot-img-wrap" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-yellow-400/80 glow-reward bg-slate-900 transition-all duration-500">
+                            <img id="dash-mascot-img" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                        </div>
+                        <span id="dash-mascot-tag" class="absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900">
+                            🏆 REWARD
+                        </span>
+                    </div>
+
+                    <!-- Speech Bubble & Info -->
+                    <div class="flex-1 min-w-0 text-center sm:text-left">
+                        <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2 mb-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs font-black text-yellow-400 tracking-wider">🦉 SI ULMET</span>
+                                <span id="dash-mascot-subtitle" class="text-[11px] text-slate-400 font-semibold">• Pengingat Pintar</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <a href="widget.html" class="inline-flex items-center gap-1 bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs px-3 py-1 rounded-xl shadow-md transition active:scale-95">
+                                    <span>📱</span> Mode Widget Android
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Mascot Dialogue -->
+                        <div id="dash-speech-bubble" class="bg-slate-950/60 border border-slate-700/60 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-slate-200 leading-relaxed shadow-inner">
+                            <p id="dash-mascot-speech" class="font-medium">
+                                Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya! 🎓✨
+                            </p>
+                        </div>
+
+                        <!-- Quick Indicators & Test Controls -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-800/60 text-[11px]">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+                                    📋 <span id="dash-widget-active-tasks">0</span> Tugas Kuliah
+                                </span>
+                                <span class="bg-emerald-950/40 text-emerald-300 border border-emerald-700/40 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+                                    📿 <span id="dash-widget-habits-done">0/0</span> Kebiasaan
+                                </span>
+                            </div>
+
+                            <!-- Fast Emotion Preview Buttons for Testing -->
+                            <div class="flex items-center gap-1">
+                                <span class="text-[10px] text-slate-400 font-semibold mr-1">Tes Mood:</span>
+                                <button onclick="setDashMascotMoodPreview('happy')" title="Simulasi Reward" class="px-1.5 py-0.5 rounded-lg bg-yellow-400/20 text-yellow-300 hover:bg-yellow-400 hover:text-slate-950 font-bold text-[10px] border border-yellow-400/30 transition">🏆</button>
+                                <button onclick="setDashMascotMoodPreview('angry')" title="Simulasi Marah" class="px-1.5 py-0.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] border border-red-500/30 transition">😡</button>
+                                <button onclick="setDashMascotMoodPreview('worried')" title="Simulasi Panik Deadline" class="px-1.5 py-0.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white font-bold text-[10px] border border-orange-500/30 transition">⏰</button>
+                                <button onclick="setDashMascotMoodPreview('auto')" title="Kembali ke Otomatis Real-time" class="px-1.5 py-0.5 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-600 hover:text-white font-bold text-[10px] border border-blue-500/30 transition">Auto</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK INFO CHIPS (mobile: responsive horizontal scroll snap) -->
+            <div class="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0" style="scrollbar-width:none">
                 <!-- Chip: Tugas Aktif -->
                 <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-blue-900/50 border border-blue-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[130px]">
                     <div class="text-2xl">📋</div>
                     <div>
                         <p class="text-[10px] text-blue-400 font-semibold uppercase tracking-wide">Tugas Aktif</p>
                         <p class="text-xl font-extrabold text-white leading-tight" id="chip-tugas">0</p>
+                    </div>
+                </div>
+                <!-- Chip: Kebiasaan Hari Ini -->
+                <div onclick="window.location.href='jadwal.html?tab=kebiasaan'" class="flex-shrink-0 snap-start bg-emerald-950/40 border border-emerald-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-emerald-400/50 transition min-w-[135px]" title="Kebiasaan Keseharian Hari Ini">
+                    <div class="text-2xl">📿</div>
+                    <div>
+                        <p class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wide">Kebiasaan</p>
+                        <p class="text-xl font-extrabold text-emerald-400 leading-tight" id="chip-habits">0/0</p>
+                    </div>
+                </div>
+                <!-- Chip: Cuaca Locari Kampus 3 -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-sky-950/40 border border-sky-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-sky-400/50 transition min-w-[155px]" title="Cuaca Real-Time Locari Kampus 3 UIN">
+                    <div class="text-2xl" id="dash-weather-icon">🌤️</div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-wide truncate">Locari Kampus 3</p>
+                        <p class="text-sm font-extrabold text-white leading-tight flex items-center gap-1.5 truncate">
+                            <span id="dash-weather-temp">--°C</span>
+                            <span id="dash-weather-cond" class="text-[11px] font-medium text-sky-300 truncate">Memuat...</span>
+                        </p>
                     </div>
                 </div>
                 <!-- Chip: Selesai -->
@@ -111,12 +280,20 @@
                         <p class="text-xl font-extrabold text-green-400 leading-tight" id="chip-selesai">0</p>
                     </div>
                 </div>
-                <!-- Chip: Saldo -->
-                <div onclick="window.location.href='keuangan.html'" class="flex-shrink-0 snap-start bg-yellow-900/20 border border-yellow-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[150px]">
+                <!-- Chip: Sisa Jatah Hari Ini -->
+                <div onclick="window.location.href='keuangan.html'" class="flex-shrink-0 snap-start bg-yellow-900/20 border border-yellow-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[170px]" title="Sisa Jatah Belanja Hari Ini">
                     <div class="text-2xl">💸</div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-yellow-400 font-semibold uppercase tracking-wide truncate">Sisa Jatah Hari Ini</p>
+                        <p class="text-sm font-extrabold text-white leading-tight truncate" id="dash-balance-amount">Rp 0</p>
+                    </div>
+                </div>
+                <!-- Chip: Streak -->
+                <div onclick="window.location.href='jadwal.html?tab=kebiasaan'" class="flex-shrink-0 snap-start bg-orange-900/30 border border-orange-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-orange-400/50 transition min-w-[130px]">
+                    <div class="text-2xl">🔥</div>
                     <div>
-                        <p class="text-[10px] text-yellow-400 font-semibold uppercase tracking-wide">Saldo</p>
-                        <p class="text-base font-extrabold text-yellow-400 leading-tight" id="dash-balance-amount">Rp 0</p>
+                        <p class="text-[10px] text-orange-400 font-semibold uppercase tracking-wide">Streak</p>
+                        <p class="text-xl font-extrabold text-orange-400 leading-tight" id="chip-streak">0</p>
                     </div>
                 </div>
                 <!-- Chip: File -->
@@ -125,14 +302,6 @@
                     <div>
                         <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wide">File Tersimpan</p>
                         <p class="text-xl font-extrabold text-white leading-tight"><span id="dash-files-count">0</span></p>
-                    </div>
-                </div>
-                <!-- Chip: Streak -->
-                <div class="flex-shrink-0 snap-start bg-orange-900/30 border border-orange-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 min-w-[130px]">
-                    <div class="text-2xl">🔥</div>
-                    <div>
-                        <p class="text-[10px] text-orange-400 font-semibold uppercase tracking-wide">Streak</p>
-                        <p class="text-xl font-extrabold text-orange-400 leading-tight" id="chip-streak">0</p>
                     </div>
                 </div>
                 <!-- Chip: Overdue -->
@@ -145,47 +314,150 @@
                 </div>
             </div>
 
-            <!-- Bagian Bawah: Tugas & Pengeluaran -->
+            <!-- Bagian Grid Utama: Tugas, Kebiasaan, Pengeluaran & Cuaca Locari Kampus 3 -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
 
-                <!-- KIRI: Jadwal & Tugas -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span>📝</span> Tugas Terdekat
-                        </h2>
-                        <a href="jadwal.html" class="text-xs font-semibold text-yellow-400 hover:underline">Lihat Jadwal</a>
-                    </div>
+                <!-- 1. KIRI ATAS: Jadwal & Tugas Terdekat -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <span>📝</span> Tugas Terdekat
+                            </h2>
+                            <a href="jadwal.html" class="text-xs font-semibold text-yellow-400 hover:underline">Lihat Jadwal</a>
+                        </div>
 
-                    <div class="space-y-4" id="dash-tasks-list">
-                        <!-- Tasks will be loaded here dynamically -->
-                        <p class="text-center text-blue-400 py-4 text-sm">Memuat tugas...</p>
+                        <div class="space-y-4" id="dash-tasks-list">
+                            <!-- Tasks dynamically loaded here -->
+                            <p class="text-center text-blue-400 py-4 text-sm">Memuat tugas...</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- KANAN: Pengeluaran Terbesar -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span>💸</span> Pengeluaran Terbesar
-                        </h2>
-                        <a href="keuangan.html" class="text-xs font-semibold text-yellow-400 hover:underline">Keuangan</a>
+                <!-- 2. KANAN ATAS: Kebiasaan Keseharian (Daily Habits Tracker) -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">📿</span>
+                                <div>
+                                    <h2 class="text-lg font-bold text-white leading-tight">Kebiasaan Keseharian</h2>
+                                    <p class="text-[11px] text-blue-300" id="dash-habit-date">Hari ini</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="dash-habit-badge" class="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30">0/0 Selesai</span>
+                                <a href="jadwal.html?tab=kebiasaan" class="text-xs font-semibold text-yellow-400 hover:underline" title="Kelola semua kebiasaan di Jadwal">Kelola</a>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar Kebiasaan -->
+                        <div class="mb-4 bg-slate-900/60 p-3.5 rounded-2xl border border-blue-900/60">
+                            <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
+                                <span class="text-blue-300" id="dash-habit-progress-text">0 dari 0 kebiasaan selesai hari ini</span>
+                                <span class="text-yellow-400 font-extrabold" id="dash-habit-progress-pct">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
+                                <div id="dash-habit-progress-bar" class="h-full bg-gradient-to-r from-yellow-400 via-emerald-400 to-green-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- List Kebiasaan Interaktif -->
+                        <div class="space-y-3" id="dash-habits-list">
+                            <!-- Habits dynamically loaded here -->
+                            <p class="text-center text-blue-400 py-4 text-sm">Memuat kebiasaan...</p>
+                        </div>
                     </div>
 
-                    <div class="space-y-4 flex-1" id="dash-expenses-list">
-                        <!-- Expenses will be loaded here dynamically -->
-                        <p class="text-center text-blue-400 py-4 text-sm">Memuat pengeluaran...</p>
+                    <div class="mt-4 pt-3 border-t border-blue-800/30 flex justify-between items-center text-xs">
+                        <span class="text-blue-400 text-[11px]">Tersambung langsung dengan agenda &amp; jadwal</span>
+                        <a href="jadwal.html?tab=kebiasaan" class="text-yellow-400 hover:underline font-bold text-xs flex items-center gap-1">
+                            Buka Semua Kebiasaan &rarr;
+                        </a>
                     </div>
+                </div>
 
-                    <div class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-xl flex items-start gap-3">
-                        <span class="text-xl">💡</span>
-                        <div>
-                            <p class="text-sm text-red-200 font-semibold mb-1">Terlalu boros bulan ini?</p>
-                            <p class="text-xs text-red-300/80 mb-2">Cek kembali pengeluaran terbesar Anda dan potong langganan yang tidak perlu.</p>
-                            <button onclick="window.location.href='keuangan.html'" class="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg transition font-bold">
-                                Evaluasi Pengeluaran
+                <!-- 3. KIRI BAWAH: Pengeluaran Terbesar -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                                <span>💸</span> Pengeluaran Terbesar per Kategori
+                            </h2>
+                            <a href="keuangan.html" class="text-xs font-semibold text-yellow-400 hover:underline">Keuangan</a>
+                        </div>
+
+                        <div class="space-y-3.5 flex-1" id="dash-expenses-list">
+                            <!-- Expenses will be loaded here dynamically -->
+                            <p class="text-center text-blue-400 py-4 text-sm">Memuat pengeluaran...</p>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-2xl flex items-start gap-3">
+                            <span class="text-xl">💡</span>
+                            <div>
+                                <p class="text-sm text-red-200 font-bold mb-1">Evaluasi Pengeluaran Terbesar</p>
+                                <p class="text-xs text-red-300/80 mb-2 leading-relaxed" id="dash-expense-warning-desc">Cek kembali kategori dengan akumulasi pengeluaran paling tinggi agar jatah harianmu tetap aman.</p>
+                                <button onclick="window.location.href='keuangan.html'" class="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg transition font-bold">
+                                    Evaluasi di Keuangan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. KANAN BAWAH: Cuaca & Suasana Kampus 3 Locari UIN Malang -->
+                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">📍</span>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-lg font-bold text-white leading-tight">Cuaca Kampus 3 UIN</h2>
+                                        <span class="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.2 rounded">BMKG LIVE</span>
+                                    </div>
+                                    <p class="text-[11px] text-blue-300">Desa Tlekung, Kec. Junrejo, Kota Batu (Locari)</p>
+                                </div>
+                            </div>
+                            <button onclick="fetchDashboardWeather(true)" id="dash-weather-refresh-btn" class="p-2 rounded-xl bg-slate-900/70 border border-blue-800/50 text-blue-300 hover:text-yellow-400 transition active:scale-95 text-xs flex items-center gap-1.5" title="Perbarui Cuaca Locari">
+                                <span id="dash-weather-spin">🔄</span>
+                                <span class="hidden sm:inline text-[11px] font-semibold">Segarkan</span>
                             </button>
                         </div>
+
+                        <div class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 mb-4 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-4xl" id="dash-w-icon">🌤️</span>
+                                    <div>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-3xl font-extrabold text-white tracking-tight" id="dash-w-temp">--°C</span>
+                                            <span class="text-sm font-semibold text-sky-300 truncate" id="dash-w-cond">Memuat...</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-400 mt-0.5"><span id="dash-w-range" class="text-sky-300 font-semibold">17–28 °C</span> • Elevasi ~803 mdpl</p>
+                                    </div>
+                                </div>
+                                <div class="text-right text-xs space-y-1">
+                                    <div class="text-blue-300 font-medium">💧 Kelembaban: <span id="dash-w-humidity" class="text-white font-bold">--%</span></div>
+                                    <div class="text-blue-300 font-medium">💨 Angin: <span id="dash-w-wind" class="text-white font-bold">-- km/h</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 bg-sky-950/30 border border-sky-800/40 rounded-xl flex items-start gap-3">
+                            <span class="text-xl flex-shrink-0">💡</span>
+                            <div>
+                                <p class="text-xs text-sky-200 font-semibold mb-0.5">Suasana Belajar Mahasiswa di Locari</p>
+                                <p class="text-xs text-slate-300 leading-relaxed" id="dash-w-tip">Memuat tips belajar...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-blue-800/30 flex justify-between items-center text-xs">
+                        <span class="text-blue-400 text-[11px]">Data Resmi BMKG • Auto-update setiap 15 menit</span>
+                        <a href="jadwal.html" class="text-yellow-400 hover:underline font-bold text-xs flex items-center gap-1">
+                            Buka Agenda &amp; Kalender &rarr;
+                        </a>
                     </div>
                 </div>
 
@@ -213,311 +485,1042 @@
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Helper Format Rupiah
-            const formatRupiah = (angka) => {
-                if (angka === undefined || angka === null || isNaN(angka)) return 'Rp 0';
-                const abs = Math.abs(Math.round(Number(angka)));
-                const sign = Number(angka) < 0 ? '- ' : '';
-                return sign + 'Rp ' + abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            };
+        // Helper Format Rupiah
+        const formatRupiah = (angka) => {
+            if (angka === undefined || angka === null || isNaN(angka)) return 'Rp 0';
+            const abs = Math.abs(Math.round(Number(angka)));
+            const sign = Number(angka) < 0 ? '- ' : '';
+            return sign + 'Rp ' + abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        };
 
-            // Helper Format Deadline Date
-            const formatDeadlineDisplay = (dateStr) => {
-                if (!dateStr) return 'TBA';
-                try {
-                    const d = new Date(dateStr);
-                    if (isNaN(d.getTime())) return dateStr;
-                    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                } catch (e) {
-                    return dateStr;
-                }
-            };
-
-            // Helper Calculate Urgency
-            const getUrgencyInfo = (dateStr) => {
-                if (!dateStr) return { text: 'TBA', class: 'bg-slate-800 text-slate-300 border-slate-700' };
-                try {
-                    const now = new Date();
-                    const deadline = new Date(dateStr);
-                    const diff = deadline - now;
-                    if (diff <= 0) {
-                        return { text: 'Mendesak / Lewat', class: 'bg-red-500/20 text-red-400 border-red-500/30' };
-                    }
-                    const days = Math.floor(diff / 86400000);
-                    const hours = Math.floor((diff % 86400000) / 3600000);
-                    if (days === 0) {
-                        return { text: hours > 0 ? `${hours} jam lagi` : 'Mendesak', class: 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse' };
-                    } else if (days <= 3) {
-                        return { text: `${days} hari lagi`, class: 'bg-amber-500/20 text-yellow-400 border-amber-500/30' };
-                    } else {
-                        return { text: `${days} hari lagi`, class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
-                    }
-                } catch (e) {
-                    return { text: 'Menunggu', class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
-                }
-            };
-
-            // 1. LOAD TASKS
+        // Helper Format Deadline Date
+        const formatDeadlineDisplay = (dateStr) => {
+            if (!dateStr) return 'TBA';
             try {
-                let tasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            } catch (e) {
+                return dateStr;
+            }
+        };
 
-                const activeTasks = tasks.filter(t => t.status !== 'selesai' && t.status !== 'completed');
-                const completedTasks = tasks.filter(t => t.status === 'selesai' || t.status === 'completed');
-                const now2 = new Date();
-                const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now2);
-
-                document.getElementById('chip-tugas').innerText = activeTasks.length;
-                document.getElementById('chip-selesai').innerText = completedTasks.length;
-                document.getElementById('chip-overdue').innerText = overdueTasks.length;
-
-                // Streak from jadwal page storage
-                const streak = parseInt(localStorage.getItem('ulmet_streak') || '0');
-                document.getElementById('chip-streak').innerText = streak;
-
-                const tasksListContainer = document.getElementById('dash-tasks-list');
-                if (activeTasks.length === 0) {
-                    tasksListContainer.innerHTML = `
-                        <div class="text-center py-8">
-                            <p class="text-3xl mb-2">🎉</p>
-                            <p class="text-blue-300 font-semibold text-sm">Semua tugas selesai!</p>
-                            <p class="text-xs text-blue-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
-                            <a href="jadwal.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
-                        </div>
-                    `;
+        // Helper Calculate Urgency
+        const getUrgencyInfo = (dateStr) => {
+            if (!dateStr) return { text: 'TBA', class: 'bg-slate-800 text-slate-300 border-slate-700' };
+            try {
+                const now = new Date();
+                const deadline = new Date(dateStr);
+                const diff = deadline - now;
+                if (diff <= 0) {
+                    return { text: 'Mendesak / Lewat', class: 'bg-red-500/20 text-red-400 border-red-500/30' };
+                }
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                if (days === 0) {
+                    return { text: hours > 0 ? `${hours} jam lagi` : 'Mendesak', class: 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse' };
+                } else if (days <= 3) {
+                    return { text: `${days} hari lagi`, class: 'bg-amber-500/20 text-yellow-400 border-amber-500/30' };
                 } else {
-                    // Urutkan deadline terdekat
-                    activeTasks.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
-                    const topTasks = activeTasks.slice(0, 4);
+                    return { text: `${days} hari lagi`, class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+                }
+            } catch (e) {
+                return { text: 'Menunggu', class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+            }
+        };
 
-                    tasksListContainer.innerHTML = topTasks.map(t => {
-                        const title = t.nama || t.title || 'Tugas Kuliah';
-                        const course = t.matkul || t.course || 'Umum';
-                        const deadlineRaw = t.deadline || t.date || '';
-                        const urgency = getUrgencyInfo(deadlineRaw);
-                        const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
+        function renderDashboardTasks(tasks) {
+            const activeTasks = (tasks || []).filter(t => t.status !== 'selesai' && t.status !== 'completed');
+            const completedTasks = (tasks || []).filter(t => t.status === 'selesai' || t.status === 'completed');
+            const now2 = new Date();
+            const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now2);
 
-                        return `
-                        <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
-                            <div class="space-y-1">
-                                <h4 class="font-bold text-white text-sm group-hover:text-yellow-400 transition flex items-center gap-2">
-                                    <span>📌</span> ${title}
-                                </h4>
-                                <div class="flex items-center gap-2 text-xs text-blue-300">
-                                    <span class="bg-blue-900/50 px-2 py-0.5 rounded text-[11px] text-blue-200 border border-blue-700/40">${course}</span>
-                                </div>
-                            </div>
-                            <div class="text-right flex flex-col items-end space-y-1.5">
-                                <span class="${urgency.class} px-2.5 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
-                                <span class="text-xs text-blue-300/90 font-medium">📅 ${deadlineFormatted}</span>
+            document.getElementById('chip-tugas').innerText = activeTasks.length;
+            document.getElementById('chip-selesai').innerText = completedTasks.length;
+            document.getElementById('chip-overdue').innerText = overdueTasks.length;
+
+            const streak = parseInt(localStorage.getItem(userKey('ulmet_streak')) || '0');
+            document.getElementById('chip-streak').innerText = streak;
+
+            updateDashboardMascotWidget(tasks);
+
+            const tasksListContainer = document.getElementById('dash-tasks-list');
+            if (activeTasks.length === 0) {
+                tasksListContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-3xl mb-2">🎉</p>
+                        <p class="text-blue-300 font-semibold text-sm">Semua tugas selesai!</p>
+                        <p class="text-xs text-blue-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
+                        <a href="jadwal.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
+                    </div>
+                `;
+            } else {
+                activeTasks.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
+                const topTasks = activeTasks.slice(0, 4);
+
+                tasksListContainer.innerHTML = topTasks.map(t => {
+                    const title = t.nama || t.title || 'Tugas Kuliah';
+                    const course = t.matkul || t.course || 'Umum';
+                    const deadlineRaw = t.deadline || t.date || '';
+                    const urgency = getUrgencyInfo(deadlineRaw);
+                    const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
+
+                    return `
+                    <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-white text-sm group-hover:text-yellow-400 transition flex items-center gap-2">
+                                <span>📌</span> ${title}
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs text-blue-300">
+                                <span class="bg-blue-900/50 px-2 py-0.5 rounded text-[11px] text-blue-200 border border-blue-700/40">${course}</span>
                             </div>
                         </div>
-                        `;
-                    }).join('');
+                        <div class="text-right flex flex-col items-end space-y-1.5">
+                            <span class="${urgency.class} px-2.5 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
+                            <span class="text-xs text-blue-300/90 font-medium">📅 ${deadlineFormatted}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function getCategoryMeta(catName) {
+            const n = (catName || '').toLowerCase();
+            if (n.includes('rokok')) return { icon: '🚬', color: 'bg-red-500/20 text-red-400 border-red-500/30', barGradient: 'from-red-500 to-rose-600' };
+            if (n.includes('makan') || n.includes('sarapan') || n.includes('siang') || n.includes('malam') || n.includes('nasi') || n.includes('mie') || n.includes('ayam')) return { icon: '🍜', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30', barGradient: 'from-orange-500 to-amber-400' };
+            if (n.includes('kopi') || n.includes('nongkrong') || n.includes('ngopi') || n.includes('cafe') || n.includes('kafe')) return { icon: '☕', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', barGradient: 'from-amber-400 to-yellow-500' };
+            if (n.includes('bensin') || n.includes('transport') || n.includes('ojol') || n.includes('motor') || n.includes('parkir')) return { icon: '🛵', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', barGradient: 'from-blue-500 to-cyan-400' };
+            if (n.includes('kos') || n.includes('galon') || n.includes('listrik') || n.includes('wifi') || n.includes('sabun') || n.includes('laundry')) return { icon: '🧻', color: 'bg-teal-500/20 text-teal-400 border-teal-500/30', barGradient: 'from-teal-400 to-emerald-500' };
+            if (n.includes('kuliah') || n.includes('print') || n.includes('tugas') || n.includes('fotokopi') || n.includes('buku')) return { icon: '📚', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', barGradient: 'from-purple-500 to-indigo-400' };
+            if (n.includes('snack') || n.includes('jajan') || n.includes('cemilan')) return { icon: '🍰', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30', barGradient: 'from-pink-500 to-rose-400' };
+            if (n.includes('skincare') || n.includes('makeup') || n.includes('baju')) return { icon: '✨', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30', barGradient: 'from-pink-400 to-fuchsia-500' };
+            if (n.includes('game') || n.includes('top up') || n.includes('diamond')) return { icon: '🎮', color: 'bg-violet-500/20 text-violet-400 border-violet-500/30', barGradient: 'from-violet-500 to-purple-600' };
+            return { icon: '🛍️', color: 'bg-sky-500/20 text-sky-400 border-sky-500/30', barGradient: 'from-sky-500 to-blue-600' };
+        }
+
+        function renderDashboardExpenses(expenses, budget) {
+            const exps = expenses || [];
+            const b = Number(budget) || 0;
+            const today = new Date().toISOString().slice(0, 10);
+            
+            // Pisahkan belanja sebelum hari ini vs hari ini
+            let pastExpenses = 0;
+            let todayExpenses = 0;
+            let totalSpent = 0;
+            exps.forEach(exp => {
+                const amt = Number(exp.amount) || 0;
+                totalSpent += amt;
+                const d = exp.date ? exp.date.slice(0, 10) : today;
+                if (d < today) pastExpenses += amt;
+                else if (d === today) todayExpenses += amt;
+            });
+
+            // Ambil config budget jika ada
+            let totalDays = 30;
+            let startDate = today;
+            try {
+                const rawCfg = localStorage.getItem(userKey('ulmet_keuangan_config'));
+                if (rawCfg) {
+                    const cfg = JSON.parse(rawCfg);
+                    if (cfg.days) totalDays = Number(cfg.days);
+                    if (cfg.start_date) startDate = cfg.start_date;
                 }
-            } catch (err) {
-                console.error("Gagal memuat tugas:", err);
-                document.getElementById('dash-tasks-list').innerHTML = '<p class="text-center text-red-400 text-xs py-4">Gagal memuat tugas.</p>';
+            } catch(e) {}
+
+            const d1 = new Date(startDate);
+            const d2 = new Date(today);
+            const daysPassed = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+            const daysRemaining = Math.max(1, totalDays - daysPassed);
+            const moneyAtStartOfToday = Math.max(0, b - pastExpenses);
+            const quotaToday = Math.round(moneyAtStartOfToday / daysRemaining);
+            const remainingToday = quotaToday - todayExpenses;
+
+            const balEl = document.getElementById('dash-balance-amount');
+            if (balEl) {
+                if (b > 0) {
+                    balEl.innerHTML = `<span class="${remainingToday < 0 ? 'text-rose-400 font-extrabold' : 'text-emerald-400 font-extrabold'}">${formatRupiah(remainingToday)}</span> <span class="text-[10px] text-slate-400 font-normal">/ ${formatRupiah(quotaToday)}</span>`;
+                } else {
+                    balEl.innerText = formatRupiah(0);
+                }
             }
 
-            // 2. LOAD FILES (MATERI)
-            try {
-                let files = JSON.parse(localStorage.getItem('ulmet_files') || '[]');
-                document.getElementById('dash-files-count').innerText = files.length;
-            } catch (err) {
-                console.error("Gagal memuat file materi:", err);
-            }
+            const expensesListContainer = document.getElementById('dash-expenses-list');
+            if (exps.length === 0) {
+                expensesListContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-3xl mb-2">💸</p>
+                        <p class="text-blue-300 font-semibold text-sm">Belum ada catatan pengeluaran.</p>
+                        <p class="text-xs text-blue-400/80 mt-1">Catat pengeluaran harianmu agar keuangan terkontrol.</p>
+                        <a href="keuangan.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Catat Pengeluaran</a>
+                    </div>
+                `;
+                const warnDesc = document.getElementById('dash-expense-warning-desc');
+                if (warnDesc) warnDesc.textContent = "Belum ada catatan pengeluaran untuk dievaluasi.";
+            } else {
+                // KELOMPOKKAN SEMUA PENGELUARAN BERDASARKAN KATEGORI (SATU POIN PER KATEGORI/BARANG)
+                const categoryMap = {};
+                let grandTotal = 0;
 
-            // 3. LOAD KEUANGAN & TOP EXPENSES
-            try {
-                let budget = parseInt(localStorage.getItem('ulmet_keuangan_budget') || '0');
-                let expenses = JSON.parse(localStorage.getItem('ulmet_keuangan_expenses') || '[]');
+                exps.forEach(exp => {
+                    let cat = (exp.category || exp.note || 'Lainnya').trim();
+                    if (cat.length > 0) {
+                        cat = cat.charAt(0).toUpperCase() + cat.slice(1);
+                    }
+                    const amt = Number(exp.amount) || 0;
+                    if (amt <= 0) return;
+                    grandTotal += amt;
 
-                // Hitung Sisa Saldo
-                const totalSpent = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-                const remaining = budget > 0 ? (budget - totalSpent) : 0;
-                document.getElementById('dash-balance-amount').innerText = formatRupiah(remaining);
+                    if (!categoryMap[cat]) {
+                        categoryMap[cat] = {
+                            category: cat,
+                            totalAmount: 0,
+                            count: 0
+                        };
+                    }
+                    categoryMap[cat].totalAmount += amt;
+                    categoryMap[cat].count += 1;
+                });
 
-                // Render Diagram Batang Pengeluaran Terbesar
-                const expensesListContainer = document.getElementById('dash-expenses-list');
-                if (expenses.length === 0) {
+                const grouped = Object.values(categoryMap).sort((a, b) => b.totalAmount - a.totalAmount);
+
+                if (grouped.length === 0) {
                     expensesListContainer.innerHTML = `
-                        <div class="text-center py-8">
-                            <p class="text-3xl mb-2">💸</p>
-                            <p class="text-blue-300 font-semibold text-sm">Belum ada catatan pengeluaran.</p>
-                            <p class="text-xs text-blue-400/80 mt-1">Catat pengeluaran harianmu agar keuangan terkontrol.</p>
-                            <a href="keuangan.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Catat Pengeluaran</a>
-                        </div>
+                        <div class="text-center py-6 text-xs text-blue-400">Belum ada nominal pengeluaran.</div>
                     `;
-                } else {
-                    // Urutkan pengeluaran terbesar
-                    const sortedExpenses = [...expenses].sort((a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0));
-                    const topExpenses = sortedExpenses.slice(0, 4);
-                    const maxAmount = Number(topExpenses[0].amount) || 1;
+                    return;
+                }
 
-                    expensesListContainer.innerHTML = topExpenses.map(exp => {
-                        const amount = Number(exp.amount) || 0;
-                        const note = exp.note || exp.category || 'Pengeluaran Lainnya';
-                        const category = exp.category || 'Umum';
-                        // Persentase lebar diagram batang (minimal 18% agar tetap estetik dan teks terlihat jelas)
-                        const widthPercent = Math.max(18, Math.round((amount / maxAmount) * 100));
+                const topCategories = grouped.slice(0, 4);
+                const maxAmount = topCategories[0].totalAmount || 1;
 
-                        return `
-                        <div onclick="window.location.href='keuangan.html'" class="space-y-1.5 group cursor-pointer p-2.5 rounded-xl hover:bg-slate-900/40 transition">
-                            <div class="flex justify-between items-center text-xs">
-                                <div class="flex items-center gap-2 overflow-hidden pr-2">
-                                    <span class="text-white font-semibold truncate group-hover:text-yellow-400 transition">${note}</span>
-                                    <span class="text-[10px] text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-700/30">${category}</span>
+                expensesListContainer.innerHTML = topCategories.map(item => {
+                    const meta = getCategoryMeta(item.category);
+                    const widthPercent = Math.max(18, Math.round((item.totalAmount / maxAmount) * 100));
+                    const pctOfGrand = grandTotal > 0 ? Math.round((item.totalAmount / grandTotal) * 100) : 0;
+
+                    return `
+                    <div onclick="window.location.href='keuangan.html'" class="space-y-1.5 group cursor-pointer p-2.5 rounded-2xl hover:bg-slate-900/60 transition border border-transparent hover:border-blue-700/40">
+                        <div class="flex justify-between items-center text-xs">
+                            <div class="flex items-center gap-2 overflow-hidden pr-2">
+                                <span class="w-7 h-7 rounded-xl flex items-center justify-center text-sm border ${meta.color} flex-shrink-0">${meta.icon}</span>
+                                <div class="min-w-0">
+                                    <span class="text-white font-bold truncate group-hover:text-yellow-400 transition">${escapeHtml(item.category)}</span>
+                                    <span class="text-[10px] text-slate-400 font-semibold ml-1">(${item.count}x beli)</span>
                                 </div>
-                                <span class="text-yellow-400 font-extrabold whitespace-nowrap">${formatRupiah(amount)}</span>
                             </div>
-                            <div class="w-full bg-slate-900 rounded-full h-3.5 border border-slate-700/50 p-0.5 overflow-hidden flex items-center">
-                                <div class="bg-gradient-to-r from-red-500 via-orange-400 to-amber-300 h-full rounded-full transition-all duration-700 ease-out relative group-hover:brightness-125" style="width: ${widthPercent}%"></div>
+                            <div class="text-right flex-shrink-0 flex items-center gap-1.5">
+                                <span class="text-yellow-400 font-black">${formatRupiah(item.totalAmount)}</span>
+                                <span class="text-[10px] text-slate-400 font-bold bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-700/40">${pctOfGrand}%</span>
                             </div>
                         </div>
-                        `;
-                    }).join('');
+                        <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-700/50 p-0.5 overflow-hidden flex items-center">
+                            <div class="bg-gradient-to-r ${meta.barGradient} h-full rounded-full transition-all duration-700 ease-out relative group-hover:brightness-125" style="width: ${widthPercent}%"></div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                // Evaluasi pengeluaran akumulasi terbesar
+                const topOne = topCategories[0];
+                const warnDesc = document.getElementById('dash-expense-warning-desc');
+                if (warnDesc && topOne) {
+                    const topMeta = getCategoryMeta(topOne.category);
+                    let advice = "Evaluasi pos ini agar tidak menguras sisa jatah harianmu.";
+                    const lowerName = topOne.category.toLowerCase();
+                    if (lowerName.includes('rokok')) advice = "Rokok adalah pengeluaran paling boros! Kurangi beli rokok agar jatah harianmu esok hari tetap bertambah.";
+                    else if (lowerName.includes('makan')) advice = "Makan mendominasi total belanjamu. Coba variasikan dengan masak di kos agar sisa jatah harian semakin banyak.";
+                    else if (lowerName.includes('kopi') || lowerName.includes('nongkrong')) advice = "Nongkrong & ngopi cukup sering. Batasi jajan kafe agar dompet tetap aman.";
+                    
+                    warnDesc.innerHTML = `Akumulasi terbesar: <b class="text-white">${topMeta.icon} ${escapeHtml(topOne.category)}</b> total <b class="text-yellow-400">${formatRupiah(topOne.totalAmount)}</b> (${topOne.count}x beli). ${advice}`;
                 }
-            } catch (err) {
-                console.error("Gagal memuat data keuangan:", err);
-                document.getElementById('dash-expenses-list').innerHTML = '<p class="text-center text-red-400 text-xs py-4">Gagal memuat data keuangan.</p>';
+            }
+        }
+
+        // ===== HELPER XSS ESCAPE & DATE =====
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function todayStr() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        // ===== KEBIASAAN KESEHARIAN (HABITS) INTEGRATION =====
+        function getHabitsList() {
+            let habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || 'null');
+            if (!habits || !Array.isArray(habits)) {
+                habits = [
+                    { id: 1, nama: 'Setoran Hafalan', icon: '📖', target: 'Setiap hari', reminderJam: '07:00', streak: 0, lastChecked: null },
+                    { id: 2, nama: 'Sholat 5 Waktu', icon: '🕌', target: 'Setiap hari', reminderJam: '05:00', streak: 0, lastChecked: null },
+                    { id: 3, nama: 'Olahraga Pagi', icon: '🏃', target: 'Setiap hari', reminderJam: '06:30', streak: 0, lastChecked: null },
+                ];
+                localStorage.setItem(userKey('ulmet_habits'), JSON.stringify(habits));
+            }
+            return habits;
+        }
+
+        function renderDashboardHabits() {
+            const habits = getHabitsList();
+            const today = todayStr();
+            const total = habits.length;
+            const doneCount = habits.filter(h => h.lastChecked === today).length;
+            const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+            // Date label
+            const dateEl = document.getElementById('dash-habit-date');
+            if (dateEl) {
+                dateEl.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+            }
+
+            // Badge & Progress
+            const badgeEl = document.getElementById('dash-habit-badge');
+            if (badgeEl) badgeEl.textContent = `${doneCount}/${total} Selesai`;
+
+            const progTextEl = document.getElementById('dash-habit-progress-text');
+            if (progTextEl) progTextEl.textContent = `${doneCount} dari ${total} kebiasaan selesai hari ini`;
+
+            const progPctEl = document.getElementById('dash-habit-progress-pct');
+            if (progPctEl) progPctEl.textContent = `${pct}%`;
+
+            const progBarEl = document.getElementById('dash-habit-progress-bar');
+            if (progBarEl) progBarEl.style.width = `${pct}%`;
+
+            // Chip habits in quick info
+            const chipHabitsEl = document.getElementById('chip-habits');
+            if (chipHabitsEl) chipHabitsEl.textContent = `${doneCount}/${total}`;
+
+            // Sinkronkan streak tertinggi ke chip-streak
+            const maxStreak = habits.reduce((max, h) => Math.max(max, Number(h.streak) || 0), 0);
+            localStorage.setItem(userKey('ulmet_streak'), maxStreak);
+            const streakChip = document.getElementById('chip-streak');
+            if (streakChip) streakChip.textContent = maxStreak;
+
+            updateDashboardMascotWidget();
+
+            // List render
+            const listEl = document.getElementById('dash-habits-list');
+            if (!listEl) return;
+
+            if (total === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-6 text-slate-400">
+                        <p class="text-2xl mb-1">📿</p>
+                        <p class="text-xs">Belum ada daftar kebiasaan.</p>
+                        <a href="jadwal.html?tab=kebiasaan" class="inline-block mt-2 text-xs text-yellow-400 hover:underline font-bold">Tambah Kebiasaan</a>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = habits.map(h => {
+                const done = h.lastChecked === today;
+                return `
+                    <div class="p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${done ? 'bg-emerald-950/25 border-emerald-500/40' : 'bg-slate-900/60 border-blue-900/50 hover:border-yellow-400/40'}">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <button onclick="toggleDashHabit(${h.id})" title="${done ? 'Batal centang' : 'Tandai selesai'}"
+                                class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition-all active:scale-90
+                                ${done ? 'bg-emerald-500 border-emerald-400 text-white shadow-md shadow-emerald-500/30' : 'border-dashed border-blue-600/50 hover:border-emerald-400 hover:bg-emerald-900/20 text-blue-400'}">
+                                ${done ? '<span class="text-lg font-bold">✓</span>' : `<span class="text-base">${h.icon || '📌'}</span>`}
+                            </button>
+                            <div class="min-w-0">
+                                <p class="font-bold text-xs sm:text-sm ${done ? 'line-through text-emerald-300/70' : 'text-white'} truncate">${escapeHtml(h.nama)}</p>
+                                <div class="flex items-center gap-2 text-[10px] sm:text-[11px] text-blue-300/80 mt-0.5">
+                                    <span class="text-orange-400 font-bold">🔥 ${h.streak || 0} hari</span>
+                                    <span>•</span>
+                                    <span class="text-blue-400">⏰ ${h.reminderJam || '07:00'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <button onclick="toggleDashHabit(${h.id})"
+                                class="text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold transition active:scale-95 whitespace-nowrap
+                                ${done ? 'bg-slate-800/70 text-slate-400 hover:text-white border border-slate-700/50' : 'bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/40'}">
+                                ${done ? 'Batal' : '✓ Selesai'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleDashHabit(id) {
+            let habits = getHabitsList();
+            const h = habits.find(x => x.id === id);
+            if (!h) return;
+            const today = todayStr();
+
+            if (h.lastChecked === today) {
+                h.lastChecked = null;
+                h.streak = Math.max(0, (Number(h.streak) || 0) - 1);
+            } else {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yStr = yesterday.toISOString().slice(0, 10);
+                h.streak = (h.lastChecked === yStr) ? ((Number(h.streak) || 0) + 1) : 1;
+                h.lastChecked = today;
+                playDashHabitSound();
+                showDashToast(`🎉 ${h.nama} selesai! Streak ${h.streak} hari 🔥`);
+            }
+
+            localStorage.setItem(userKey('ulmet_habits'), JSON.stringify(habits));
+            renderDashboardHabits();
+        }
+
+        function playDashHabitSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        function showDashToast(msg) {
+            let toast = document.getElementById('dash-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'dash-toast';
+                toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 border border-yellow-400/60 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl shadow-black/60 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-2';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+            }, 2800);
+        }
+
+        // ===== MASCOT WIDGET & ACTIVITY TRACKER LOGIC =====
+        let dashCurrentMascotMood = 'happy';
+
+        function trackDashboardActivity() {
+            const today = new Date().toISOString().slice(0, 10);
+            const lastActive = localStorage.getItem(userKey('ulmet_last_active_date'));
+            let streakDays = parseInt(localStorage.getItem(userKey('ulmet_active_streak_days')) || '1');
+
+            if (!lastActive) {
+                localStorage.setItem(userKey('ulmet_last_active_date'), today);
+                localStorage.setItem(userKey('ulmet_active_streak_days'), '1');
+            } else if (lastActive !== today) {
+                const lastDate = new Date(lastActive);
+                const currDate = new Date(today);
+                const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    streakDays += 1;
+                } else if (diffDays > 1) {
+                    streakDays = 1;
+                }
+                localStorage.setItem(userKey('ulmet_active_streak_days'), streakDays.toString());
+                localStorage.setItem(userKey('ulmet_last_active_date'), today);
+            }
+            localStorage.setItem(userKey('ulmet_last_active_time'), Date.now().toString());
+        }
+
+        function updateDashboardMascotWidget(tasksInput) {
+            const tasks = tasksInput || JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
+            const habits = getHabitsList();
+            const today = todayStr();
+            const now = new Date();
+
+            const activeTasks = tasks.filter(t => t.status !== 'selesai' && t.status !== 'completed');
+            const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now);
+            const urgentTasks = activeTasks.filter(t => {
+                if (!t.deadline) return false;
+                const diffH = (new Date(t.deadline) - now) / 3600000;
+                return diffH > 0 && diffH <= 24;
+            });
+
+            const doneHabitsCount = habits.filter(h => h.lastChecked === today).length;
+            const totalHabits = habits.length;
+
+            // Update stats in widget
+            const actTasksEl = document.getElementById('dash-widget-active-tasks');
+            if (actTasksEl) actTasksEl.textContent = activeTasks.length;
+            const habDoneEl = document.getElementById('dash-widget-habits-done');
+            if (habDoneEl) habDoneEl.textContent = `${doneHabitsCount}/${totalHabits}`;
+
+            // Check manual test mood
+            const testOverride = localStorage.getItem('ulmet_widget_preview_mood') || 'auto';
+            let mood = 'happy';
+
+            if (testOverride && testOverride !== 'auto') {
+                mood = testOverride;
+            } else {
+                const lastActive = localStorage.getItem(userKey('ulmet_last_active_date'));
+                let daysInactive = 0;
+                if (lastActive) {
+                    const d1 = new Date(lastActive);
+                    const d2 = new Date(today);
+                    daysInactive = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+                }
+
+                if (overdueTasks.length > 0 || daysInactive >= 2) {
+                    mood = 'angry';
+                } else if (urgentTasks.length > 0) {
+                    mood = 'worried';
+                } else {
+                    mood = 'happy';
+                }
+            }
+
+            dashCurrentMascotMood = mood;
+            const imgEl = document.getElementById('dash-mascot-img');
+            const wrapEl = document.getElementById('dash-mascot-img-wrap');
+            const tagEl = document.getElementById('dash-mascot-tag');
+            const speechEl = document.getElementById('dash-mascot-speech');
+            const bubbleEl = document.getElementById('dash-speech-bubble');
+            const subtitleEl = document.getElementById('dash-mascot-subtitle');
+            const accentEl = document.getElementById('dash-mascot-accent');
+
+            if (!imgEl || !wrapEl) return;
+
+            wrapEl.className = 'w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 bg-slate-900 transition-all duration-500';
+
+            if (mood === 'happy') {
+                imgEl.src = 'mascot-happy.jpg';
+                wrapEl.classList.add('glow-reward');
+                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500';
+                if (tagEl) {
+                    tagEl.textContent = '🏆 REWARD';
+                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900';
+                }
+                if (subtitleEl) subtitleEl.textContent = '• Bangga Padamu!';
+                if (speechEl) speechEl.innerHTML = 'Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya, calon sarjana sukses! 🎓✨';
+                if (bubbleEl) bubbleEl.className = 'bg-slate-950/60 border border-yellow-500/40 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-slate-200 leading-relaxed shadow-inner';
+            } else if (mood === 'angry') {
+                imgEl.src = 'mascot-angry.jpg';
+                wrapEl.classList.add('glow-angry');
+                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-red-500 transition-all duration-500';
+                if (tagEl) {
+                    tagEl.textContent = '😡 MARAH!';
+                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900 animate-pulse';
+                }
+                if (subtitleEl) subtitleEl.textContent = '• Sedang Marah!';
+                if (speechEl) speechEl.innerHTML = '<b>HEI KAMU! 💢</b> Kemana aja kok jarang buka ULMET?! Ada tugas numpuk yang kamu abaikan! Buka dan selesaikan <b>SEKARANG JUGA!</b>';
+                if (bubbleEl) bubbleEl.className = 'bg-red-950/30 border border-red-500/50 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-red-200 leading-relaxed shadow-inner';
+            } else if (mood === 'worried') {
+                imgEl.src = 'mascot-worried.jpg';
+                wrapEl.classList.add('glow-worried');
+                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500 transition-all duration-500';
+                if (tagEl) {
+                    tagEl.textContent = '⏰ PANIK!';
+                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-orange-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900';
+                }
+                if (subtitleEl) subtitleEl.textContent = '• Deadline Mepet!';
+                if (speechEl) speechEl.innerHTML = '<b>GAWAT! ⏰</b> Deadline tugas tinggal hitungan jam lagi! Matikan sosmed, fokus selesaikan sekarang sebelum telat!';
+                if (bubbleEl) bubbleEl.className = 'bg-amber-950/30 border border-orange-500/50 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-amber-200 leading-relaxed shadow-inner';
+            }
+        }
+
+        function setDashMascotMoodPreview(mood) {
+            localStorage.setItem('ulmet_widget_preview_mood', mood);
+            updateDashboardMascotWidget();
+            if (mood === 'happy') {
+                pokeDashboardMascot();
+            } else if (mood === 'angry') {
+                pokeDashboardMascot();
+            } else if (mood === 'worried') {
+                pokeDashboardMascot();
+            }
+        }
+
+        function pokeDashboardMascot() {
+            const wrapEl = document.getElementById('dash-mascot-img-wrap');
+            if (dashCurrentMascotMood === 'happy') {
+                if (wrapEl) {
+                    wrapEl.classList.remove('bounce-animation');
+                    void wrapEl.offsetWidth;
+                    wrapEl.classList.add('bounce-animation');
+                }
+                playDashMascotRewardSound();
+            } else if (dashCurrentMascotMood === 'angry') {
+                if (wrapEl) {
+                    wrapEl.classList.remove('shake-animation');
+                    void wrapEl.offsetWidth;
+                    wrapEl.classList.add('shake-animation');
+                }
+                playDashMascotAngrySound();
+            } else {
+                playDashMascotWorriedSound();
+            }
+        }
+
+        function playDashMascotRewardSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.3);
+                });
+            } catch(e) {}
+        }
+
+        function playDashMascotAngrySound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.setValueAtTime(110, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } catch(e) {}
+        }
+
+        function playDashMascotWorriedSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } catch(e) {}
+        }
+
+        // ===== CUACA REAL-TIME LOCARI KAMPUS 3 UIN MALANG (BMKG RESMI) =====
+        const LOCARI_LAT = -7.9197;
+        const LOCARI_LON = 112.5516;
+        const LOCARI_CITY = 'Locari, Kampus 3 UIN Malang';
+        const BMKG_ADM4_TLEKUNG = '35.79.03.2004'; // Desa Tlekung, Kec. Junrejo, Kota Batu
+
+        function getBmkgIcon(desc) {
+            if (!desc) return '🌤️';
+            const d = desc.toLowerCase();
+            if (d.includes('petir')) return '⚡';
+            if (d.includes('lebat') || d.includes('sedang')) return '🌧️';
+            if (d.includes('hujan') || d.includes('gerimis')) return '🌦️';
+            if (d.includes('kabut') || d.includes('kabur')) return '🌫️';
+            if (d.includes('tebal')) return '☁️';
+            if (d.includes('berawan')) return '⛅';
+            if (d.includes('cerah')) return '☀️';
+            return '🌤️';
+        }
+
+        function getWmoInfo(code, isDay = 1) {
+            if (code === 0) return { text: isDay ? 'Cerah' : 'Cerah Malam', icon: isDay ? '☀️' : '🌙' };
+            if (code === 1 || code === 2) return { text: 'Cerah Berawan', icon: isDay ? '🌤️' : '⛅' };
+            if (code === 3) return { text: 'Berawan', icon: '☁️' };
+            if (code === 45 || code === 48) return { text: 'Berkabut', icon: '🌫️' };
+            if (code >= 51 && code <= 57) return { text: 'Gerimis Ringan', icon: '🌦️' };
+            if (code >= 61 && code <= 65) return { text: 'Hujan', icon: '🌧️' };
+            if (code >= 66 && code <= 67) return { text: 'Hujan Dingin', icon: '🌧️' };
+            if (code >= 71 && code <= 77) return { text: 'Hujan Salju', icon: '❄️' };
+            if (code >= 80 && code <= 82) return { text: 'Hujan Lebat', icon: '⛈️' };
+            if (code >= 95 && code <= 99) return { text: 'Badai Petir', icon: '⚡' };
+            return { text: 'Cerah Berawan', icon: '🌤️' };
+        }
+
+        function getWeatherStudyTip(temp, condition) {
+            if (condition.includes('Hujan') || condition.includes('Badai') || condition.includes('Gerimis')) {
+                return '🌧️ Hujan di sekitar Locari & Kampus 3, suasana sejuk dan adem buat fokus ngerjain tugas di kos!';
+            }
+            if (temp >= 30) {
+                return '☀️ Cuaca cukup terik di Kampus 3 Locari, jangan lupa banyak minum air dan cicil tugasmu.';
+            }
+            if (temp <= 22) {
+                return '☕ Hawa sejuk khas pegunungan Locari Junrejo, nikmat untuk membaca materi atau istirahat.';
+            }
+            return '🎯 Suasana belajar yang pas di sekitar Locari & Kampus 3, yuk selesaikan target tugasmu hari ini!';
+        }
+
+        let dashWeather = {
+            temp: 24,
+            condition: 'Cerah Berawan',
+            icon: '🌤️',
+            city: LOCARI_CITY,
+            source: 'BMKG',
+            humidity: 65,
+            wind: 8,
+            tip: 'Suasana sejuk di kawasan Locari & Kampus 3, waktu pas buat fokus kuliah dan tugas!',
+            loading: false
+        };
+
+        function renderDashboardWeatherUI() {
+            const tempEl = document.getElementById('dash-w-temp');
+            if (tempEl) tempEl.textContent = `${dashWeather.temp}°C`;
+            const condEl = document.getElementById('dash-w-cond');
+            if (condEl) condEl.textContent = dashWeather.condition;
+            const iconEl = document.getElementById('dash-w-icon');
+            if (iconEl) iconEl.textContent = dashWeather.icon;
+            const rangeEl = document.getElementById('dash-w-range');
+            if (rangeEl) rangeEl.textContent = dashWeather.tRange ? `Rentang ${dashWeather.tRange}` : '17–28 °C';
+            const humEl = document.getElementById('dash-w-humidity');
+            if (humEl) humEl.textContent = `${dashWeather.humidity}%`;
+            const windEl = document.getElementById('dash-w-wind');
+            if (windEl) windEl.textContent = `${dashWeather.wind} km/h`;
+            const tipEl = document.getElementById('dash-w-tip');
+            if (tipEl) tipEl.textContent = dashWeather.tip;
+
+            // Quick chip weather
+            const chipTempEl = document.getElementById('dash-weather-temp');
+            if (chipTempEl) chipTempEl.textContent = `${dashWeather.temp}°C`;
+            const chipCondEl = document.getElementById('dash-weather-cond');
+            if (chipCondEl) chipCondEl.textContent = dashWeather.condition;
+            const chipIconEl = document.getElementById('dash-weather-icon');
+            if (chipIconEl) chipIconEl.textContent = dashWeather.icon;
+        }
+
+        async function fetchDashboardWeather(force = false) {
+            if (dashWeather.loading) return;
+            const cached = localStorage.getItem('ulmet_live_weather');
+            if (cached) {
+                try {
+                    const data = JSON.parse(cached);
+                    if (data && typeof data.temp === 'number' && data.source === 'BMKG') {
+                        dashWeather = { ...dashWeather, ...data, city: LOCARI_CITY };
+                        renderDashboardWeatherUI();
+                        const now = Date.now();
+                        if (!force && data.lastUpdated && (now - data.lastUpdated < 15 * 60 * 1000)) {
+                            return;
+                        }
+                    } else {
+                        localStorage.removeItem('ulmet_live_weather');
+                    }
+                } catch(e) {}
+            }
+
+            dashWeather.loading = true;
+            const spinEl = document.getElementById('dash-weather-spin');
+            if (spinEl) spinEl.classList.add('animate-spin');
+
+            // 1. Coba ambil dari BMKG Resmi terlebih dahulu (Desa Tlekung, Kec. Junrejo, Kota Batu)
+            try {
+                const bmkgUrl = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${BMKG_ADM4_TLEKUNG}`;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                const res = await fetch(bmkgUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    const bData = await res.json();
+                    const cuacaDays = (bData.data && bData.data[0] && bData.data[0].cuaca) || [];
+                    const allSlots = [];
+                    cuacaDays.forEach(day => {
+                        if (Array.isArray(day)) day.forEach(s => allSlots.push(s));
+                    });
+
+                    if (allSlots.length > 0) {
+                        const nowTs = Date.now();
+                        let bestSlot = allSlots[0];
+                        let minDiff = Infinity;
+                        allSlots.forEach(s => {
+                            const sTime = new Date(s.datetime || s.utc_datetime).getTime();
+                            const diff = Math.abs(nowTs - sTime);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                bestSlot = s;
+                            }
+                        });
+
+                        // Rentang suhu & kelembaban hari ini dari slot BMKG
+                        const nowD = new Date();
+                        const todayStr = nowD.getFullYear()+'-'+String(nowD.getMonth()+1).padStart(2,'0')+'-'+String(nowD.getDate()).padStart(2,'0');
+                        const todaySlots = allSlots.filter(s => {
+                            const dt = (s.local_datetime || s.datetime || '').slice(0, 10);
+                            return dt === todayStr;
+                        });
+                        const validSlots = todaySlots.length > 0 ? todaySlots : allSlots.slice(0, 8);
+                        const temps = validSlots.map(s => Number(s.t)).filter(n => !isNaN(n));
+                        const hus = validSlots.map(s => Number(s.hu)).filter(n => !isNaN(n));
+                        const tMin = temps.length ? Math.min(...temps) : 17;
+                        const tMax = temps.length ? Math.max(...temps) : 28;
+                        const huMin = hus.length ? Math.min(...hus) : 30;
+                        const huMax = hus.length ? Math.max(...hus) : 91;
+
+                        const temp = Math.round(Number(bestSlot.t) || 24);
+                        const cond = bestSlot.weather_desc || 'Cerah Berawan';
+                        const icon = getBmkgIcon(cond);
+                        const hum = Number(bestSlot.hu) || 60;
+                        const wind = Math.round(Number(bestSlot.ws) || 5);
+
+                        dashWeather = {
+                            temp: temp,
+                            tRange: `${tMin}–${tMax} °C`,
+                            huRange: `${huMin}–${huMax}%`,
+                            condition: cond,
+                            icon: icon,
+                            city: LOCARI_CITY,
+                            source: 'BMKG',
+                            humidity: hum,
+                            wind: wind,
+                            tip: getWeatherStudyTip(temp, cond),
+                            loading: false,
+                            lastUpdated: Date.now()
+                        };
+
+                        localStorage.setItem('ulmet_live_weather', JSON.stringify(dashWeather));
+                        renderDashboardWeatherUI();
+                        if (spinEl) spinEl.classList.remove('animate-spin');
+                        return;
+                    }
+                }
+            } catch(bmkgErr) {
+                console.warn('[ULMET Weather] BMKG API fallback to Open-Meteo di Dashboard:', bmkgErr);
+            }
+
+            // 2. Fallback: Open-Meteo
+            try {
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LOCARI_LAT}&longitude=${LOCARI_LON}&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=Asia%2FJakarta`;
+                const res = await fetch(weatherUrl);
+                if (!res.ok) throw new Error('Weather API error');
+                const data = await res.json();
+                const curr = data.current || {};
+                const roundedTemp = Math.round(curr.temperature_2m || 24);
+                const wCode = curr.weather_code ?? 1;
+                const isDay = curr.is_day ?? 1;
+                const wmo = getWmoInfo(wCode, isDay);
+                const humidity = curr.relative_humidity_2m ?? 70;
+                const wind = curr.wind_speed_10m ?? 5;
+
+                dashWeather = {
+                    temp: roundedTemp,
+                    condition: wmo.text,
+                    icon: wmo.icon,
+                    city: LOCARI_CITY,
+                    source: 'BMKG Ref',
+                    humidity: humidity,
+                    wind: wind,
+                    tip: getWeatherStudyTip(roundedTemp, wmo.text),
+                    loading: false,
+                    lastUpdated: Date.now()
+                };
+
+                localStorage.setItem('ulmet_live_weather', JSON.stringify(dashWeather));
+                renderDashboardWeatherUI();
+            } catch(err) {
+                console.warn('Gagal memuat cuaca Locari di Dashboard:', err);
+                dashWeather.loading = false;
+            } finally {
+                if (spinEl) spinEl.classList.remove('animate-spin');
+            }
+        }
+
+        async function initDashboard() {
+            // 1. Verifikasi auth dan set user scope
+            const session = await requireAuth();
+            if (!session || !session.user) return;
+            const uid = session.user.id;
+            setCurrentUserId(uid);
+
+            // 2. Load Profile User
+            try {
+                const sb = getSupabase();
+                let profile = null;
+                if (sb) {
+                    const { data } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+                    if (data) {
+                        profile = data;
+                        localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(profile));
+                    }
+                }
+                if (!profile) {
+                    const cachedProf = localStorage.getItem(userKey('ulmet_profile'));
+                    if (cachedProf) profile = JSON.parse(cachedProf);
+                }
+                if (profile) {
+                    const namaPanggilan = profile.panggilan || (profile.nama ? profile.nama.split(' ')[0] : 'Mahasiswa');
+                    const welcomeEl = document.getElementById('welcome-name');
+                    if (welcomeEl) welcomeEl.innerText = namaPanggilan;
+                    if (profile.nama) document.getElementById('sidebar-nama').innerText = profile.nama;
+                    if (profile.semester) document.getElementById('sidebar-semester').innerText = 'Semester ' + profile.semester;
+                    if (profile.avatar) document.getElementById('sidebar-avatar').innerText = profile.avatar;
+                }
+            } catch (e) {
+                console.warn('Gagal memuat profil:', e);
+            }
+
+            // 3. Render awal dari user-scoped cache lokal (Instan & Responsif)
+            try {
+                trackDashboardActivity();
+                renderDashboardHabits();
+                fetchDashboardWeather();
+                const localTasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
+                renderDashboardTasks(localTasks);
+                const localFiles = JSON.parse(localStorage.getItem(userKey('ulmet_files')) || '[]');
+                document.getElementById('dash-files-count').innerText = localFiles.length;
+                const localBudget = parseInt(localStorage.getItem(userKey('ulmet_keuangan_budget')) || '0');
+                const localExpenses = JSON.parse(localStorage.getItem(userKey('ulmet_keuangan_expenses')) || '[]');
+                renderDashboardExpenses(localExpenses, localBudget);
+            } catch(e) {
+                console.warn('Gagal render cache lokal:', e);
+            }
+
+            // 4. Background Sync dari Supabase (Otoritatif per user)
+            try {
+                const [sbTasks, sbFiles, sbExpenses, sbBudget] = await Promise.all([
+                    loadTasks(),
+                    loadFiles(),
+                    loadExpenses(),
+                    loadBudgetConfig()
+                ]);
+
+                renderDashboardTasks(sbTasks || []);
+                document.getElementById('dash-files-count').innerText = (sbFiles || []).length;
+                const b = (sbBudget && typeof sbBudget.budget === 'number') ? sbBudget.budget : 0;
+                renderDashboardExpenses(sbExpenses || [], b);
+            } catch(e) {
+                console.warn('Sync background dashboard warning:', e);
+            }
+
+            // Auto-refresh cuaca tiap 15 menit & sinkron kebiasaan saat window aktif kembali
+            setInterval(() => fetchDashboardWeather(), 15 * 60 * 1000);
+            window.addEventListener('focus', () => {
+                renderDashboardHabits();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+
+            // Klik profile section untuk logout
+            const profileSectionEl = document.querySelector('.profile-section');
+            if (profileSectionEl) {
+                profileSectionEl.style.cursor = 'pointer';
+                profileSectionEl.addEventListener('click', async () => {
+                    if (confirm('Apakah kamu yakin ingin keluar (Logout)?')) {
+                        await logoutUser();
+                        window.location.href = 'login.html';
+                    }
+                });
             }
         });
+
+        let audioCtx;
+        function playUlmetAlarm() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const playTone = (freq, type, startTime, duration, vol) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, startTime);
+                gain.gain.setValueAtTime(vol, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            };
+
+            const now = audioCtx.currentTime;
+            playTone(880, 'square', now, 0.1, 0.1);
+            playTone(880, 'square', now + 0.15, 0.1, 0.1);
+            playTone(1320, 'sine', now + 0.3, 0.4, 0.15);
+            playTone(880, 'square', now + 0.8, 0.1, 0.1);
+            playTone(880, 'square', now + 0.95, 0.1, 0.1);
+            playTone(1320, 'sine', now + 1.1, 0.4, 0.15);
+        }
+
+        function toggleAlarmModal(customMessage = null) {
+            const modal = document.getElementById('modal-alarm');
+            if (modal.classList.contains('hidden')) {
+                if (customMessage) {
+                    const msgEl = modal.querySelector('p');
+                    if (msgEl) msgEl.textContent = customMessage;
+                }
+                modal.classList.remove('hidden');
+                setTimeout(playUlmetAlarm, 300);
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        setInterval(() => {
+            toggleAlarmModal("Waktunya cek jadwal dan cicil tugasmu sedikit demi sedikit! Konsistensi adalah kunci lulus tepat waktu, pejuang! 💪");
+        }, 30 * 60 * 1000);
     </script>
 
-    <!-- BOTTOM NAVIGATION (Mobile Only) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
-    <a href="dashboard.html" class="bnav-item active">
-        <span class="bnav-icon">&#128202;</span>
-        <span class="bnav-label">Dashboard</span>
-    </a>
-    <a href="jadwal.html" class="bnav-item">
-        <span class="bnav-icon">&#128197;</span>
-        <span class="bnav-label">Jadwal</span>
-    </a>
-    <a href="materi.html" class="bnav-item">
-        <span class="bnav-icon">&#128218;</span>
-        <span class="bnav-label">Materi</span>
-    </a>
-    <a href="ai.html" class="bnav-item">
-        <span class="bnav-icon">&#129302;</span>
-        <span class="bnav-label">AI</span>
-    </a>
-    <a href="profil.html" class="bnav-item">
-        <span class="bnav-icon">👤</span>
-        <span class="bnav-label">Profil</span>
-    </a>
-    <a href="keuangan.html" class="bnav-item">
-        <span class="bnav-icon">&#128184;</span>
-        <span class="bnav-label">Keuangan</span>
-    </a>
-</nav>
-<!-- PULL TO REFRESH SCRIPT -->
-<script>
-let ptrStartY = 0;
-let ptrIsAtTop = true;
-document.addEventListener('touchstart', (e) => {
-    ptrStartY = e.touches[0].clientY;
-    const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
-    ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
-}, {passive: true});
+    <!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+    <nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
+        <a href="dashboard.html" class="bnav-item active">
+            <span class="bnav-icon">📊</span>
+            <span class="bnav-label">Dashboard</span>
+        </a>
+        <a href="jadwal.html" class="bnav-item">
+            <span class="bnav-icon">📅</span>
+            <span class="bnav-label">Jadwal</span>
+        </a>
+        <a href="materi.html" class="bnav-item">
+            <span class="bnav-icon">📚</span>
+            <span class="bnav-label">Materi</span>
+        </a>
+        <a href="ai.html" class="bnav-item">
+            <span class="bnav-icon">🤖</span>
+            <span class="bnav-label">AI</span>
+        </a>
+        <a href="keuangan.html" class="bnav-item">
+            <span class="bnav-icon">💸</span>
+            <span class="bnav-label">Keuangan</span>
+        </a>
+        <a href="profil.html" class="bnav-item">
+            <span class="bnav-icon">👤</span>
+            <span class="bnav-label">Profil</span>
+        </a>
+    </nav>
 
-document.addEventListener('touchend', (e) => {
-    const endY = e.changedTouches[0].clientY;
-    if (ptrIsAtTop && endY > ptrStartY + 150) {
-        const ptrInd = document.createElement('div');
-        ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
-        document.body.appendChild(ptrInd);
-        setTimeout(() => window.location.reload(), 500);
-    }
-}, {passive: true});
-</script>
+    <!-- PULL TO REFRESH SCRIPT -->
+    <script>
+    let ptrStartY = 0;
+    let ptrIsAtTop = true;
+    document.addEventListener('touchstart', (e) => {
+        ptrStartY = e.touches[0].clientY;
+        const scrollable = e.target.closest('.overflow-y-auto') || e.target.closest('.flex-1');
+        ptrIsAtTop = scrollable ? scrollable.scrollTop <= 0 : true;
+    }, {passive: true});
+
+    document.addEventListener('touchend', (e) => {
+        const endY = e.changedTouches[0].clientY;
+        if (ptrIsAtTop && endY > ptrStartY + 150) {
+            const ptrInd = document.createElement('div');
+            ptrInd.innerHTML = '<div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; color:#facc15; padding:8px 16px; border-radius:20px; border: 1px solid #1e3a8a; box-shadow:0 4px 15px rgba(0,0,0,0.5); z-index:9999; font-size:12px; font-weight:bold; display:flex; align-items:center; gap:8px;"><span>⏳</span> Memperbarui...</div>';
+            document.body.appendChild(ptrInd);
+            setTimeout(() => window.location.reload(), 500);
+        }
+    }, {passive: true});
+    </script>
+    <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+    let deferredDashPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredDashPrompt = e;
+    });
+    </script>
 </body>
 </html>
-<script>
-// Menambahkan fungsi klik pada profil bawah kiri untuk logout
-document.querySelector('.profile-section').style.cursor = 'pointer';
-document.querySelector('.profile-section').addEventListener('click', async () => {
-    if (confirm('Apakah kamu yakin ingin keluar (Logout)?')) {
-        localStorage.clear();
-        if (window.supabase) {
-            await window.supabase.createClient('https://xpvwedzljeeasdorigko.supabase.co', 'sb_publishable_FcerT5DGq2vhdefNqeztqA_y8dYG-BH').auth.signOut();
-        }
-        window.location.href = 'login.html';
-    }
-});
-</script>
-<script>
-// Load profile
-document.addEventListener("DOMContentLoaded", () => {
-    const profileStr = localStorage.getItem('ulmet_profile');
-    if (profileStr) {
-        try {
-            const profile = JSON.parse(profileStr);
-            const namaPanggilan = profile.panggilan || (profile.nama ? profile.nama.split(' ')[0] : 'Mahasiswa');
-            const welcomeEl = document.getElementById('welcome-name');
-            if (welcomeEl) welcomeEl.innerText = namaPanggilan;
-
-            if (profile.nama) {
-                document.getElementById('sidebar-nama').innerText = profile.nama;
-            }
-            if (profile.semester) {
-                document.getElementById('sidebar-semester').innerText = 'Semester ' + profile.semester;
-            }
-            if (profile.avatar) {
-                document.getElementById('sidebar-avatar').innerText = profile.avatar;
-            }
-        } catch (e) {}
-    }
-});
-
-let audioCtx;
-function playUlmetAlarm() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    const playTone = (freq, type, startTime, duration, vol) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(vol, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-    };
-
-    const now = audioCtx.currentTime;
-    // Ciri khas ULMET: 2 beat pendek, 1 panjang
-    playTone(880, 'square', now, 0.1, 0.1);
-    playTone(880, 'square', now + 0.15, 0.1, 0.1);
-    playTone(1320, 'sine', now + 0.3, 0.4, 0.15);
-    
-    // Ulangi
-    playTone(880, 'square', now + 0.8, 0.1, 0.1);
-    playTone(880, 'square', now + 0.95, 0.1, 0.1);
-    playTone(1320, 'sine', now + 1.1, 0.4, 0.15);
-}
-
-function toggleAlarmModal(customMessage = null) {
-    const modal = document.getElementById('modal-alarm');
-    if (modal.classList.contains('hidden')) {
-        if (customMessage) {
-            const msgEl = modal.querySelector('p');
-            if (msgEl) msgEl.textContent = customMessage;
-        }
-        modal.classList.remove('hidden');
-        // Auto play saat dibuka
-        setTimeout(playUlmetAlarm, 300);
-    } else {
-        modal.classList.add('hidden');
-    }
-}
-
-// Fitur Alarm Pengingat Berkala (Gaya Duolingo)
-// Akan muncul setiap 30 menit jika aplikasi terbuka
-setInterval(() => {
-    toggleAlarmModal("Waktunya cek jadwal dan cicil tugasmu sedikit demi sedikit! Konsistensi adalah kunci lulus tepat waktu, pejuang! 💪");
-}, 30 * 60 * 1000); // 30 menit
-</script>

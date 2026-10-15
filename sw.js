@@ -1,18 +1,25 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v21';
+const CACHE_NAME = 'ulmet-v54';
 const ASSETS = [
     './',
     './jadwal.html',
     './dashboard.html',
+    './widget.html',
     './materi.html',
     './keuangan.html',
     './ai.html',
+    './profil.html',
     './login.html',
+    './admin.html',
     './manifest.json',
     './icon-192.png',
     './icon-512.png',
+    './mascot-happy.jpg',
+    './mascot-angry.jpg',
+    './mascot-worried.jpg',
+    './supabase-config.js',
     './ai-widget.js'
 ];
 
@@ -50,26 +57,41 @@ const saveSharedFile = async (file) => {
             const db = e.target.result;
             const tx = db.transaction('shared_files', 'readwrite');
             const store = tx.objectStore('shared_files');
-            store.put({ id: 'pending_share', file: file, timestamp: Date.now() });
+            store.put({ 
+                id: 'pending_share', 
+                file: file, 
+                name: file.name || ('Dokumen_WhatsApp_' + Date.now()),
+                type: file.type || 'application/octet-stream',
+                size: file.size || 0,
+                timestamp: Date.now() 
+            });
             tx.oncomplete = () => resolve();
-            tx.onerror = () => reject();
+            tx.onerror = () => reject(tx.error);
         };
-        req.onerror = () => reject();
+        req.onerror = () => reject(req.error);
     });
 };
 
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
-    if (event.request.method === 'POST' && url.pathname === '/share-target') {
+    if (event.request.method === 'POST' && (url.pathname.endsWith('/share-target') || url.pathname.endsWith('share-target'))) {
         event.respondWith((async () => {
             try {
                 const formData = await event.request.formData();
-                const file = formData.get('shared_file');
+                let file = formData.get('shared_file');
+                if (!file) {
+                    for (const val of formData.values()) {
+                        if (val instanceof File || (val && typeof val === 'object' && val.name)) {
+                            file = val;
+                            break;
+                        }
+                    }
+                }
                 if (file) {
                     await saveSharedFile(file);
                 }
             } catch (err) {
-                console.error("Error processing share target", err);
+                console.error("Error processing share target in SW:", err);
             }
             return Response.redirect('./materi.html?shared=1', 303);
         })());

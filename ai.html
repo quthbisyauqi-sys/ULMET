@@ -2,17 +2,29 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <title>AI Asisten Belajar - ULMET</title>
+    <!-- Supabase SDK & Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Marked.js untuk render Markdown dari AI -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- PDF.js untuk membaca isi berkas PDF agar AI dapat membaca langsung dokumen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
     <style>
-        body { font-family: "Plus Jakarta Sans", sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
         .page-fade { animation: pageFade 0.35s ease forwards; }
@@ -25,12 +37,54 @@
         .prose code { background: #1e293b; padding: 2px 4px; border-radius: 4px; font-size: 0.85em; color: #38bdf8; }
         .prose pre { background: #0f172a; padding: 10px; border-radius: 8px; overflow-x: auto; margin-bottom: 0.5rem; border: 1px solid #1e3a8a; }
 
-        /* Bottom nav mobile */
-        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
-        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
-        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
-        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
-        .bnav-icon { font-size: 20px; line-height: 1; }
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-white flex h-screen overflow-hidden">
@@ -64,16 +118,20 @@
                 <span class="text-lg group-hover:scale-110 transition-transform">&#128184;</span>
                 <span class="font-medium text-sm">Keuangan Kos</span>
             </a>
+            <a href="profil.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition group">
+                <span class="text-lg group-hover:scale-110 transition-transform">👤</span>
+                <span class="font-medium text-sm">Profil Saya</span>
+            </a>
         </nav>
     </div>
     <div class="p-4 border-t border-blue-800/40 bg-blue-950/20">
-        <div class="flex items-center gap-3 px-2 py-2">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-yellow-200 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm shadow-md flex-shrink-0">A</div>
+        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
+            <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-yellow-200 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm shadow-md flex-shrink-0">A</div>
             <div class="min-w-0">
-                <p class="text-sm font-bold text-white truncate drop-shadow-sm">Anak Sastra</p>
-                <p class="text-[11px] text-blue-300 font-medium tracking-wide">Semester 5</p>
+                <p id="sidebar-nama" class="text-sm font-bold text-white truncate drop-shadow-sm">Mahasiswa</p>
+                <p id="sidebar-semester" class="text-[11px] text-blue-300 font-medium tracking-wide">Semester -</p>
             </div>
-        </div>
+        </a>
     </div>
 </aside>
 
@@ -85,36 +143,60 @@
             <span class="text-xl md:text-2xl drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">🤖</span>
             <div class="min-w-0">
                 <h1 class="text-base md:text-lg font-extrabold text-white truncate tracking-wide">Teman Belajar AI</h1>
-                <p class="text-[10px] md:text-[11px] text-blue-400 font-medium hidden sm:block">Bahas materi, tanya fitur ULMET, atau minta jelaskan konsep</p>
+                <p class="text-[10px] md:text-[11px] text-blue-400 font-medium hidden sm:block">SnifoxAI Gateway &bull; Diskusi materi, tugas, dan konsep perkuliahan</p>
             </div>
         </div>
-        <button onclick="document.getElementById('api-modal').classList.remove('hidden')" class="text-xs bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 text-blue-300 px-3 py-1.5 rounded-lg transition font-semibold flex items-center gap-1.5 flex-shrink-0">
-            <span>⚙️</span> <span class="hidden sm:inline">Pengaturan AI</span>
-        </button>
+        
+        <div class="flex items-center gap-2">
+            <!-- Model Selector Dropdown -->
+            <div class="relative">
+                <select id="model-select" onchange="changeModel(this.value)" class="bg-blue-950/90 border border-blue-700/60 hover:border-yellow-400/70 text-yellow-400 text-xs font-bold rounded-xl px-3 py-2 pr-7 outline-none appearance-none cursor-pointer transition shadow-inner">
+                    <option value="openai/gpt-5.5">🚀 GPT-5.5</option>
+                    <option value="google/gemini-2.5-flash">⚡ Gemini Flash 2.5</option>
+                    <option value="anthropic/claude-opus-4.7">👑 Claude Opus 4.7</option>
+                </select>
+                <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-blue-400 text-[10px]">▼</span>
+            </div>
+
+            <!-- Tombol Hapus Riwayat Chat -->
+            <button onclick="confirmClearHistory()" id="btn-clear-chat" class="hidden text-xs bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-red-300 px-2.5 sm:px-3 py-2 rounded-xl transition font-semibold items-center gap-1.5 flex-shrink-0 cursor-pointer" title="Hapus Riwayat Chat">
+                <span>🗑️</span> <span class="hidden sm:inline">Hapus Riwayat</span>
+            </button>
+            
+            <button onclick="document.getElementById('api-modal').classList.remove('hidden')" class="text-xs bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 text-blue-300 px-3 py-2 rounded-xl transition font-semibold flex items-center gap-1.5 flex-shrink-0 cursor-pointer">
+                <span>⚙️</span> <span class="hidden sm:inline">Pengaturan AI</span>
+            </button>
+        </div>
     </header>
 
     <!-- Chat Area -->
-    <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6 scroll-smooth pb-24 md:pb-6">
+    <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 md:space-y-6 scroll-smooth pb-36 md:pb-6">
         
         <!-- Welcome Message -->
         <div class="flex gap-4 max-w-3xl">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-lg shadow-lg flex-shrink-0 border border-blue-500/50">🤖</div>
             <div class="bg-blue-950/50 border border-blue-800/60 rounded-2xl rounded-tl-sm p-4 text-sm text-blue-100 shadow-md">
-                <p class="font-bold text-white mb-1">Halo! Saya AI Asisten Belajar ULMET.</p>
-                <p class="text-blue-200/90 leading-relaxed">Saya siap menjadi teman diskusi belajarmu. Kamu bisa melakukan ini bersamaku:</p>
-                <ul class="list-disc pl-5 mt-2 space-y-1 text-blue-300/90">
-                    <li>Kirim file PDF/Word materi dosen untuk dirangkum atau dibahas bersama.</li>
-                    <li>Tanya tentang fitur-fitur di aplikasi ULMET jika kamu bingung.</li>
-                    <li>Minta jelaskan teori atau konsep perkuliahan yang rumit.</li>
+                <p class="font-bold text-white mb-1 flex items-center gap-2">
+                    Halo! Saya AI Asisten Belajar ULMET.
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-normal">SnifoxAI Ready</span>
+                </p>
+                <p class="text-blue-200/90 leading-relaxed">Saya terhubung ke gateway SnifoxAI. Kamu bisa memilih 3 model AI terbaik di kanan atas:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1 text-blue-300/90 text-xs">
+                    <li><b>🚀 GPT-5.5:</b> Penalaran kuat, cepat, dan pemecahan masalah kuliah.</li>
+                    <li><b>⚡ Gemini Flash 2.5:</b> Cepat & responsif untuk tanya jawab materi.</li>
+                    <li><b>👑 Claude Opus 4.7:</b> Flagship untuk analisis mendalam dan esai.</li>
                 </ul>
-                <p class="mt-3 text-xs italic text-blue-400/80">Tips: Pastikan kamu sudah memasukkan API Key Gemini di Pengaturan agar kita bisa mulai ngobrol!</p>
+                <div class="mt-3.5 pt-3 border-t border-blue-800/40 flex items-center justify-between text-xs">
+                    <span class="text-blue-400">Model aktif: <b id="welcome-model-text" class="text-yellow-400 font-mono">GPT-5.5</b></span>
+                    <button onclick="document.getElementById('api-modal').classList.remove('hidden')" class="text-yellow-400 hover:underline">Uji / Ganti API Key ⚙️</button>
+                </div>
             </div>
         </div>
 
     </div>
 
     <!-- Input Area -->
-    <div class="p-4 bg-slate-900/80 border-t border-blue-800/40 flex-shrink-0 backdrop-blur-md pb-24 md:pb-4">
+    <div class="p-4 bg-slate-900/80 border-t border-blue-800/40 flex-shrink-0 backdrop-blur-md pb-16 md:pb-4">
         
         <!-- File preview zone -->
         <div id="file-preview-zone" class="hidden max-w-4xl mx-auto mb-3 flex items-center gap-3 flex-wrap"></div>
@@ -123,91 +205,636 @@
             
             <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(event)">
             
-            <button onclick="document.getElementById('file-upload').click()" class="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-blue-400 hover:text-white hover:bg-blue-800/50 transition" title="Lampirkan File/Materi">
+            <button onclick="document.getElementById('file-upload').click()" class="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-blue-400 hover:text-white hover:bg-blue-800/50 transition cursor-pointer" title="Lampirkan File dari HP/Laptop">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
             </button>
 
-            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white text-sm px-2 py-2.5 resize-none outline-none max-h-32 placeholder-blue-600/70" placeholder="Tanya materi, fitur ULMET, atau perintah lainnya..." onkeydown="handleEnter(event)"></textarea>
+            <!-- Tombol Khusus Buka Folder Materi ULMET -->
+            <button type="button" onclick="openMateriPickerModal()" class="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/20 bg-yellow-400/10 border border-yellow-400/40 transition shadow-inner active:scale-95 cursor-pointer" title="Pilih Berkas dari Folder Materi Kuliah ULMET">
+                <span class="text-lg">📁</span>
+            </button>
 
-            <button id="send-btn" onclick="sendMessage()" class="w-10 h-10 flex-shrink-0 bg-yellow-400 hover:bg-yellow-300 text-blue-950 rounded-xl flex items-center justify-center transition shadow-md shadow-yellow-400/20 active:scale-95">
+            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-white text-sm px-2 py-2.5 resize-none outline-none max-h-32 placeholder-blue-600/70" placeholder="Tanya materi dosen, minta rangkuman, atau diskusikan tugas..." onkeydown="handleEnter(event)"></textarea>
+
+            <button id="send-btn" onclick="sendMessage()" class="w-10 h-10 flex-shrink-0 bg-yellow-400 hover:bg-yellow-300 text-blue-950 rounded-xl flex items-center justify-center transition shadow-md shadow-yellow-400/20 active:scale-95 cursor-pointer">
                 <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V6m0 0l-8 8m8-8l8 8"></path></svg>
             </button>
         </div>
-        <p class="text-center text-[10px] text-blue-500 mt-2">Didukung oleh Google Gemini Flash</p>
+        <div class="flex items-center justify-between max-w-4xl mx-auto mt-2 px-1 text-[11px] text-blue-400">
+            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Endpoint: <code class="text-blue-300 font-mono">core.snifoxai.com</code></span>
+            <span id="footer-model-badge" class="font-semibold text-yellow-400">google/gemini-2.5-flash</span>
+        </div>
     </div>
 </div>
 
-<!-- API KEY MODAL -->
+<!-- API KEY MODAL (SnifoxAI Gateway) -->
 <div id="api-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-700/60 rounded-3xl p-7 max-w-sm w-full shadow-2xl relative page-fade">
+    <div class="bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-700/60 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl relative page-fade">
         <button onclick="document.getElementById('api-modal').classList.add('hidden')" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
         
-        <h3 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span>🔑</span> Kunci API Gemini</h3>
-        <p class="text-xs text-blue-300 mb-5 leading-relaxed">Untuk menjadikan AI ini super pintar dan gratis tanpa batas bagi Anda, Anda perlu memasukkan API Key Google Gemini milik Anda sendiri.</p>
+        <h3 class="text-white font-bold text-lg mb-1 flex items-center gap-2"><span>🔑</span> Pengaturan SnifoxAI Gateway</h3>
+        <p class="text-xs text-blue-300 mb-4 leading-relaxed">Kelola API Key SnifoxAI dan model AI yang ingin digunakan untuk belajar di ULMET.</p>
         
         <div class="space-y-4">
             <div>
-                <label class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">Masukkan API Key Anda</label>
-                <input type="password" id="api-key-input" placeholder="AIzaSyB..." class="w-full bg-slate-950/70 border border-blue-700/50 focus:border-yellow-400 rounded-xl px-4 py-3 text-sm text-white placeholder-blue-700 outline-none transition">
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-[11px] font-bold text-blue-300 uppercase tracking-wider block">API Key SnifoxAI</label>
+                    <span class="text-[10px] text-emerald-400 font-mono bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">PAYG $1.00</span>
+                </div>
+                <div class="relative">
+                    <input type="password" id="api-key-input" placeholder="snfx-..." class="w-full bg-slate-950/80 border border-blue-700/60 focus:border-yellow-400 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white font-mono placeholder-slate-600 outline-none transition">
+                    <button type="button" onclick="toggleModalPwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-white text-xs">👁️</button>
+                </div>
             </div>
             
-            <div class="bg-blue-900/30 border border-blue-800/50 rounded-xl p-3 text-[11px] text-blue-200">
-                <p class="font-bold text-yellow-400 mb-1">Cara mendapatkan gratis:</p>
-                <ol class="list-decimal pl-4 space-y-1">
-                    <li>Buka <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-400 underline hover:text-blue-300">Google AI Studio</a></li>
-                    <li>Login dengan akun Google Anda</li>
-                    <li>Klik tombol "Create API key"</li>
-                    <li>Salin kode panjang tersebut dan tempel ke sini</li>
-                </ol>
+            <div>
+                <label class="text-[11px] font-bold text-blue-300 uppercase tracking-wider mb-1.5 block">Model AI Utama</label>
+                <select id="modal-model-select" class="w-full bg-slate-950/80 border border-blue-700/60 focus:border-yellow-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none transition cursor-pointer">
+                    <option value="openai/gpt-5.5">🚀 GPT-5.5 (OpenAI)</option>
+                    <option value="google/gemini-2.5-flash">⚡ Gemini Flash 2.5 (Google)</option>
+                    <option value="anthropic/claude-opus-4.7">👑 Claude Opus 4.7 (Anthropic)</option>
+                </select>
             </div>
-            
-            <button onclick="saveApiKey()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20">
-                Simpan API Key
-            </button>
+
+            <!-- Hasil Uji Koneksi -->
+            <div id="test-api-result" class="hidden p-3 rounded-xl text-xs space-y-1"></div>
+
+            <div class="flex gap-2 pt-1">
+                <button type="button" id="btn-test-api" onclick="testApiConnection()" class="flex-1 bg-blue-900/60 hover:bg-blue-800 border border-blue-700/50 text-blue-200 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                    ⚡ Uji Koneksi API
+                </button>
+                <button type="button" onclick="saveApiKey()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-2.5 rounded-xl text-xs transition shadow-md shadow-yellow-400/20 cursor-pointer">
+                    💾 Simpan Pengaturan
+                </button>
+            </div>
+
+            <div class="bg-blue-950/60 border border-blue-800/60 rounded-xl p-3 text-[11px] text-blue-200 space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-yellow-400 flex items-center gap-1">🦊 SnifoxAI Gateway</span>
+                    <a href="https://snifoxai.com/auth/login" target="_blank" class="text-blue-300 hover:text-white underline text-[10px]">Buka Dashboard ↗</a>
+                </div>
+                <div class="text-[10px] text-slate-300 font-mono space-y-0.5">
+                    <div>User: <span class="text-yellow-300">quthbisyauqi@gmail.com</span></div>
+                    <div>Host: <span class="text-blue-300">https://core.snifoxai.com/v1</span></div>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- MODAL: PILIH MATERI KULIAH DARI FOLDER ULMET -->
+<div id="modal-materi-picker" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="modal-box bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 border border-yellow-400/50 rounded-3xl p-5 sm:p-6 max-w-lg w-full shadow-2xl relative page-fade flex flex-col max-h-[85vh]">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-blue-800/60 flex-shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center text-xl text-yellow-400 flex-shrink-0">
+                    📁
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-white font-extrabold text-base leading-tight">Pilih Materi Kuliah ULMET</h3>
+                    <p class="text-[11px] text-blue-300">Pilih mata kuliah & berkas untuk dibahas bersama AI</p>
+                </div>
+            </div>
+            <button onclick="closeMateriPickerModal()" class="text-blue-400 hover:text-white text-2xl leading-none p-1 cursor-pointer">&times;</button>
+        </div>
+
+        <!-- Breadcrumb / Navigation -->
+        <div id="materi-picker-breadcrumb" class="py-2 px-1 flex items-center gap-1.5 text-xs text-blue-300 flex-shrink-0">
+            <button onclick="showMateriCourseList()" class="hover:text-yellow-400 font-bold flex items-center gap-1 cursor-pointer transition">
+                <span>📚</span> Semua Mata Kuliah
+            </button>
+            <span id="materi-breadcrumb-separator" class="text-blue-600 hidden">/</span>
+            <span id="materi-breadcrumb-active-course" class="text-yellow-400 font-bold truncate hidden">Nama Matkul</span>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-3 flex-shrink-0">
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 text-xs">🔍</span>
+                <input type="text" id="materi-picker-search" oninput="handleMateriSearch(this.value)" placeholder="Cari nama materi atau mata kuliah..." class="w-full bg-slate-950/80 border border-blue-700/60 focus:border-yellow-400 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none transition">
+            </div>
+        </div>
+
+        <!-- Body: Courses View OR Files View -->
+        <div class="flex-1 overflow-y-auto pr-1 space-y-2 min-h-[220px]" id="materi-picker-content">
+            <!-- Diisi otomatis oleh renderMateriCourses() atau renderMateriFiles() -->
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-3 border-t border-blue-800/60 flex items-center justify-between text-xs text-blue-400 flex-shrink-0">
+            <span class="text-[11px]">💡 Teks file akan diekstrak otomatis agar AI memahaminya</span>
+            <button onclick="closeMateriPickerModal()" class="px-3.5 py-1.5 bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 text-blue-200 rounded-xl font-bold transition cursor-pointer">Tutup</button>
+        </div>
+
     </div>
 </div>
 
 <script>
-    // Context tentang ULMET agar AI tahu dirinya
+    // System Prompt ULMET
     const SYSTEM_PROMPT = `Kamu adalah teman belajar dan asisten pintar untuk aplikasi bernama ULMET (Aplikasi Manajemen Kuliah Mahasiswa).
-Karaktermu: Ramah, santai tapi cerdas, menggunakan bahasa Indonesia yang baik tapi tidak terlalu kaku (seperti teman kuliah yang jago banget). 
+Karaktermu: Ramah, santai tapi cerdas, menggunakan bahasa Indonesia yang baik tapi santai layaknya teman kuliah cerdas.
 Tugasmu:
-1. Membantu mahasiswa berdiskusi tentang materi kuliah (mereka bisa memberikan file teks materi).
-2. Menjelaskan fitur-fitur aplikasi ULMET jika mereka bingung.
-Penjelasan fitur ULMET:
-- Dashboard: Halaman utama melihat ringkasan tugas dan status.
-- Jadwal & Tugas: Tempat mengelola tugas kuliah, memiliki kalender, sistem alarm, Pomodoro timer (25 menit fokus, 5 menit istirahat), dan Kebiasaan Harian (Habit tracker). Catatan: ULMET tidak lagi menggunakan fitur Eisenhower matrix.
-- Materi Dosen: Tempat mahasiswa menyimpan file/PDF dari dosen. Sistem ini otomatis tersinkronisasi dua arah secara invisible (tanpa server backend) dengan Google Drive mahasiswa.
-- Keuangan Kos: Fitur tambahan.
-Jangan memberi penjelasan yang terlalu panjang kecuali diminta. Gunakan format markdown yang rapi.`;
+1. Membantu mahasiswa berdiskusi tentang materi kuliah, merangkum dokumen, dan menjawab pertanyaan studi.
+2. Jika ada teks dokumen pada pesan mahasiswa di bagian [DOKUMEN TERLAMPIR: "..."], BACA DENGAN SEKSAMA isi teks dokumen tersebut. Jangan pernah mengatakan kamu tidak bisa melihat atau membaca berkasnya, melainkan langsung berikan rangkuman, jawaban pertanyaan, atau analisis materi berdasarkan teks dokumen yang diberikan.
+3. Menjelaskan fitur-fitur aplikasi ULMET:
+   - Dashboard: Rangkuman tugas, countdown deadline, dan statistik.
+   - Jadwal & Tugas: Kalender, alarm, timer Pomodoro (25/5), habit tracker.
+   - Materi Dosen: Penyimpanan cloud untuk file dokumen/PDF dosen (terintegrasi Supabase Cloud Storage).
+   - Keuangan Kos: Pencatat pengeluaran dan wishlist kos.
+Gunakan format markdown yang rapi, sertakan emoji secukupnya, dan berikan poin-poin terstruktur.`;
 
-    let conversationHistory = [];
+    // Konfigurasi SnifoxAI
+    const SNIFOX_ENDPOINT = 'https://core.snifoxai.com/v1/chat/completions';
+    const DEFAULT_SNIFOX_KEY = 'snfx-rcENe1gqyQLhifbgRQjW8ajvKju8oKWjidv8fCMaQ7GMG';
+    const DEFAULT_MODEL = 'openai/gpt-5.5';
+
+    let conversationHistory = []; // format OpenAI: [{role: 'user'|'assistant'|'system', content: '...', fileName?: '...'}]
     let pendingFileBase64 = null;
     let pendingFileName = null;
     let pendingFileMime = null;
+    let pendingFileText = null;
 
-    // Load API Key
-    document.addEventListener("DOMContentLoaded", () => {
-        const key = localStorage.getItem("ulmet_gemini_api_key");
-        if (key) document.getElementById('api-key-input').value = key;
+    // Helper key terisolasi per akun user
+    const getAiHistoryKey = () => (typeof userKey === 'function' ? userKey('ulmet_ai_history') : 'ulmet_ai_history');
+
+    function updateHistoryCountUI() {
+        const btnClear = document.getElementById('btn-clear-chat');
+        if (!btnClear) return;
+        if (conversationHistory && conversationHistory.length > 0) {
+            btnClear.classList.remove('hidden');
+            btnClear.classList.add('inline-flex');
+        } else {
+            btnClear.classList.add('hidden');
+            btnClear.classList.remove('inline-flex');
+        }
+    }
+
+    function saveAiHistory() {
+        try {
+            const key = getAiHistoryKey();
+            const now = Date.now();
+            localStorage.setItem(key, JSON.stringify(conversationHistory));
+            localStorage.setItem(key + '_time', String(now));
+            updateHistoryCountUI();
+            backupAiHistoryToCloud();
+        } catch (e) {
+            console.error("Gagal simpan riwayat percakapan AI:", e);
+        }
+    }
+
+    async function backupAiHistoryToCloud() {
+        try {
+            if (typeof getSupabase !== 'function') return;
+            const sb = getSupabase();
+            const uid = typeof getCurrentUserId === 'function' ? getCurrentUserId() : null;
+            if (!sb || !uid) return;
+
+            const now = Date.now();
+            const payload = JSON.stringify({
+                updated_at: now,
+                messages: conversationHistory
+            });
+            const blob = new Blob([payload], { type: 'application/json' });
+            const filePath = `${uid}/_system_ai_history.json`;
+
+            // Hapus file lama terlebih dahulu agar tidak menabrak batasan RLS UPDATE di Supabase Storage
+            try {
+                await sb.storage.from('materi').remove([filePath]);
+            } catch (delErr) {}
+
+            // Unggah berkas baru dengan cacheControl: 0 agar selalu real-time di semua perangkat
+            const { error } = await sb.storage.from('materi').upload(filePath, blob, {
+                contentType: 'application/json',
+                cacheControl: '0'
+            });
+
+            if (error) {
+                console.warn('Backup cloud history error:', error);
+            } else {
+                // Notifikasi tab lain via BroadcastChannel
+                if (typeof BroadcastChannel !== 'undefined') {
+                    try {
+                        const bc = new BroadcastChannel('ulmet_ai_sync');
+                        bc.postMessage({ type: 'AI_HISTORY_UPDATED', updated_at: now });
+                    } catch(e) {}
+                }
+            }
+        } catch (e) {
+            console.warn('Backup cloud history dilewati:', e);
+        }
+    }
+
+    async function restoreAiHistoryFromCloud() {
+        try {
+            const uid = typeof getCurrentUserId === 'function' ? getCurrentUserId() : null;
+            if (!uid) return null;
+
+            // Ambil langsung via public URL dengan timestamp cache-buster agar respons selalu real-time
+            const cacheBuster = Date.now();
+            const url = `${SUPABASE_URL}/storage/v1/object/public/materi/${uid}/_system_ai_history.json?t=${cacheBuster}`;
+            const resp = await fetch(url, { cache: 'no-cache' });
+            if (!resp.ok) return null;
+            const json = await resp.json();
+
+            let cloudMessages = [];
+            let cloudUpdatedAt = 0;
+
+            if (Array.isArray(json)) {
+                cloudMessages = json;
+                cloudUpdatedAt = Date.now();
+            } else if (json && Array.isArray(json.messages)) {
+                cloudMessages = json.messages;
+                cloudUpdatedAt = json.updated_at || 0;
+            }
+
+            return { messages: cloudMessages, updated_at: cloudUpdatedAt };
+        } catch (e) {
+            console.warn('Restore cloud history dilewati:', e);
+        }
+        return null;
+    }
+
+    let isSyncingAiHistory = false;
+
+    async function syncAiHistoryFromCloud(forceRender = false) {
+        if (isSyncingAiHistory) return;
+        isSyncingAiHistory = true;
+
+        try {
+            const cloudData = await restoreAiHistoryFromCloud();
+            if (!cloudData || !Array.isArray(cloudData.messages)) {
+                isSyncingAiHistory = false;
+                return;
+            }
+
+            const key = getAiHistoryKey();
+            const localRaw = localStorage.getItem(key);
+            let localMessages = [];
+            let localUpdatedAt = parseInt(localStorage.getItem(key + '_time') || '0', 10);
+
+            if (localRaw) {
+                try {
+                    const parsed = JSON.parse(localRaw);
+                    if (Array.isArray(parsed)) localMessages = parsed;
+                    else if (parsed && Array.isArray(parsed.messages)) {
+                        localMessages = parsed.messages;
+                        if (parsed.updated_at) localUpdatedAt = parsed.updated_at;
+                    }
+                } catch(e) {}
+            }
+
+            const cloudIsNewer = cloudData.updated_at > localUpdatedAt;
+            const cloudHasMore = cloudData.messages.length > localMessages.length;
+            const localIsEmpty = localMessages.length === 0 && cloudData.messages.length > 0;
+
+            if (forceRender || cloudIsNewer || cloudHasMore || localIsEmpty) {
+                // Periksa apakah pesan berbeda
+                const isDifferent = JSON.stringify(conversationHistory) !== JSON.stringify(cloudData.messages);
+                if (isDifferent || forceRender) {
+                    conversationHistory = cloudData.messages;
+                    localStorage.setItem(key, JSON.stringify(cloudData.messages));
+                    localStorage.setItem(key + '_time', String(cloudData.updated_at || Date.now()));
+
+                    renderAllMessages();
+                    updateHistoryCountUI();
+
+                    if (!forceRender && (cloudIsNewer || cloudHasMore)) {
+                        showSyncBadge("🔄 Percakapan tersinkron dari perangkat lain");
+                    }
+                }
+            } else if (localMessages.length > cloudData.messages.length && !cloudIsNewer) {
+                // Lokal memiliki pesan baru yang belum di-backup
+                await backupAiHistoryToCloud();
+            }
+        } catch(err) {
+            console.warn("Sync AI history error:", err);
+        } finally {
+            isSyncingAiHistory = false;
+        }
+    }
+
+    function renderAllMessages() {
+        const container = document.getElementById('chat-container');
+        if (!container) return;
+
+        // Ambil elemen welcome message yang ada di awal
+        const welcomeCard = container.querySelector('.max-w-3xl');
+        container.innerHTML = '';
+        if (welcomeCard) container.appendChild(welcomeCard);
+
+        conversationHistory.forEach(msg => {
+            appendMessage(msg.role, msg.content, msg.fileName, false);
+        });
+
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 50);
+    }
+
+    function showSyncBadge(text) {
+        let badge = document.getElementById('ai-sync-pill');
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.id = 'ai-sync-pill';
+            badge.className = 'fixed top-16 left-1/2 -translate-x-1/2 z-40 bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-xl backdrop-blur flex items-center gap-2 page-fade';
+            document.body.appendChild(badge);
+        }
+        badge.innerHTML = `<span>⚡</span> <span>${text}</span>`;
+        badge.classList.remove('hidden');
+        clearTimeout(badge._timeout);
+        badge._timeout = setTimeout(() => {
+            badge.classList.add('hidden');
+        }, 3000);
+    }
+
+    async function deleteAiHistoryFromCloud() {
+        try {
+            if (typeof getSupabase !== 'function') return;
+            const sb = getSupabase();
+            const uid = typeof getCurrentUserId === 'function' ? getCurrentUserId() : null;
+            if (!sb || !uid) return;
+            const filePath = `${uid}/_system_ai_history.json`;
+            await sb.storage.from('materi').remove([filePath]);
+
+            // Buat file penanda kosong dengan timestamp baru agar perangkat lain tahu riwayat dihapus
+            const emptyPayload = JSON.stringify({ updated_at: Date.now(), messages: [] });
+            await sb.storage.from('materi').upload(filePath, new Blob([emptyPayload], { type: 'application/json' }), {
+                contentType: 'application/json',
+                cacheControl: '0'
+            });
+        } catch (e) {}
+    }
+
+    async function loadAiHistory() {
+        try {
+            if (typeof requireAuth === 'function') {
+                const session = await requireAuth();
+                if (session && session.user && typeof setCurrentUserId === 'function') {
+                    setCurrentUserId(session.user.id);
+                }
+            }
+            // Load profil untuk sidebar
+            try {
+                const cachedProf = localStorage.getItem(userKey('ulmet_profile'));
+                if (cachedProf) {
+                    const p = JSON.parse(cachedProf);
+                    const sn = document.getElementById('sidebar-nama');
+                    const ss = document.getElementById('sidebar-semester');
+                    const sa = document.getElementById('sidebar-avatar');
+                    if (sn && p.nama) sn.textContent = p.nama;
+                    if (ss && p.semester) ss.textContent = `Semester ${p.semester}`;
+                    if (sa && (p.avatar || p.nama)) sa.textContent = p.avatar || p.nama.charAt(0).toUpperCase();
+                }
+                const sb = typeof getSupabase === 'function' ? getSupabase() : null;
+                const uid = typeof getCurrentUserId === 'function' ? getCurrentUserId() : null;
+                if (sb && uid) {
+                    sb.from('profiles').select('*').eq('id', uid).maybeSingle().then(({ data }) => {
+                        if (data) {
+                            localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(data));
+                            const sn = document.getElementById('sidebar-nama');
+                            const ss = document.getElementById('sidebar-semester');
+                            const sa = document.getElementById('sidebar-avatar');
+                            if (sn && data.nama) sn.textContent = data.nama;
+                            if (ss && data.semester) ss.textContent = `Semester ${data.semester}`;
+                            if (sa && (data.avatar || data.nama)) sa.textContent = data.avatar || data.nama.charAt(0).toUpperCase();
+                        }
+                    }).catch(() => {});
+                }
+            } catch(e) {}
+
+            // 1. Tampilkan riwayat lokal secepat kilat (agar tidak ada delay bagi user)
+            const key = getAiHistoryKey();
+            let saved = localStorage.getItem(key);
+            if (!saved) {
+                const legacy = localStorage.getItem('ulmet_ai_history');
+                if (legacy) {
+                    saved = legacy;
+                    localStorage.setItem(key, legacy);
+                }
+            }
+
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    const messages = Array.isArray(parsed) ? parsed : (parsed?.messages || []);
+                    if (messages.length > 0) {
+                        conversationHistory = messages;
+                        renderAllMessages();
+                    }
+                } catch(e) {}
+            }
+            updateHistoryCountUI();
+
+            // 2. Sinkronisasikan secara realtime dengan Cloud Supabase
+            // Jika di laptop baru kirim chat, HP akan langsung menarik dan menampilkan percakapan tersebut!
+            await syncAiHistoryFromCloud(false);
+
+            // 3. Pasang listener realtime untuk mendeteksi perubahan antar perangkat:
+            // a. Ketika tab kembali aktif / HP dibuka dari layar kunci (visibilitychange)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    syncAiHistoryFromCloud(false);
+                }
+            });
+
+            // b. Ketika jendela/browser mendapatkan fokus
+            window.addEventListener('focus', () => {
+                syncAiHistoryFromCloud(false);
+            });
+
+            // c. Heartbeat polling setiap 4 detik saat halaman sedang aktif
+            if (!window._aiSyncInterval) {
+                window._aiSyncInterval = setInterval(() => {
+                    if (document.visibilityState === 'visible') {
+                        syncAiHistoryFromCloud(false);
+                    }
+                }, 4000);
+            }
+
+            // d. BroadcastChannel untuk sinkronisasi seketika antar-tab di perangkat yang sama
+            if (typeof BroadcastChannel !== 'undefined') {
+                const bc = new BroadcastChannel('ulmet_ai_sync');
+                bc.onmessage = (ev) => {
+                    if (ev.data && ev.data.type === 'AI_HISTORY_UPDATED') {
+                        syncAiHistoryFromCloud(false);
+                    }
+                };
+            }
+
+        } catch (e) {
+            console.error("Gagal memuat riwayat percakapan AI:", e);
+        }
+    }
+
+    async function confirmClearHistory() {
+        if (!confirm("Hapus seluruh riwayat percakapan belajar ini?")) return;
+        conversationHistory = [];
+        const key = getAiHistoryKey();
+        const now = Date.now();
+        localStorage.removeItem(key);
+        localStorage.removeItem('ulmet_ai_history');
+        localStorage.setItem(key + '_time', String(now));
+
+        await deleteAiHistoryFromCloud();
+
+        // Bersihkan chat container kecuali welcome card
+        const container = document.getElementById('chat-container');
+        if (container) {
+            const welcomeCard = container.querySelector('.max-w-3xl');
+            container.innerHTML = '';
+            if (welcomeCard) container.appendChild(welcomeCard);
+        }
+        updateHistoryCountUI();
+
+        // Beritahu tab/perangkat lain
+        if (typeof BroadcastChannel !== 'undefined') {
+            try {
+                const bc = new BroadcastChannel('ulmet_ai_sync');
+                bc.postMessage({ type: 'AI_HISTORY_UPDATED', updated_at: now });
+            } catch(e) {}
+        }
+    }
+
+    function getSnifoxApiKey() {
+        const key = localStorage.getItem("ulmet_snifox_api_key");
+        // Jika belum ada atau tersimpan key yang typo sebelumnya, perbarui otomatis
+        if (!key || key.includes('rcENc1') || key.includes('RQjw8')) {
+            localStorage.setItem("ulmet_snifox_api_key", DEFAULT_SNIFOX_KEY);
+            return DEFAULT_SNIFOX_KEY;
+        }
+        return key.trim();
+    }
+
+    const ALLOWED_MODELS = ['openai/gpt-5.5', 'google/gemini-2.5-flash', 'anthropic/claude-opus-4.7'];
+
+    function getSelectedModel() {
+        const saved = localStorage.getItem("ulmet_ai_model");
+        if (!saved || !ALLOWED_MODELS.includes(saved)) {
+            localStorage.setItem("ulmet_ai_model", DEFAULT_MODEL);
+            return DEFAULT_MODEL;
+        }
+        return saved;
+    }
+
+    function changeModel(newModel) {
+        localStorage.setItem("ulmet_ai_model", newModel);
+        updateModelUI(newModel);
+    }
+
+    function updateModelUI(model) {
+        const select = document.getElementById('model-select');
+        const modalSelect = document.getElementById('modal-model-select');
+        const badge = document.getElementById('footer-model-badge');
+        const welcomeText = document.getElementById('welcome-model-text');
         
+        if (select) select.value = model;
+        if (modalSelect) modalSelect.value = model;
+        if (badge) badge.textContent = model;
+        if (welcomeText) {
+            const opt = select?.querySelector(`option[value="${model}"]`);
+            welcomeText.textContent = opt ? opt.textContent : model;
+        }
+    }
+
+    function toggleModalPwd() {
+        const inp = document.getElementById('api-key-input');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    // Load data awal saat halaman siap
+    document.addEventListener("DOMContentLoaded", () => {
+        // Bersihkan key lama jika ada
+        const currentSavedKey = localStorage.getItem("ulmet_snifox_api_key");
+        if (currentSavedKey && (currentSavedKey.includes('rcENc1') || currentSavedKey.includes('RQjw8'))) {
+            localStorage.setItem("ulmet_snifox_api_key", DEFAULT_SNIFOX_KEY);
+        }
+
+        const key = getSnifoxApiKey();
+        const model = getSelectedModel();
+
+        const keyInp = document.getElementById('api-key-input');
+        if (keyInp) keyInp.value = key;
+
+        updateModelUI(model);
+
         // Auto resize textarea
         const tx = document.getElementById('chat-input');
-        tx.addEventListener("input", function() {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight) + "px";
-        });
+        if (tx) {
+            tx.addEventListener("input", function() {
+                this.style.height = "auto";
+                this.style.height = (this.scrollHeight) + "px";
+            });
+        }
+
+        // Muat riwayat percakapan belajar
+        loadAiHistory();
     });
 
     function saveApiKey() {
         const key = document.getElementById('api-key-input').value.trim();
+        const model = document.getElementById('modal-model-select').value;
         if (key) {
-            localStorage.setItem("ulmet_gemini_api_key", key);
+            localStorage.setItem("ulmet_snifox_api_key", key);
+            localStorage.setItem("ulmet_gemini_api_key", key); // backup
+            localStorage.setItem("ulmet_ai_model", model);
+            updateModelUI(model);
             document.getElementById('api-modal').classList.add('hidden');
-            alert("API Key berhasil disimpan!");
+            alert("✅ Pengaturan SnifoxAI Gateway berhasil disimpan!");
         } else {
-            alert("API Key tidak boleh kosong!");
+            alert("⚠️ API Key tidak boleh kosong!");
+        }
+    }
+
+    async function testApiConnection() {
+        const testBtn = document.getElementById('btn-test-api');
+        const resBox = document.getElementById('test-api-result');
+        const key = (document.getElementById('api-key-input')?.value || getSnifoxApiKey()).trim();
+        const model = document.getElementById('modal-model-select')?.value || getSelectedModel();
+
+        if (!key) {
+            resBox.className = 'p-3 rounded-xl text-xs bg-red-950/70 border border-red-500/50 text-red-200';
+            resBox.textContent = '⚠️ Harap masukkan API Key terlebih dahulu.';
+            resBox.classList.remove('hidden');
+            return;
+        }
+
+        testBtn.disabled = true;
+        testBtn.textContent = 'Menguji... ⏳';
+        resBox.className = 'p-3 rounded-xl text-xs bg-blue-950/60 border border-blue-700/50 text-blue-200';
+        resBox.innerHTML = `Menguji koneksi ke <b>${model}</b> via SnifoxAI...`;
+        resBox.classList.remove('hidden');
+
+        try {
+            const resp = await fetch(SNIFOX_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${key}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{ role: 'user', content: 'Tes koneksi ULMET. Balas 1 kata: "Online!"' }],
+                    max_tokens: 15
+                })
+            });
+
+            const data = await resp.json();
+            if (resp.ok && data?.choices?.[0]?.message?.content) {
+                resBox.className = 'p-3 rounded-xl text-xs bg-emerald-950/70 border border-emerald-500/50 text-emerald-200';
+                resBox.innerHTML = `✅ <b>Koneksi Berhasil!</b><br>Model <code>${model}</code> merespons: "<em>${data.choices[0].message.content.trim()}</em>". Gateway aktif dan siap digunakan!`;
+            } else {
+                const err = data.message || data.error?.message || `HTTP ${resp.status}`;
+                resBox.className = 'p-3 rounded-xl text-xs bg-red-950/70 border border-red-500/50 text-red-200';
+                resBox.innerHTML = `⚠️ <b>Gateway Snifox merespons:</b> ${err}.<br><span class="text-[10px] text-red-300">Pastikan API Key sudah sesuai atau salin ulang dari email / dashboard.</span>`;
+            }
+        } catch(e) {
+            resBox.className = 'p-3 rounded-xl text-xs bg-red-950/70 border border-red-500/50 text-red-200';
+            resBox.innerHTML = `❌ <b>Koneksi gagal:</b> ${e.message}`;
+        } finally {
+            testBtn.disabled = false;
+            testBtn.textContent = '⚡ Uji Koneksi API';
         }
     }
 
@@ -218,44 +845,434 @@ Jangan memberi penjelasan yang terlalu panjang kecuali diminta. Gunakan format m
         }
     }
 
-    function handleFileSelect(e) {
+    async function handleFileSelect(e) {
         const file = e.target.files[0];
         if (!file) return;
         
-        // For Gemini API, we currently support pdf, txt (can be expanded)
         pendingFileName = file.name;
         pendingFileMime = file.type || 'application/octet-stream';
-        
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            // Remove the data:mimetype;base64, prefix for API
-            const base64str = evt.target.result.split(',')[1]; 
-            pendingFileBase64 = base64str;
-            
-            // Show preview
-            const zone = document.getElementById('file-preview-zone');
-            zone.innerHTML = `
-                <div class="bg-blue-900/60 border border-blue-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-                    <span class="text-yellow-400">📄</span>
-                    <span class="text-white truncate max-w-[150px] font-semibold">${file.name}</span>
-                    <button onclick="removeFile()" class="text-red-400 hover:text-red-300 ml-1 font-bold">&times;</button>
-                </div>
-            `;
-            zone.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+        pendingFileText = null;
+
+        const zone = document.getElementById('file-preview-zone');
+        zone.innerHTML = `
+            <div class="bg-blue-900/60 border border-blue-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
+                <span id="file-icon" class="text-yellow-400">⏳</span>
+                <span class="text-white truncate max-w-[200px] font-semibold">${file.name}</span>
+                <span id="file-status-label" class="text-[10px] text-blue-300 italic">Membaca dokumen...</span>
+                <button onclick="removeFile()" class="text-red-400 hover:text-red-300 ml-1 font-bold">&times;</button>
+            </div>
+        `;
+        zone.classList.remove('hidden');
+
+        try {
+            const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+            if (isPdf) {
+                const arrayBuffer = await file.arrayBuffer();
+                if (typeof pdfjsLib !== 'undefined') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                    const pdf = await loadingTask.promise;
+                    let fullText = "";
+                    const maxPages = Math.min(pdf.numPages, 40);
+                    for (let i = 1; i <= maxPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageStr = textContent.items.map(item => item.str).join(" ");
+                        if (pageStr.trim()) {
+                            fullText += `--- Halaman ${i} ---\n${pageStr}\n\n`;
+                        }
+                    }
+                    pendingFileText = fullText.trim() || `[Berkas ${file.name} terbaca (${pdf.numPages} halaman), namun halaman berupa gambar/scan tanpa teks langsung]`;
+                    const lbl = document.getElementById('file-status-label');
+                    if (lbl) lbl.textContent = `(${pdf.numPages} hal • Siap)`;
+                } else {
+                    pendingFileText = `[Berkas PDF terlampir: ${file.name}]`;
+                }
+            } else if (file.name.toLowerCase().endsWith('.txt') || file.type.startsWith('text/')) {
+                pendingFileText = await file.text();
+                const lbl = document.getElementById('file-status-label');
+                if (lbl) lbl.textContent = `(Teks siap)`;
+            } else {
+                const raw = await file.text().catch(() => '');
+                const clean = raw.replace(/[^\x20-\x7E\t\n\r]/g, ' ').replace(/\s+/g, ' ').trim();
+                pendingFileText = clean.length > 50 ? clean.slice(0, 30000) : `[Berkas ${file.name} terlampir]`;
+                const lbl = document.getElementById('file-status-label');
+                if (lbl) lbl.textContent = `(Siap)`;
+            }
+        } catch(err) {
+            console.error("Gagal membaca file:", err);
+            pendingFileText = `[Berkas ${file.name} terlampir]`;
+            const lbl = document.getElementById('file-status-label');
+            if (lbl) lbl.textContent = `(Siap)`;
+        } finally {
+            const icon = document.getElementById('file-icon');
+            if (icon) icon.textContent = '📄';
+        }
     }
 
     function removeFile() {
         pendingFileBase64 = null;
         pendingFileName = null;
         pendingFileMime = null;
-        document.getElementById('file-upload').value = '';
-        document.getElementById('file-preview-zone').classList.add('hidden');
-        document.getElementById('file-preview-zone').innerHTML = '';
+        pendingFileText = null;
+        const fileUpload = document.getElementById('file-upload');
+        if (fileUpload) fileUpload.value = '';
+        const zone = document.getElementById('file-preview-zone');
+        if (zone) {
+            zone.classList.add('hidden');
+            zone.innerHTML = '';
+        }
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.placeholder = "Tanya materi dosen, minta rangkuman, atau diskusikan tugas...";
+        }
     }
 
-    function appendMessage(role, content, fileName = null) {
+    // =============================================
+    // MATERI PICKER MODAL LOGIC FOR AI
+    // =============================================
+    let materiPickerCourses = [];
+    let materiPickerFiles = [];
+    let materiActiveCourse = null;
+
+    async function openMateriPickerModal() {
+        const modal = document.getElementById('modal-materi-picker');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+
+        const searchInput = document.getElementById('materi-picker-search');
+        if (searchInput) searchInput.value = '';
+
+        // Tampilkan status memuat
+        const container = document.getElementById('materi-picker-content');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-12 text-blue-300">
+                    <span class="text-3xl block animate-spin mb-2">⏳</span>
+                    <p class="text-xs font-bold text-yellow-400">Memuat folder & materi kuliah...</p>
+                </div>
+            `;
+        }
+
+        // Ambil data courses dan files
+        try {
+            if (typeof loadCourses === 'function') {
+                const c = await loadCourses(['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']);
+                if (Array.isArray(c)) materiPickerCourses = c.map(item => typeof item === 'string' ? item : (item && item.name ? item.name : String(item))).filter(Boolean);
+            } else {
+                const raw = localStorage.getItem(userKey('ulmet_courses'));
+                materiPickerCourses = raw ? JSON.parse(raw) : ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
+            }
+
+            if (typeof loadFiles === 'function') {
+                const f = await loadFiles();
+                materiPickerFiles = Array.isArray(f) ? f : [];
+            } else {
+                const raw = localStorage.getItem(userKey('ulmet_files'));
+                materiPickerFiles = raw ? JSON.parse(raw) : [];
+            }
+        } catch(err) {
+            console.warn("Gagal memuat materi picker:", err);
+            const rawC = localStorage.getItem(userKey('ulmet_courses'));
+            materiPickerCourses = rawC ? JSON.parse(rawC) : ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
+            const rawF = localStorage.getItem(userKey('ulmet_files'));
+            materiPickerFiles = rawF ? JSON.parse(rawF) : [];
+        }
+
+        showMateriCourseList();
+    }
+
+    function closeMateriPickerModal() {
+        const modal = document.getElementById('modal-materi-picker');
+        if (modal) modal.classList.add('hidden');
+        materiActiveCourse = null;
+    }
+
+    function showMateriCourseList() {
+        materiActiveCourse = null;
+        const sep = document.getElementById('materi-breadcrumb-separator');
+        const act = document.getElementById('materi-breadcrumb-active-course');
+        if (sep) sep.classList.add('hidden');
+        if (act) act.classList.add('hidden');
+
+        const container = document.getElementById('materi-picker-content');
+        if (!container) return;
+
+        if (!materiPickerCourses || materiPickerCourses.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <span class="text-4xl block mb-2">📁</span>
+                    <p class="text-sm font-bold text-white">Belum ada folder Mata Kuliah</p>
+                    <p class="text-xs text-blue-300 mt-1">Buka menu Materi Dosen untuk membuat folder & mengunggah file.</p>
+                    <a href="materi.html" class="inline-block mt-3 px-4 py-2 bg-yellow-400 text-blue-950 font-bold text-xs rounded-xl">Buka Menu Materi ➔</a>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = materiPickerCourses.map(courseName => {
+            const filesInCourse = materiPickerFiles.filter(f => f.course === courseName);
+            const count = filesInCourse.length;
+            const safeName = courseName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            return `
+                <div onclick="selectMateriCourse('${safeName}')" class="flex items-center justify-between p-3.5 bg-blue-900/30 hover:bg-yellow-400/10 border border-blue-700/50 hover:border-yellow-400/60 rounded-2xl transition cursor-pointer group active:scale-[0.98]">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950 border border-blue-700/60 flex items-center justify-center text-xl text-yellow-400 group-hover:scale-105 transition flex-shrink-0">
+                            📁
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-white group-hover:text-yellow-300 truncate">${courseName}</p>
+                            <p class="text-xs text-blue-300 mt-0.5">${count} berkas materi tersimpan</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-blue-300 group-hover:text-yellow-400">
+                        <span>Lihat File</span>
+                        <span>➔</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function selectMateriCourse(courseName) {
+        materiActiveCourse = courseName;
+        const sep = document.getElementById('materi-breadcrumb-separator');
+        const act = document.getElementById('materi-breadcrumb-active-course');
+        if (sep) sep.classList.remove('hidden');
+        if (act) {
+            act.textContent = courseName;
+            act.classList.remove('hidden');
+        }
+
+        const container = document.getElementById('materi-picker-content');
+        if (!container) return;
+
+        const filesInCourse = materiPickerFiles.filter(f => f.course === courseName);
+
+        if (filesInCourse.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-10 bg-blue-950/40 rounded-2xl border border-blue-800/40">
+                    <span class="text-3xl block mb-2">📭</span>
+                    <p class="text-sm font-bold text-blue-200">Folder ini belum memiliki berkas</p>
+                    <p class="text-xs text-blue-400 mt-1">Unggah berkas materi melalui menu Materi Dosen terlebih dahulu.</p>
+                    <button onclick="showMateriCourseList()" class="mt-3 px-3 py-1.5 bg-blue-900/60 text-blue-200 text-xs rounded-xl font-bold hover:bg-blue-800 transition cursor-pointer">← Kembali ke Daftar Matkul</button>
+                </div>
+            `;
+            return;
+        }
+
+        const getFileTheme = ext => {
+            if (ext === "pdf") return { bg:"bg-red-950/60", border:"border-red-700/60", text:"text-red-400", badge:"PDF" };
+            if (["doc","docx"].includes(ext)) return { bg:"bg-blue-900/50", border:"border-blue-600/60", text:"text-blue-400", badge:"DOC" };
+            if (["ppt","pptx"].includes(ext)) return { bg:"bg-orange-950/60", border:"border-orange-700/60", text:"text-orange-400", badge:"PPT" };
+            if (["xls","xlsx"].includes(ext)) return { bg:"bg-green-950/60", border:"border-green-700/60", text:"text-green-400", badge:"XLS" };
+            if (["png","jpg","jpeg","webp"].includes(ext)) return { bg:"bg-purple-950/60", border:"border-purple-700/60", text:"text-purple-400", badge:"IMG" };
+            return { bg:"bg-yellow-950/60", border:"border-yellow-700/60", text:"text-yellow-400", badge:ext.toUpperCase() };
+        };
+
+        container.innerHTML = filesInCourse.map(file => {
+            const ext = (file.ext || (file.name ? file.name.split('.').pop() : '')).toLowerCase();
+            const theme = getFileTheme(ext);
+            const safeId = file.id;
+            const isCloud = !!file.storage_path;
+            return `
+                <div onclick="attachMateriFileToAI('${safeId}')" class="flex items-center justify-between p-3 bg-slate-900/80 hover:bg-yellow-400/15 border border-blue-800/60 hover:border-yellow-400/60 rounded-2xl transition cursor-pointer group active:scale-[0.98]">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 ${theme.bg} border ${theme.border} rounded-xl flex items-center justify-center ${theme.text} font-bold text-xs uppercase flex-shrink-0">
+                            ${theme.badge}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${file.name}</p>
+                            <div class="flex items-center gap-2 mt-0.5 text-[10px] text-blue-300">
+                                <span>${file.size || 'Materi'}</span>
+                                <span>•</span>
+                                <span class="${isCloud ? 'text-emerald-400' : 'text-blue-400'}">${isCloud ? '☁️ Cloud' : (file.date || 'Lokal')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-extrabold text-[11px] rounded-xl transition shadow-md shadow-yellow-400/20 flex-shrink-0 cursor-pointer">
+                        Pilih & Diskusikan ➔
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function handleMateriSearch(keyword) {
+        const q = (keyword || '').toLowerCase().trim();
+        if (!q) {
+            if (materiActiveCourse) {
+                selectMateriCourse(materiActiveCourse);
+            } else {
+                showMateriCourseList();
+            }
+            return;
+        }
+
+        const container = document.getElementById('materi-picker-content');
+        if (!container) return;
+
+        // Filter file yang cocok berdasarkan nama file atau matkul
+        const matchedFiles = materiPickerFiles.filter(f => 
+            (f.name && f.name.toLowerCase().includes(q)) || 
+            (f.course && f.course.toLowerCase().includes(q))
+        );
+
+        if (matchedFiles.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-10">
+                    <span class="text-3xl block mb-2">🔍</span>
+                    <p class="text-sm font-bold text-blue-200">Tidak ada berkas cocok dengan "${keyword}"</p>
+                    <p class="text-xs text-blue-400 mt-1">Coba cari dengan kata kunci lain.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <p class="text-[11px] text-yellow-400 font-bold px-1 mb-1">Ditemukan ${matchedFiles.length} berkas materi:</p>
+            ${matchedFiles.map(file => {
+                return `
+                    <div onclick="attachMateriFileToAI('${file.id}')" class="flex items-center justify-between p-3 bg-slate-900/80 hover:bg-yellow-400/15 border border-blue-800/60 hover:border-yellow-400/60 rounded-2xl transition cursor-pointer group active:scale-[0.98]">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <span class="text-xl">📄</span>
+                            <div class="min-w-0 flex-1">
+                                <span class="text-[10px] text-yellow-400 font-bold block uppercase">${file.course}</span>
+                                <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${file.name}</p>
+                                <span class="text-[10px] text-blue-300">${file.size || ''}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-extrabold text-[11px] rounded-xl transition shadow-md shadow-yellow-400/20 flex-shrink-0 cursor-pointer">
+                            Pilih ➔
+                        </button>
+                    </div>
+                `;
+            }).join('')}
+        `;
+    }
+
+    async function attachMateriFileToAI(fileId) {
+        const file = materiPickerFiles.find(f => f.id === fileId);
+        if (!file) return;
+
+        closeMateriPickerModal();
+
+        pendingFileName = `[${file.course}] ${file.name}`;
+        pendingFileMime = 'application/octet-stream';
+        pendingFileText = null;
+
+        const zone = document.getElementById('file-preview-zone');
+        zone.innerHTML = `
+            <div class="bg-blue-900/70 border border-yellow-400/50 px-3.5 py-2 rounded-xl flex items-center gap-2.5 text-xs shadow-md">
+                <span id="file-icon" class="text-yellow-400 text-base">⏳</span>
+                <div class="min-w-0">
+                    <span class="text-[10px] text-yellow-300 font-bold block uppercase tracking-wide">Materi [${file.course}]</span>
+                    <span class="text-white truncate font-bold max-w-[220px] sm:max-w-xs block">${file.name}</span>
+                </div>
+                <span id="file-status-label" class="text-[10px] text-blue-300 italic ml-2">Membaca materi...</span>
+                <button onclick="removeFile()" class="text-red-400 hover:text-red-300 ml-2 font-bold text-base cursor-pointer">&times;</button>
+            </div>
+        `;
+        zone.classList.remove('hidden');
+
+        try {
+            let arrayBuffer = null;
+            const sb = typeof getSupabase === 'function' ? getSupabase() : null;
+
+            // Coba unduh dari Supabase Storage jika ada storage_path
+            if (sb && file.storage_path) {
+                try {
+                    const { data, error } = await sb.storage.from('materi').download(file.storage_path);
+                    if (!error && data) {
+                        arrayBuffer = await data.arrayBuffer();
+                    }
+                } catch(e) {
+                    console.warn("Storage download warning:", e);
+                }
+            }
+
+            // Fallback coba getPublicUrl jika download direct belum dapat
+            if (!arrayBuffer && file.storage_path && typeof getFileUrl === 'function') {
+                try {
+                    const pubUrl = getFileUrl(file.storage_path);
+                    if (pubUrl) {
+                        const res = await fetch(pubUrl);
+                        if (res.ok) arrayBuffer = await res.arrayBuffer();
+                    }
+                } catch(e) {}
+            }
+
+            // Fallback dari dataUrl lokal jika ada
+            if (!arrayBuffer && file.dataUrl && file.dataUrl.startsWith('data:')) {
+                try {
+                    const base64 = file.dataUrl.split(',')[1];
+                    const binary = atob(base64);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    arrayBuffer = bytes.buffer;
+                } catch(e) {}
+            }
+
+            const ext = (file.ext || (file.name ? file.name.split('.').pop() : '')).toLowerCase();
+
+            if (arrayBuffer && ext === 'pdf') {
+                if (typeof pdfjsLib !== 'undefined') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                    const pdf = await loadingTask.promise;
+                    let fullText = "";
+                    const maxPages = Math.min(pdf.numPages, 40);
+                    for (let i = 1; i <= maxPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageStr = textContent.items.map(item => item.str).join(" ");
+                        if (pageStr.trim()) {
+                            fullText += `--- Halaman ${i} ---\n${pageStr}\n\n`;
+                        }
+                    }
+                    pendingFileText = fullText.trim() || `[Berkas ${file.name} dari matkul ${file.course} terbaca (${pdf.numPages} halaman)]`;
+                    const lbl = document.getElementById('file-status-label');
+                    if (lbl) lbl.textContent = `(${pdf.numPages} hal • Siap dibahas)`;
+                } else {
+                    pendingFileText = `[Berkas materi terlampir: ${file.name} dari mata kuliah ${file.course}]`;
+                }
+            } else if (arrayBuffer && ['txt'].includes(ext)) {
+                const dec = new TextDecoder('utf-8');
+                pendingFileText = dec.decode(arrayBuffer);
+                const lbl = document.getElementById('file-status-label');
+                if (lbl) lbl.textContent = `(Teks siap)`;
+            } else if (arrayBuffer) {
+                const dec = new TextDecoder('utf-8', { fatal: false });
+                const raw = dec.decode(arrayBuffer);
+                const clean = raw.replace(/[^\x20-\x7E\t\n\r]/g, ' ').replace(/\s+/g, ' ').trim();
+                pendingFileText = clean.length > 50 ? clean.slice(0, 30000) : `[Berkas materi ${file.name} mata kuliah ${file.course} terlampir]`;
+                const lbl = document.getElementById('file-status-label');
+                if (lbl) lbl.textContent = `(Siap dibahas)`;
+            } else {
+                pendingFileText = `[Berkas materi "${file.name}" dari folder mata kuliah "${file.course}" telah dipilih untuk didiskusikan.]`;
+                const lbl = document.getElementById('file-status-label');
+                if (lbl) lbl.textContent = `(Materi terpilih)`;
+            }
+
+        } catch(err) {
+            console.error("Gagal membaca file materi:", err);
+            pendingFileText = `[Berkas ${file.name} mata kuliah ${file.course} terlampir]`;
+            const lbl = document.getElementById('file-status-label');
+            if (lbl) lbl.textContent = `(Siap dibahas)`;
+        } finally {
+            const icon = document.getElementById('file-icon');
+            if (icon) icon.textContent = '📄';
+        }
+
+        // Ubah placeholder input dan beri fokus otomatis
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.placeholder = `Tanyakan rangkuman, konsep penting, atau kisi-kisi ujian dari materi "${file.name}"...`;
+            chatInput.focus();
+        }
+    }
+
+    function appendMessage(role, content, fileName = null, scroll = true) {
         const container = document.getElementById('chat-container');
         const div = document.createElement('div');
         div.className = "flex gap-4 max-w-3xl " + (role === 'user' ? "ml-auto flex-row-reverse" : "");
@@ -265,7 +1282,7 @@ Jangan memberi penjelasan yang terlalu panjang kecuali diminta. Gunakan format m
             role === 'user' ? "bg-gradient-to-tr from-yellow-500 to-yellow-300 border-yellow-400/50 text-blue-950 font-bold" 
             : "bg-gradient-to-br from-blue-600 to-blue-800 border-blue-500/50"
         }`;
-        avatar.textContent = role === 'user' ? "A" : "🤖"; // "A" for Anak Sastra
+        avatar.textContent = role === 'user' ? "A" : "🤖";
 
         const msgBox = document.createElement('div');
         msgBox.className = `border rounded-2xl p-4 text-sm shadow-md prose prose-invert max-w-full overflow-hidden ${
@@ -276,153 +1293,150 @@ Jangan memberi penjelasan yang terlalu panjang kecuali diminta. Gunakan format m
 
         let finalHtml = "";
         if (fileName) {
-            finalHtml += `<div class="mb-2 bg-blue-950/40 border border-blue-800/40 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 inline-flex items-center gap-2"><span class="text-yellow-400">📄</span> Dilampirkan: ${fileName}</div><br>`;
+            finalHtml += `<div class="mb-2 bg-blue-950/40 border border-blue-800/40 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 inline-flex items-center gap-2"><span class="text-yellow-400">📄</span> Berkas terlampir: ${fileName}</div><br>`;
         }
         
         if (role === 'user') {
-            // User message is plain text, escape HTML to prevent XSS
             const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
             }[tag]));
             finalHtml += escapeHTML(content);
         } else {
-            // AI message is markdown
-            finalHtml += marked.parse(content);
+            finalHtml += typeof marked !== 'undefined' ? marked.parse(content) : content;
         }
         
         msgBox.innerHTML = finalHtml;
-
         div.appendChild(avatar);
         div.appendChild(msgBox);
         container.appendChild(div);
+        if (scroll) {
+            container.scrollTop = container.scrollHeight;
+        }
         
-        // Scroll to bottom
-        container.scrollTop = container.scrollHeight;
-        
-        return msgBox; // return so we can update it if it's a typing indicator
+        return msgBox;
     }
 
     async function sendMessage() {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
-        const apiKey = localStorage.getItem("ulmet_gemini_api_key");
+        const apiKey = getSnifoxApiKey();
+        const model = getSelectedModel();
 
-        if (!text && !pendingFileBase64) return;
+        if (!text && !pendingFileName) return;
         if (!apiKey) {
             document.getElementById('api-modal').classList.remove('hidden');
             return;
         }
 
-        // Add user message to UI
         const fileAttached = pendingFileName;
         appendMessage('user', text, fileAttached);
         
-        // Setup payload for history
-        let userContent = [];
-        if (text) userContent.push({ "text": text });
-        if (pendingFileBase64) {
-            // Convert mime if doc/docx to simple pdf/txt for Gemini if needed, 
-            // but Gemini 1.5 Flash supports pdf, txt directly.
-            // For docx/etc it's better handled as plain text if possible, but let's send base64.
-            userContent.push({
-                "inline_data": {
-                    "mime_type": pendingFileMime === 'application/pdf' ? 'application/pdf' : 'text/plain', 
-                    "data": pendingFileBase64
-                }
-            });
+        // Buat konten prompt user
+        let userPrompt = text;
+        if (pendingFileText) {
+            userPrompt += `\n\n[DOKUMEN TERLAMPIR: "${pendingFileName}"]:\n${pendingFileText.slice(0, 35000)}\n[AKHIR DOKUMEN: "${pendingFileName}"]\n(Penting untuk AI: Dokumen di atas telah diekstrak dan siap dibaca. Analisis, rangkum, atau jawab pertanyaan mahasiswa berdasarkan isi dokumen tersebut.)`;
+        } else if (fileAttached) {
+            userPrompt += `\n\n[DOKUMEN TERLAMPIR: "${pendingFileName}"]`;
         }
 
-        conversationHistory.push({
-            "role": "user",
-            "parts": userContent
-        });
+        // Susun payload messages OpenAI standard
+        const messagesToSend = [
+            { role: "system", content: SYSTEM_PROMPT }
+        ];
+
+        // Masukkan history percakapan sebelumnya
+        conversationHistory.forEach(h => messagesToSend.push({ role: h.role, content: h.content }));
+
+        // Masukkan pesan user terbaru
+        messagesToSend.push({ role: "user", content: userPrompt });
 
         input.value = '';
         input.style.height = "auto";
         removeFile();
 
-        // Add loading indicator
-        const loadingBox = appendMessage('model', "⏳ Memikirkan jawaban...");
+        // Tampilkan indikator loading berfikir
+        const loadingBox = appendMessage('assistant', '<span class="text-yellow-400 font-semibold animate-pulse tracking-wide">Thingking...</span>');
 
         try {
-            let attempt = 0;
-            let success = false;
-            let data, aiText;
-            
-            while (attempt < 3 && !success) {
-                attempt++;
-                if (attempt > 1) {
-                    loadingBox.innerHTML = `⏳ AI sedang sibuk (Overload). Mencoba ulang otomatis (Percobaan ${attempt}/3)...`;
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "system_instruction": { "parts": [{ "text": SYSTEM_PROMPT }] },
-                        "contents": conversationHistory,
-                        "generationConfig": { "temperature": 0.7, "maxOutputTokens": 2048 }
-                    })
-                });
-
-                data = await response.json();
-                
-                if (response.ok) {
-                    success = true;
-                    aiText = data.candidates[0].content.parts[0].text;
-                } else {
-                    const errMsg = data.error?.message || "";
-                    if (!errMsg.toLowerCase().includes("high demand") && !errMsg.toLowerCase().includes("overloaded")) {
-                        throw new Error(errMsg || "Gagal menghubungi AI");
-                    }
-                    if (attempt === 3) throw new Error("Server AI masih kepenuhan setelah 3x percobaan. Coba beberapa menit lagi ya.");
-                }
-            }
-            
-            // Update history
-            conversationHistory.push({
-                "role": "model",
-                "parts": [{ "text": aiText }]
+            const response = await fetch(SNIFOX_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: messagesToSend,
+                    temperature: 0.7,
+                    max_tokens: 2048
+                })
             });
 
-            // Update UI
-            loadingBox.innerHTML = marked.parse(aiText);
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errMsg = data.message || data.error?.message || `HTTP ${response.status}`;
+                throw new Error(errMsg);
+            }
+
+            const aiReply = data.choices?.[0]?.message?.content || "Maaf, AI tidak memberikan respons.";
+
+            // Simpan ke riwayat lokal & cloud
+            conversationHistory.push({ role: "user", content: text || `[Membahas file ${fileAttached}]`, fileName: fileAttached });
+            conversationHistory.push({ role: "assistant", content: aiReply });
+            saveAiHistory();
+
+            // Render hasil
+            loadingBox.innerHTML = typeof marked !== 'undefined' ? marked.parse(aiReply) : aiReply;
             document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
 
         } catch (error) {
-            loadingBox.innerHTML = `<span class="text-red-400"><strong>Error:</strong> ${error.message}</span>`;
-            // Remove last user message from history so they can retry
-            conversationHistory.pop();
+            loadingBox.innerHTML = `
+                <div class="text-red-400 space-y-1">
+                    <p><strong>⚠️ Gagal mendapatkan jawaban dari SnifoxAI:</strong></p>
+                    <p class="text-xs bg-red-950/60 p-2 rounded-lg border border-red-900/50">${error.message}</p>
+                    <button onclick="document.getElementById('api-modal').classList.remove('hidden')" class="text-xs text-yellow-400 hover:underline mt-1 font-semibold">
+                        Buka Pengaturan API untuk cek API Key ↗
+                    </button>
+                </div>
+            `;
         }
     }
+
+    // Keyboard shortcut: Escape untuk tutup modal
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.getElementById('api-modal')?.classList.add('hidden');
+            closeMateriPickerModal();
+        }
+    });
 </script>
 
-<!-- BOTTOM NAVIGATION (Mobile Only) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
     <a href="dashboard.html" class="bnav-item">
-        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
     </a>
     <a href="jadwal.html" class="bnav-item">
-        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-icon">📅</span>
         <span class="bnav-label">Jadwal</span>
     </a>
     <a href="materi.html" class="bnav-item">
-        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-icon">📚</span>
         <span class="bnav-label">Materi</span>
     </a>
     <a href="ai.html" class="bnav-item active">
-        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-icon">🤖</span>
         <span class="bnav-label">AI</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">💸</span>
+        <span class="bnav-label">Keuangan</span>
     </a>
     <a href="profil.html" class="bnav-item">
         <span class="bnav-icon">👤</span>
         <span class="bnav-label">Profil</span>
-    </a>
-    <a href="keuangan.html" class="bnav-item">
-        <span class="bnav-icon">&#128184;</span>
-        <span class="bnav-label">Keuangan</span>
     </a>
 </nav>
 
@@ -445,6 +1459,9 @@ document.addEventListener('touchend', (e) => {
         setTimeout(() => window.location.reload(), 500);
     }
 }, {passive: true});
+</script>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
 </script>
 </body>
 </html>

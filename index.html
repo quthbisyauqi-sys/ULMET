@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="manifest" href="manifest.json">
     <title>Mengalihkan...</title>
     <script>
         // Pindahkan semua parameter error atau hash Supabase ke login.html
@@ -13,5 +14,8 @@
 </head>
 <body style="background-color: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif;">
     <h2>Memuat ULMET... ⏳</h2>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+</script>
 </body>
 </html>

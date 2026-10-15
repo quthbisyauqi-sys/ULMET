@@ -2,8 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <title>Materi Dosen - ULMET</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,8 +15,8 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: "Plus Jakarta Sans", sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
+        body { font-family: "Plus Jakarta Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
         @keyframes pageFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -34,18 +36,62 @@
         @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
         .shake { animation: shake 0.35s ease; }
 
-        /* Bottom nav mobile */
-        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
-        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
-        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
-        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
-        .bnav-icon { font-size: 20px; line-height: 1; }
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
 
         /* Mobile folder drawer */
         #mobile-folder-drawer { transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1); }
         #mobile-folder-drawer.open { transform: translateX(0) !important; }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Supabase SDK & Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body class="bg-slate-900 text-white flex h-screen overflow-hidden">
 
@@ -96,10 +142,10 @@
         <div class="px-5 py-4 border-b border-blue-800/40 flex-shrink-0">
             <div class="flex items-center justify-between mb-1">
                 <h2 class="text-sm font-extrabold text-white tracking-wide">&#128194; Mata Kuliah</h2>
-                <button onclick="openGDriveModal()" class="flex items-center gap-1.5 bg-blue-900/60 hover:bg-blue-800 border border-blue-700/50 px-2.5 py-1.5 rounded-lg transition cursor-pointer">
-                    <span class="text-[10px]" id="drive-icon-sidebar">&#9729;&#65039;</span>
-                    <span class="text-[10px] font-bold text-blue-400" id="drive-text-sidebar">Drive</span>
-                </button>
+                <div class="flex items-center gap-1.5 bg-blue-900/40 border border-blue-800/40 px-2.5 py-1.5 rounded-lg">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-[10px] font-bold text-emerald-400">Cloud</span>
+                </div>
             </div>
             <p class="text-[11px] text-blue-400">Pilih folder untuk melihat &amp; upload file</p>
         </div>
@@ -151,7 +197,7 @@
             <p class="text-sm text-blue-400 mt-2">Klik salah satu folder di sebelah kiri untuk melihat dan mengelola file di dalamnya.</p>
         </div>
 
-        <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-6 pb-6 mt-4">
+        <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-4 md:px-6 pb-36 md:pb-6 mt-3 sm:mt-4">
             <div id="file-list-container" class="space-y-2"></div>
         </div>
     </div>
@@ -220,39 +266,66 @@
     </div>
 </div>
 
-<!-- MODAL: GOOGLE DRIVE -->
-<div id="modal-gdrive" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4" onclick="handleDriveModalBackdrop(event)">
-    <div class="modal-box bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-800/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center relative" id="modal-gdrive-box">
-        
-        <!-- Close Button -->
-        <button onclick="closeGDriveModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none transition">&times;</button>
-
-        <!-- Icon & Header -->
-        <div class="w-20 h-20 bg-blue-900/40 border border-blue-700/50 rounded-3xl flex items-center justify-center text-5xl mx-auto mb-5 shadow-inner">&#9729;&#65039;</div>
-        <h3 class="text-white font-bold text-xl mb-1">Google Drive</h3>
-        <p class="text-xs text-blue-300 px-4 leading-relaxed mb-6">Hubungkan akun Google kamu agar semua materi kuliah otomatis tersimpan dan tertata rapi di Drive.</p>
-
-        <!-- Status -->
-        <div class="bg-blue-950/50 border border-blue-800/50 rounded-2xl p-4 mb-6" id="gdrive-status-banner">
-            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
-                <span id="gdrive-status-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse flex-shrink-0"></span>
-                <span id="gdrive-status-label">Belum Terhubung</span>
-            </p>
+<!-- MODAL: SIMPAN BERKAS DARI SHARE TARGET (WHATSAPP/ANDROID) -->
+<div id="modal-share-destination" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[85] flex items-center justify-center p-4">
+    <div class="modal-box bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 border border-yellow-400/50 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl relative page-fade">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg">
+                📥
+            </div>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">Berbagi dari WhatsApp</span>
+                <h3 class="text-white font-extrabold text-lg leading-tight mt-0.5 truncate">Simpan ke Folder Materi</h3>
+            </div>
+            <button onclick="dismissShareModal()" class="text-blue-400 hover:text-white transition text-2xl leading-none flex-shrink-0 p-1">&times;</button>
         </div>
 
-        <!-- Actions -->
-        <div class="space-y-3">
-            <button onclick="connectGoogleAccount()" id="btn-login-gdrive" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-400/20">
-                &#128272; Hubungkan Sekarang
-            </button>
-            <button onclick="disconnectDrive()" id="btn-disconnect-drive" class="hidden w-full py-3 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-950/30 rounded-xl transition">
-                Putuskan Koneksi
-            </button>
+        <!-- File Preview Card -->
+        <div class="bg-blue-950/80 border border-blue-700/60 rounded-2xl p-3.5 mb-4 flex items-center gap-3 shadow-inner">
+            <div id="share-file-icon" class="w-11 h-11 rounded-xl bg-blue-900/60 border border-blue-600/50 flex items-center justify-center text-xl font-bold text-yellow-400 flex-shrink-0">
+                📄
+            </div>
+            <div class="min-w-0 flex-1">
+                <p id="share-file-name" class="text-sm font-bold text-white truncate">Dokumen.pdf</p>
+                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-blue-300">
+                    <span id="share-file-size">0 KB</span>
+                    <span>•</span>
+                    <span class="text-emerald-400 font-medium">Siap disimpan</span>
+                </div>
+            </div>
         </div>
-        
-        <p class="text-[10px] text-blue-500 mt-5">Folder akan dibuat otomatis: <br>Drive &rarr; ULMET &rarr; [Nama Mata Kuliah]</p>
+
+        <p class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span>📁</span> Tekan Folder Tujuan untuk Menyimpan:
+        </p>
+
+        <!-- Course Selection Grid -->
+        <div id="share-course-options" class="max-h-56 overflow-y-auto space-y-1.5 pr-1 mb-3">
+            <!-- Diisi otomatis oleh renderShareCourseOptions() -->
+        </div>
+
+        <!-- Input inline buat folder baru cepat jika belum ada foldernya -->
+        <div class="pt-3 border-t border-blue-800/50">
+            <div id="share-new-folder-box" class="hidden mb-3 space-y-2">
+                <input type="text" id="share-new-folder-input" placeholder="Ketik nama folder matkul baru..." class="w-full bg-slate-950 border border-yellow-400/60 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none">
+                <div class="flex gap-2">
+                    <button onclick="confirmCreateCourseAndSaveShare()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-2 rounded-xl text-xs transition">Simpan ke Folder Baru Ini</button>
+                    <button onclick="toggleShareNewFolder(false)" class="px-3 bg-blue-950 border border-blue-800 text-blue-300 text-xs rounded-xl">Batal</button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+                <button onclick="toggleShareNewFolder(true)" id="btn-toggle-share-new" class="text-xs font-bold text-yellow-400 hover:text-yellow-300 flex items-center gap-1.5 py-1 transition cursor-pointer">
+                    <span>➕</span> Buat Folder Baru
+                </button>
+                <button onclick="dismissShareModal()" class="text-xs text-blue-400 hover:text-red-400 transition font-medium cursor-pointer">
+                    Abaikan / Batal
+                </button>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Google Drive modal telah dihapus — berkas kini disimpan otomatis via Supabase Storage -->
 
 <!-- TOAST -->
 <div id="toast" class="hidden fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs"></div>
@@ -271,36 +344,36 @@ if (localStorage.getItem("ulmet_data_version") !== DATA_VERSION) {
 
 let currentCourse = null;
 let currentViewingFileId = null;
-let gdriveToken = localStorage.getItem("ulmet_gdrive_token") || null;
-let gdriveAccount = localStorage.getItem("ulmet_gdrive_account") ? JSON.parse(localStorage.getItem("ulmet_gdrive_account")) : null;
-let gdriveClientId = localStorage.getItem("ulmet_gdrive_client_id") || "";
-let tokenClient = null;
 
-// Data kosong — mahasiswa yang mengisi sendiri!
-let userCourses = JSON.parse(localStorage.getItem("ulmet_courses") || "null");
-if (!Array.isArray(userCourses)) {
-    userCourses = [];
-    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+// Data sinkron Supabase & localStorage cache
+const DEFAULT_COURSES = ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
+let userCourses = JSON.parse(localStorage.getItem(userKey("ulmet_courses")) || "null");
+if (!Array.isArray(userCourses) || userCourses.length === 0) {
+    userCourses = DEFAULT_COURSES;
+} else {
+    userCourses = userCourses.map(c => typeof c === 'string' ? c : (c && c.name ? c.name : String(c))).filter(Boolean);
 }
+localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
 
-let userFiles = JSON.parse(localStorage.getItem("ulmet_files") || "null");
+let userFiles = JSON.parse(localStorage.getItem(userKey("ulmet_files")) || "null");
 if (!Array.isArray(userFiles)) {
     userFiles = [];
-    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+    localStorage.setItem(userKey("ulmet_files"), JSON.stringify(userFiles));
 }
 
 // === Load profil ke sidebar ===
 (function() {
     try {
-        const p = JSON.parse(localStorage.getItem('ulmet_profile') || '{}');
-        if (p.nama) {
-            const nm = document.getElementById('sidebar-nama');
-            const sm = document.getElementById('sidebar-semester');
-            const av = document.getElementById('sidebar-avatar');
-            if (nm) nm.textContent = p.nama;
-            if (sm) sm.textContent = 'Semester ' + (p.semester || '-');
-            if (av) av.textContent = p.nama.charAt(0).toUpperCase();
-        }
+        const p = JSON.parse(localStorage.getItem(userKey('ulmet_profile')) || localStorage.getItem('ulmet_profile') || '{}');
+        const acc = JSON.parse(localStorage.getItem(userKey('ulmet_account')) || localStorage.getItem('ulmet_account') || '{}');
+        const nama = p.nama || acc.name || 'Mahasiswa ULMET';
+        const semester = p.semester ? 'Semester ' + p.semester : 'Aktif';
+        const nm = document.getElementById('sidebar-nama');
+        const sm = document.getElementById('sidebar-semester');
+        const av = document.getElementById('sidebar-avatar');
+        if (nm) nm.textContent = nama;
+        if (sm) sm.textContent = semester;
+        if (av) av.textContent = (nama.charAt(0) || 'U').toUpperCase();
     } catch(e) {}
 })();
 
@@ -336,7 +409,8 @@ function renderCourseFolders() {
         container.appendChild(emptyP);
         return;
     }
-    userCourses.forEach(function(name) {
+    userCourses.forEach(function(rawCourse) {
+        var name = typeof rawCourse === 'string' ? rawCourse : (rawCourse && rawCourse.name ? rawCourse.name : String(rawCourse));
         var count = userFiles.filter(function(f) { return f.course === name; }).length;
         var isActive = name === currentCourse;
 
@@ -378,6 +452,7 @@ function renderCourseFolders() {
 
 function selectCourse(courseName) {
     currentCourse = courseName;
+    try { localStorage.setItem(userKey("ulmet_active_course"), courseName); } catch(e) {}
     document.getElementById("active-course-title").textContent = courseName;
     const count = userFiles.filter(f => f.course === courseName).length;
     document.getElementById("active-course-subtitle").textContent = count + " file tersimpan";
@@ -391,9 +466,11 @@ function deleteCourseFolder(courseName) {
     const count = userFiles.filter(f => f.course === courseName).length;
     if (!confirm((count > 0 ? "Hapus folder \"" + courseName + "\" beserta " + count + " file?" : "Hapus folder \"" + courseName + "\"?"))) return;
     userCourses = userCourses.filter(c => c !== courseName);
-    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+    localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
+    syncCourses(userCourses);
     userFiles = userFiles.filter(f => f.course !== courseName);
-    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+    localStorage.setItem(userKey("ulmet_files"), JSON.stringify(userFiles));
+    syncFiles(userFiles);
     if (currentCourse === courseName) {
         currentCourse = null;
         document.getElementById("no-course-selected").classList.remove("hidden");
@@ -442,7 +519,12 @@ function confirmAddFolder() {
         return;
     }
 
-    if (userCourses.some(c => c.toLowerCase() === name.toLowerCase())) {
+    const exists = userCourses.some(c => {
+        const cName = typeof c === 'string' ? c : (c && c.name ? c.name : '');
+        return cName.toLowerCase() === name.toLowerCase();
+    });
+
+    if (exists) {
         inp.classList.add("shake", "border-red-500");
         setTimeout(() => { inp.classList.remove("shake"); inp.classList.remove("border-red-500"); }, 400);
         if (hint) { hint.textContent = "⚠ Folder \"" + name + "\" sudah ada!"; hint.className = "text-[10px] text-red-400 font-semibold"; }
@@ -452,18 +534,12 @@ function confirmAddFolder() {
 
     // Tambahkan folder baru
     userCourses.push(name);
-    localStorage.setItem("ulmet_courses", JSON.stringify(userCourses));
+    localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
+    try { syncCourses(userCourses); } catch(e) { console.warn('Sync courses error:', e); }
     renderCourseFolders();
     selectCourse(name);
     closeAddFolderModal();
     showToast("📁 Folder \"" + name + "\" berhasil dibuat!");
-
-    // Jika Drive terhubung, buat folder di Drive juga
-    if (gdriveToken) {
-        getOrCreateDriveFolder("ULMET").then(id => {
-            if (id) getOrCreateDriveFolder(name, id).then(() => showToast("☁️ Folder juga dibuat di Google Drive!"));
-        }).catch(() => {});
-    }
 }
 
 function renderFilesList() {
@@ -485,7 +561,7 @@ function renderFilesList() {
     container.innerHTML = files.map(file => {
         const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
         const theme = getTheme(ext);
-        const isGDrive = !!file.gdriveId;
+        const isCloud = !!file.storage_path;
         const safeName = file.name.replace(/"/g, "&quot;").replace(/'/g, "\\'");
         return "<div class='file-card flex items-center justify-between p-4 bg-slate-900/60 border border-blue-800/40 hover:border-blue-600/60 rounded-2xl group cursor-pointer' draggable='true' ondragstart=\"if(window.aiHandleDragStart) aiHandleDragStart(event, '" + file.id + "')\" onclick=\"openFileViewer('" + file.id + "')\">" +
             "<div class='flex items-center gap-4 min-w-0 flex-1'>" +
@@ -495,7 +571,7 @@ function renderFilesList() {
                     "<div class='flex items-center gap-2 mt-0.5'>" +
                         "<span class='text-[10px] text-blue-400'>" + file.size + "</span>" +
                         "<span class='w-1 h-1 rounded-full bg-blue-800'></span>" +
-                        "<span class='text-[10px] " + (isGDrive ? "text-green-400 font-semibold" : "text-blue-400") + "'>" + (isGDrive ? "&#9729;&#65039; Tersimpan di Google Drive" : (file.date || "Tersimpan")) + "</span>" +
+                        "<span class='text-[10px] " + (isCloud ? "text-emerald-400 font-semibold" : "text-blue-400") + "'>" + (isCloud ? "☁️ Supabase Cloud" : (file.date || "Tersimpan")) + "</span>" +
                     "</div>" +
                 "</div>" +
             "</div>" +
@@ -508,47 +584,6 @@ function renderFilesList() {
     document.getElementById("active-course-subtitle").textContent = files.length + " file tersimpan";
 }
 
-async function getOrCreateDriveFolder(folderName, parentId) {
-    if (!gdriveToken) return null;
-    
-    // Bypass untuk mode simulasi (Demo)
-    if (gdriveToken.startsWith("SIMULATED_TOKEN_")) {
-        return "simulated_folder_id_" + folderName.replace(/\s+/g, '_');
-    }
-
-    let query = "mimeType='application/vnd.google-apps.folder' and name='" + folderName.replace(/'/g, "\\'") + "' and trashed=false";
-    if (parentId) query += " and '" + parentId + "' in parents";
-    const rs = await fetch("https://www.googleapis.com/drive/v3/files?q=" + encodeURIComponent(query) + "&fields=files(id,name)", { headers: { "Authorization": "Bearer " + gdriveToken } });
-    
-    if (rs.status === 401 || rs.status === 403) throw new Error("Sesi Google Drive kedaluwarsa. Silakan hubungkan ulang!");
-    
-    if (rs.ok) { const d = await rs.json(); if (d.files && d.files.length) return d.files[0].id; }
-    const meta = { name: folderName, mimeType: "application/vnd.google-apps.folder" };
-    if (parentId) meta.parents = [parentId];
-    const rc = await fetch("https://www.googleapis.com/drive/v3/files", { method: "POST", headers: { "Authorization": "Bearer " + gdriveToken, "Content-Type": "application/json" }, body: JSON.stringify(meta) });
-    if (rc.ok) { const d = await rc.json(); return d.id; }
-    return null;
-}
-
-async function uploadFileToGoogleDriveDirect(file, folderId) {
-    if (!gdriveToken) return null;
-    
-    // Bypass untuk mode simulasi (Demo)
-    if (gdriveToken.startsWith("SIMULATED_TOKEN_")) {
-        return new Promise(resolve => setTimeout(() => resolve("simulated_file_id_" + Date.now()), 800));
-    }
-
-    const meta = { name: file.name, mimeType: file.type || "application/octet-stream", description: "Materi ULMET - " + currentCourse };
-    if (folderId) meta.parents = [folderId];
-    const fd = new FormData();
-    fd.append("metadata", new Blob([JSON.stringify(meta)], { type: "application/json" }));
-    fd.append("file", file);
-    const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", { method: "POST", headers: { "Authorization": "Bearer " + gdriveToken }, body: fd });
-    if (res.ok) { const d = await res.json(); return d.id; }
-    if (res.status === 401 || res.status === 403) throw new Error("Sesi Google Drive kedaluwarsa. Silakan hubungkan ulang!");
-    const err = await res.json(); throw new Error(err.error ? err.error.message : "Upload gagal");
-}
-
 async function handleFileUpload(fileOrEvent) {
     var file = fileOrEvent;
     if (fileOrEvent && fileOrEvent.target && fileOrEvent.target.files) {
@@ -556,44 +591,73 @@ async function handleFileUpload(fileOrEvent) {
     }
     if (!file || !(file instanceof File)) return;
     if (!currentCourse) {
-        alert("⚠️ PERHATIAN: Pilih folder Mata Kuliah dulu!");
+        alert("⚠️ PERHATIAN: Pilih folder Mata Kuliah terlebih dahulu!");
         return;
     }
     const ext = file.name.split(".").pop().toLowerCase();
     const size = file.size > 1048576 ? (file.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(file.size/1024)) + " KB";
-    showToast("Menyimpan \"" + file.name + "\"...");
-    const reader = new FileReader();
-    reader.onload = async evt => {
-        const obj = { id: "file-" + Date.now(), name: file.name, course: currentCourse, size, ext, date: "Baru saja", dataUrl: evt.target.result, gdriveId: null };
-        if (gdriveToken) {
-            showToast("Mengatur folder Drive & mengunggah...");
-            try {
-                const ulmetId = await getOrCreateDriveFolder("ULMET");
-                let courseId = ulmetId;
-                if (ulmetId && currentCourse) courseId = await getOrCreateDriveFolder(currentCourse, ulmetId);
-                const gId = await uploadFileToGoogleDriveDirect(file, courseId);
-                if (gId) { obj.gdriveId = gId; showToast("Tersimpan di Drive: ULMET / " + currentCourse); }
-            } catch(err) { 
-                console.warn(err); 
-                if (err.message.includes("kedaluwarsa")) {
-                    gdriveToken = null;
-                    localStorage.removeItem("ulmet_gdrive_token");
-                    updateSidebarDriveStatus();
-                    updateModalStatusUI();
-                    showToast(err.message, "error");
-                } else {
-                    showToast("Gagal ke Drive, disimpan lokal.", "error"); 
-                }
-            }
-        } else {
-            showToast("Berhasil disimpan di ULMET!");
-        }
-        userFiles.unshift(obj);
-        localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
-        renderCourseFolders();
-        renderFilesList();
+    showToast("⏳ Mengunggah \"" + file.name + "\" ke Supabase...");
+
+    const obj = {
+        id: "file-" + Date.now(),
+        name: file.name,
+        course: currentCourse,
+        size: size,
+        ext: ext,
+        date: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}),
+        storage_path: null
     };
-    reader.readAsDataURL(file);
+
+    let uploadedToCloud = false;
+    // Upload ke Supabase Storage (bucket "materi")
+    try {
+        const folderPath = (currentCourse || 'Umum').replace(/[^a-zA-Z0-9_\-\s]/g, '').replace(/\s+/g, '_');
+        const uploadRes = await uploadFile(file, folderPath);
+        if (uploadRes && (uploadRes.fullPath || uploadRes.path)) {
+            obj.storage_path = uploadRes.fullPath || uploadRes.path;
+            uploadedToCloud = true;
+            showToast("☁️ Berkas berhasil diunggah ke Supabase Cloud!");
+        }
+    } catch(err) {
+        console.warn("Upload ke Supabase Storage gagal:", err);
+        showToast("⚠️ Upload cloud gagal: " + (err.message || 'Error'));
+    }
+
+    // Jika cloud gagal DAN ukuran file kecil (<2MB), simpan dataUrl sebagai fallback offline
+    if (!uploadedToCloud && file.size < 2 * 1024 * 1024) {
+        try {
+            const dataUrl = await new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = e => resolve(e.target.result);
+                r.readAsDataURL(file);
+            });
+            obj.dataUrl = dataUrl;
+        } catch(e) {}
+    }
+
+    userFiles.unshift(obj);
+
+    // Simpan ke cache lokal
+    try {
+        const cleanForLocal = userFiles.map(f => {
+            const { dataUrl, ...rest } = f;
+            return rest;
+        });
+        localStorage.setItem(userKey("ulmet_files"), JSON.stringify(cleanForLocal));
+    } catch (e) {
+        console.warn("LocalStorage warning:", e);
+    }
+
+    // Sinkronisasi metadata ke tabel files Supabase
+    try {
+        await syncFiles(userFiles);
+    } catch (syncErr) {
+        console.error("Gagal sync files ke DB:", syncErr);
+    }
+
+    renderCourseFolders();
+    renderFilesList();
+
     const input = document.getElementById("upload-input");
     if (input) input.value = "";
 }
@@ -601,17 +665,38 @@ async function handleFileUpload(fileOrEvent) {
 function downloadFile(fileId) {
     const file = userFiles.find(f => f.id === fileId);
     if (!file) return;
-    if (file.dataUrl) {
-        const a = document.createElement("a"); a.href = file.dataUrl; a.download = file.name;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    if (file.storage_path) {
+        const url = getFileUrl(file.storage_path);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.target = "_blank";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         showToast("Mengunduh " + file.name);
-    } else { showToast("File tidak tersedia untuk diunduh", "error"); }
+    } else if (file.dataUrl) {
+        const a = document.createElement("a");
+        a.href = file.dataUrl;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Mengunduh " + file.name);
+    } else {
+        showToast("File tidak tersedia untuk diunduh", "error");
+    }
 }
 
-function deleteFileItem(fileId, fileName) {
+async function deleteFileItem(fileId, fileName) {
     if (!confirm("Hapus berkas \"" + fileName + "\" dari ULMET?")) return;
+    const file = userFiles.find(f => f.id === fileId);
+    if (file && file.storage_path) {
+        try { await deleteStorageFile(file.storage_path); } catch(e) {}
+    }
     userFiles = userFiles.filter(f => f.id !== fileId);
-    localStorage.setItem("ulmet_files", JSON.stringify(userFiles));
+    localStorage.setItem(userKey("ulmet_files"), JSON.stringify(userFiles));
+    syncFiles(userFiles);
     renderCourseFolders();
     renderFilesList();
     showToast("File dihapus");
@@ -623,14 +708,16 @@ function openFileViewer(fileId) {
     currentViewingFileId = fileId;
     const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
     document.getElementById("viewer-title").textContent = file.name;
-    document.getElementById("viewer-meta").textContent = file.course + " - " + file.size + (file.gdriveId ? " - Google Drive" : "");
+    document.getElementById("viewer-meta").textContent = file.course + " - " + file.size + (file.storage_path ? " - Supabase Cloud" : "");
     const icon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["png","jpg","jpeg","webp","gif"].includes(ext) ? "&#128247;" : "&#128196;";
     document.getElementById("viewer-icon").innerHTML = icon;
     const container = document.getElementById("viewer-container");
+    const fileUrl = file.storage_path ? getFileUrl(file.storage_path) : (file.dataUrl || "");
+
     if (["png","jpg","jpeg","webp","gif","svg"].includes(ext)) {
-        container.innerHTML = "<div class='flex flex-col items-center justify-center max-w-5xl w-full p-2'><img src='" + (file.dataUrl || "") + "' alt='" + file.name + "' class='max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40'><p class='text-xs text-blue-300 mt-3'>Pratinjau Gambar (" + file.size + ")</p></div>";
-    } else if (ext === "pdf" && file.dataUrl) {
-        // Native PDF rendering using PDF.js to avoid download prompts on mobile
+        container.innerHTML = "<div class='flex flex-col items-center justify-center max-w-5xl w-full p-2'><img src='" + fileUrl + "' alt='" + file.name + "' class='max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40'><p class='text-xs text-blue-300 mt-3'>Pratinjau Gambar (" + file.size + ")</p></div>";
+    } else if (ext === "pdf" && fileUrl) {
+        // Native PDF rendering using PDF.js
         container.innerHTML = `
             <div class='w-full max-w-4xl h-[85vh] flex flex-col bg-slate-900 border border-blue-800/40 rounded-3xl overflow-hidden shadow-2xl relative'>
                 <div class='flex-1 overflow-y-auto bg-slate-800/80 flex flex-col items-center gap-6 p-4 md:p-8' id='pdf-render-container'>
@@ -640,10 +727,10 @@ function openFileViewer(fileId) {
                     </div>
                 </div>
             </div>`;
-        renderLocalPDF(file.dataUrl);
+        renderLocalPDF(fileUrl);
     } else {
         const docIcon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["ppt","pptx"].includes(ext) ? "&#128217;" : ["xls","xlsx"].includes(ext) ? "&#128215;" : "&#128196;";
-        const descText = file.gdriveId ? "Tersimpan aman di Google Drive." : "Berkas lokal tersimpan di memori perangkat.";
+        const descText = file.storage_path ? "Tersimpan aman di Supabase Cloud." : "Berkas lokal tersimpan di memori perangkat.";
         container.innerHTML = `
         <div class='bg-slate-900/90 border border-blue-800/60 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center space-y-6'>
             <div class='w-24 h-24 bg-blue-950/80 border border-blue-800/50 rounded-3xl flex items-center justify-center text-5xl mx-auto shadow-inner'>
@@ -655,13 +742,13 @@ function openFileViewer(fileId) {
             </div>
             <p class='text-[11px] text-slate-300 bg-blue-950/40 p-3 rounded-xl border border-blue-800/30'>${descText}</p>
             <button onclick="downloadFile('${file.id}')" class='w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 active:scale-95 text-blue-950 font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2'>
-                &#128194; Buka Berkas
+                &#128194; Buka / Unduh Berkas
             </button>
         </div>`;
     }
     document.getElementById("modal-viewer").classList.remove("hidden");
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") document.getElementById("modal-viewer").classList.add("hidden"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.getElementById("modal-viewer")?.classList.add("hidden"); });
 
 // PDF.js State
 let pdfDoc = null;
@@ -706,27 +793,30 @@ function renderPage(num, container) {
     });
 }
 
-function renderLocalPDF(dataUrl) {
+function renderLocalPDF(source) {
     pdfDoc = null;
-    const base64 = dataUrl.split(',')[1];
-    const binary = atob(base64);
-    const array = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
-    
-    pdfjsLib.getDocument(array).promise.then(doc => {
+    const container = document.getElementById('pdf-render-container');
+    const loadingTask = (typeof source === 'string' && source.startsWith('data:'))
+        ? (() => {
+            const base64 = source.split(',')[1];
+            const binary = atob(base64);
+            const array = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+            return pdfjsLib.getDocument(array);
+        })()
+        : pdfjsLib.getDocument(source);
+
+    loadingTask.promise.then(doc => {
         pdfDoc = doc;
-        const container = document.getElementById('pdf-render-container');
         if (!container) return;
-        
         const loader = document.getElementById('pdf-loading-indicator');
         if (loader) loader.remove();
-        
-        // Loop through all pages and render them for continuous scrolling
         for (let i = 1; i <= pdfDoc.numPages; i++) {
             renderPage(i, container);
         }
     }).catch(err => {
-        document.getElementById('pdf-render-container').innerHTML = "<p class='text-red-400 mt-10 font-bold'>Gagal memuat PDF. Format mungkin tidak didukung.</p>";
+        console.warn('PDF load err:', err);
+        if (container) container.innerHTML = "<p class='text-red-400 mt-10 font-bold'>Gagal memuat PDF. Anda dapat mengunduh berkas langsung.</p>";
     });
 }
 
@@ -739,171 +829,344 @@ function initDropZone() {
     dz.addEventListener("drop", e => { e.preventDefault(); dz.classList.remove("border-yellow-400","bg-blue-900/20"); if (e.dataTransfer && e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]); });
 }
 
-// === MODAL GOOGLE DRIVE ===
-function openGDriveModal() {
-    updateModalStatusUI();
-    document.getElementById("modal-gdrive").classList.remove("hidden");
-}
-
-function closeGDriveModal() { document.getElementById("modal-gdrive").classList.add("hidden"); }
-
-function handleDriveModalBackdrop(e) {
-    if (e.target === document.getElementById("modal-gdrive")) closeGDriveModal();
-}
-
-function updateModalStatusUI() {
-    const banner = document.getElementById("gdrive-status-banner");
-    const disconnectBtn = document.getElementById("btn-disconnect-drive");
-    if (gdriveToken) {
-        let accountHtml = "";
-        if (gdriveAccount) {
-            accountHtml = `
-                <div class="mt-4 pt-4 border-t border-green-700/30 flex items-center gap-3 text-left">
-                    <img src="${gdriveAccount.picture || 'https://ui-avatars.com/api/?name=' + gdriveAccount.name + '&background=0D8ABC&color=fff'}" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-green-500/50">
-                    <div class="min-w-0">
-                        <p class="text-white text-sm font-bold truncate">${gdriveAccount.name}</p>
-                        <p class="text-green-300 text-[11px] truncate">${gdriveAccount.email}</p>
-                    </div>
-                </div>
-            `;
+// === SINKRONISASI DATA SUPABASE ===
+async function initSupabaseData() {
+    try {
+        const session = await requireAuth();
+        if (session && session.user) {
+            setCurrentUserId(session.user.id);
+            const uid = session.user.id;
+            // Load profil untuk sidebar
+            try {
+                const cachedProf = localStorage.getItem(userKey('ulmet_profile'));
+                if (cachedProf) {
+                    const p = JSON.parse(cachedProf);
+                    const snEl = document.getElementById('sidebar-nama');
+                    const ssEl = document.getElementById('sidebar-semester');
+                    const saEl = document.getElementById('sidebar-avatar');
+                    if (snEl && p.nama) snEl.textContent = p.nama;
+                    if (ssEl && p.semester) ssEl.textContent = 'Semester ' + p.semester;
+                    if (saEl && p.avatar) saEl.textContent = p.avatar;
+                }
+                const sb = getSupabase();
+                if (sb) {
+                    const { data } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+                    if (data) {
+                        localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(data));
+                        const snEl = document.getElementById('sidebar-nama');
+                        const ssEl = document.getElementById('sidebar-semester');
+                        const saEl = document.getElementById('sidebar-avatar');
+                        if (snEl && data.nama) snEl.textContent = data.nama;
+                        if (ssEl && data.semester) ssEl.textContent = 'Semester ' + data.semester;
+                        if (saEl && data.avatar) saEl.textContent = data.avatar;
+                    }
+                }
+            } catch(pe) {}
         }
+
+        const loadedCourses = await loadCourses(['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']);
+        if (Array.isArray(loadedCourses) && loadedCourses.length > 0) userCourses = loadedCourses;
+        const loadedFiles = await loadFiles();
+        userFiles = Array.isArray(loadedFiles) ? loadedFiles : [];
         
-        banner.innerHTML = `
-            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
-                <span class="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"></span>
-                <span>Terhubung ke Google Drive</span>
-            </p>
-            ${accountHtml}
-        `;
-        banner.className = "bg-green-950/30 border border-green-700/50 rounded-2xl p-4 mb-6";
-        document.getElementById("btn-login-gdrive").innerHTML = "&#128472; Ganti Akun";
-        if (disconnectBtn) disconnectBtn.classList.remove("hidden");
-    } else {
-        banner.innerHTML = `
-            <p class="font-bold text-white flex items-center justify-center gap-2 text-sm">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse flex-shrink-0"></span>
-                <span>Belum Terhubung</span>
-            </p>
-        `;
-        banner.className = "bg-blue-950/50 border border-blue-800/50 rounded-2xl p-4 mb-6";
-        document.getElementById("btn-login-gdrive").innerHTML = "&#128272; Hubungkan Sekarang";
-        if (disconnectBtn) disconnectBtn.classList.add("hidden");
+        // Pilih folder aktif cerdas:
+        const savedCourse = localStorage.getItem(userKey("ulmet_active_course"));
+        if (savedCourse && userCourses.some(c => (typeof c === 'string' ? c : c.name) === savedCourse)) {
+            selectCourse(savedCourse);
+        } else if (currentCourse && userCourses.some(c => (typeof c === 'string' ? c : c.name) === currentCourse)) {
+            selectCourse(currentCourse);
+        } else {
+            // Prioritaskan folder yang ada filenya
+            const courseWithFiles = userCourses.find(c => {
+                const name = typeof c === 'string' ? c : c.name;
+                return userFiles.some(f => f.course === name);
+            });
+            if (courseWithFiles) {
+                selectCourse(typeof courseWithFiles === 'string' ? courseWithFiles : courseWithFiles.name);
+            } else if (userCourses.length > 0) {
+                const first = userCourses[0];
+                selectCourse(typeof first === 'string' ? first : first.name);
+            } else {
+                renderCourseFolders();
+            }
+        }
+    } catch(e) {
+        console.warn('Gagal memuat data Supabase di materi:', e);
     }
 }
 
-function updateSidebarDriveStatus() {
-    const icon = document.getElementById("drive-icon-sidebar");
-    const text = document.getElementById("drive-text-sidebar");
-    if (gdriveToken) {
-        if (icon) icon.textContent = "🟢";
-        if (text) { text.textContent = "Drive Aktif"; text.className = "text-[10px] font-bold text-green-400"; }
-    } else {
-        if (icon) icon.innerHTML = "&#9729;&#65039;";
-        if (text) { text.textContent = "Drive"; text.className = "text-[10px] font-bold text-blue-400"; }
+// =============================================
+// SHARE TARGET API HANDLER (WHATSAPP -> ULMET MATERI)
+// =============================================
+let pendingSharedData = null;
+
+function getPendingSharedFile() {
+    return new Promise((resolve) => {
+        try {
+            const req = indexedDB.open('ULMET_Share_DB', 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('shared_files')) {
+                    db.createObjectStore('shared_files', { keyPath: 'id' });
+                }
+            };
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('shared_files', 'readonly');
+                const store = tx.objectStore('shared_files');
+                const getReq = store.get('pending_share');
+                getReq.onsuccess = () => resolve(getReq.result || null);
+                getReq.onerror = () => resolve(null);
+            };
+            req.onerror = () => resolve(null);
+        } catch(e) {
+            resolve(null);
+        }
+    });
+}
+
+function clearPendingSharedFile() {
+    return new Promise((resolve) => {
+        try {
+            const req = indexedDB.open('ULMET_Share_DB', 1);
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('shared_files', 'readwrite');
+                const store = tx.objectStore('shared_files');
+                store.delete('pending_share');
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+            };
+            req.onerror = () => resolve(false);
+        } catch(e) {
+            resolve(false);
+        }
+    });
+}
+
+async function checkPendingSharedFile() {
+    try {
+        const shared = await getPendingSharedFile();
+        if (!shared || !shared.file) return;
+
+        // Bersihkan parameter ?shared=1 dari URL agar rapi
+        if (window.location.search.includes('shared=1')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        pendingSharedData = shared;
+        showSharedFileModal(shared);
+    } catch(err) {
+        console.warn("Gagal cek pending shared file:", err);
     }
 }
 
-function disconnectDrive() {
-    if (!confirm("Putuskan koneksi Google Drive? File yang sudah diupload tetap ada.")) return;
-    gdriveToken = null;
-    gdriveAccount = null;
-    localStorage.removeItem("ulmet_gdrive_token");
-    localStorage.removeItem("ulmet_gdrive_account");
-    updateSidebarDriveStatus();
-    updateModalStatusUI();
-    showToast("Drive diputus. File tetap tersimpan lokal.");
+function showSharedFileModal(shared) {
+    const fileName = shared.name || (shared.file && shared.file.name) || 'Dokumen_WhatsApp.pdf';
+    const fileSize = shared.size ? (shared.size > 1048576 ? (shared.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(shared.size/1024)) + " KB") : 'Dokumen';
+    
+    const ext = fileName.split('.').pop().toLowerCase();
+    const iconEl = document.getElementById('share-file-icon');
+    if (iconEl) {
+        if (ext === 'pdf') iconEl.textContent = '📕';
+        else if (['doc','docx'].includes(ext)) iconEl.textContent = '📘';
+        else if (['ppt','pptx'].includes(ext)) iconEl.textContent = '📙';
+        else if (['xls','xlsx'].includes(ext)) iconEl.textContent = '📗';
+        else if (['png','jpg','jpeg','webp'].includes(ext)) iconEl.textContent = '🖼️';
+        else iconEl.textContent = '📄';
+    }
+
+    const nameEl = document.getElementById('share-file-name');
+    if (nameEl) nameEl.textContent = fileName;
+    const sizeEl = document.getElementById('share-file-size');
+    if (sizeEl) sizeEl.textContent = fileSize;
+
+    renderShareCourseOptions();
+    toggleShareNewFolder(false);
+    const modal = document.getElementById('modal-share-destination');
+    if (modal) modal.classList.remove('hidden');
 }
 
-// Mode simulasi Drive untuk keperluan demo di localhost
-function simulateDriveConnect() {
-    gdriveToken = "SIMULATED_TOKEN_" + Date.now();
-    gdriveAccount = {
-        name: "Mahasiswa ULMET",
-        email: "mahasiswa.demo@ulmet.ac.id",
-        picture: ""
-    };
-    localStorage.setItem("ulmet_gdrive_token", gdriveToken);
-    localStorage.setItem("ulmet_gdrive_account", JSON.stringify(gdriveAccount));
-    updateSidebarDriveStatus();
-    updateModalStatusUI();
-    closeGDriveModal();
-    showToast("☁️ Mode Simulasi Drive aktif! (Demo)");
-}
+function renderShareCourseOptions() {
+    const container = document.getElementById('share-course-options');
+    if (!container) return;
 
-function connectGoogleAccount() {
-    // Gunakan client ID bawaan secara transparan
-    gdriveClientId = "1010901741046-v4b9d5a0mlc91bpskqlfffmjre7777rn.apps.googleusercontent.com";
-    localStorage.setItem("ulmet_gdrive_client_id", gdriveClientId);
-
-    // Deteksi localhost - otomatis pakai mode simulasi agar mahasiswa tidak bingung/error
-    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "";
-    if (isLocalhost) {
-        simulateDriveConnect();
+    if (!userCourses || userCourses.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4 bg-blue-950/50 rounded-xl border border-blue-800/40">
+                <p class="text-xs text-blue-300">Belum ada folder Mata Kuliah.</p>
+                <p class="text-[11px] text-yellow-400 mt-1 font-semibold">Buat folder baru di bawah untuk menyimpan file ini.</p>
+            </div>
+        `;
         return;
     }
 
-    if (typeof google === "undefined" || !google.accounts || !google.accounts.oauth2) {
-        showToast("Pustaka Google sedang dimuat, coba lagi sebentar.", "error"); return;
-    }
+    container.innerHTML = userCourses.map(c => {
+        const cName = typeof c === 'string' ? c : (c && c.name ? c.name : String(c));
+        const count = userFiles.filter(f => f.course === cName).length;
+        const safeName = cName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+        return `
+            <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-3 bg-blue-900/40 hover:bg-yellow-400/20 border border-blue-700/50 hover:border-yellow-400/60 rounded-xl transition cursor-pointer group active:scale-[0.98]">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="text-lg">📁</span>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${cName}</p>
+                        <p class="text-[10px] text-blue-300">${count} file tersimpan</p>
+                    </div>
+                </div>
+                <span class="text-xs font-bold text-yellow-400 opacity-80 group-hover:opacity-100 flex items-center gap-1">
+                    Simpan ➔
+                </span>
+            </div>
+        `;
+    }).join('');
+}
 
-    const btn = document.getElementById("btn-login-gdrive");
-    if (btn) { btn.innerHTML = "⏳ Memuat popup Google..."; btn.disabled = true; }
-
-    try {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: gdriveClientId,
-            scope: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
-            callback: async r => {
-                if (btn) { btn.disabled = false; }
-                if (r && r.access_token) {
-                    gdriveToken = r.access_token;
-                    localStorage.setItem("ulmet_gdrive_token", gdriveToken);
-                    
-                    // Fetch user email and profile info
-                    try {
-                        if (btn) btn.innerHTML = "⏳ Mengambil data akun...";
-                        const infoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-                            headers: { "Authorization": "Bearer " + gdriveToken }
-                        });
-                        if (infoRes.ok) {
-                            gdriveAccount = await infoRes.json();
-                            localStorage.setItem("ulmet_gdrive_account", JSON.stringify(gdriveAccount));
-                        }
-                    } catch (e) {
-                        console.warn("Gagal mengambil info profil Google", e);
-                    }
-
-                    updateSidebarDriveStatus(); updateModalStatusUI(); closeGDriveModal();
-                    showToast("✅ Berhasil terhubung ke Google Drive!");
-                } else {
-                    updateModalStatusUI();
-                    showToast("Login dibatalkan atau gagal.", "error");
-                }
-            },
-            error_callback: err => {
-                if (btn) { btn.disabled = false; updateModalStatusUI(); }
-                showToast("Gagal: " + (err.type || "Error tidak diketahui"), "error");
-            }
-        });
-        tokenClient.requestAccessToken({ prompt: "consent" });
-    } catch(err) {
-        if (btn) { btn.disabled = false; updateModalStatusUI(); }
-        showToast("Error: " + err.message, "error");
+function toggleShareNewFolder(show) {
+    const box = document.getElementById('share-new-folder-box');
+    const btn = document.getElementById('btn-toggle-share-new');
+    if (box) box.classList.toggle('hidden', !show);
+    if (btn) btn.classList.toggle('hidden', show);
+    if (show) {
+        const inp = document.getElementById('share-new-folder-input');
+        if (inp) {
+            inp.value = '';
+            inp.focus();
+        }
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+async function confirmCreateCourseAndSaveShare() {
+    const inp = document.getElementById('share-new-folder-input');
+    const name = inp ? inp.value.trim() : '';
+    if (!name) {
+        alert("⚠️ Masukkan nama mata kuliah terlebih dahulu!");
+        return;
+    }
+    if (!userCourses.includes(name)) {
+        userCourses.push(name);
+        localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
+        try { syncCourses(userCourses); } catch(e) {}
+        renderCourseFolders();
+    }
+    await selectCourseAndSaveSharedFile(name);
+}
+
+async function selectCourseAndSaveSharedFile(courseName) {
+    if (!pendingSharedData || !pendingSharedData.file) return;
+
+    let file = pendingSharedData.file;
+    if (!(file instanceof File)) {
+        file = new File([file], pendingSharedData.name || 'Dokumen_WhatsApp.pdf', {
+            type: pendingSharedData.type || file.type || 'application/pdf'
+        });
+    }
+
+    // Tutup modal share
+    const modal = document.getElementById('modal-share-destination');
+    if (modal) modal.classList.add('hidden');
+
+    showToast(`⏳ Menyimpan "${file.name}" ke folder "${courseName}"...`);
+
+    // Set folder aktif dan simpan file
+    currentCourse = courseName;
+    localStorage.setItem(userKey("ulmet_active_course"), courseName);
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    const size = file.size > 1048576 ? (file.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(file.size/1024)) + " KB";
+
+    const obj = {
+        id: "file-" + Date.now(),
+        name: file.name,
+        course: courseName,
+        size: size,
+        ext: ext,
+        date: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}),
+        storage_path: null
+    };
+
+    let uploadedToCloud = false;
+    try {
+        const folderPath = courseName.replace(/[^a-zA-Z0-9_\-\s]/g, '').replace(/\s+/g, '_');
+        const uploadRes = await uploadFile(file, folderPath);
+        if (uploadRes && (uploadRes.fullPath || uploadRes.path)) {
+            obj.storage_path = uploadRes.fullPath || uploadRes.path;
+            uploadedToCloud = true;
+            showToast("☁️ Berkas berhasil diunggah ke Cloud Supabase!");
+        }
+    } catch(err) {
+        console.warn("Upload file share ke Cloud gagal:", err);
+    }
+
+    if (!uploadedToCloud && file.size < 2 * 1024 * 1024) {
+        try {
+            const dataUrl = await new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = e => resolve(e.target.result);
+                r.readAsDataURL(file);
+            });
+            obj.dataUrl = dataUrl;
+        } catch(e) {}
+    }
+
+    userFiles.unshift(obj);
+
+    try {
+        const cleanForLocal = userFiles.map(f => {
+            const { dataUrl, ...rest } = f;
+            return rest;
+        });
+        localStorage.setItem(userKey("ulmet_files"), JSON.stringify(cleanForLocal));
+    } catch (e) {}
+
+    try {
+        await syncFiles(userFiles);
+    } catch (syncErr) {
+        console.error("Gagal sync files ke DB:", syncErr);
+    }
+
+    // Bersihkan pending_share dari IndexedDB
+    await clearPendingSharedFile();
+    pendingSharedData = null;
+
+    // Refresh tampilan
+    selectCourse(courseName);
     renderCourseFolders();
-    updateSidebarDriveStatus();
+    renderFilesList();
+    showToast(`✅ File "${file.name}" tersimpan permanen di folder "${courseName}"!`);
+}
+
+async function dismissShareModal() {
+    const modal = document.getElementById('modal-share-destination');
+    if (modal) modal.classList.add('hidden');
+    await clearPendingSharedFile();
+    pendingSharedData = null;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const savedCourse = localStorage.getItem(userKey("ulmet_active_course"));
+    if (savedCourse && userCourses.includes(savedCourse)) {
+        selectCourse(savedCourse);
+    } else if (userCourses.length > 0 && !currentCourse) {
+        selectCourse(userCourses[0]);
+    } else {
+        renderCourseFolders();
+    }
     initDropZone();
+    initSupabaseData(); // Load realtime dari Supabase
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+
+    // Cek apakah ada file pending yang dibagikan dari WhatsApp / Android Share Target
+    setTimeout(() => {
+        checkPendingSharedFile();
+    }, 350);
 
     // Keyboard shortcut: Escape tutup semua modal
     document.addEventListener("keydown", e => {
         if (e.key === "Escape") {
             document.getElementById("modal-viewer")?.classList.add("hidden");
             closeAddFolderModal();
-            closeGDriveModal();
+            dismissShareModal();
         }
     });
 });
@@ -929,31 +1192,31 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 </div>
 
-<!-- BOTTOM NAVIGATION (Mobile Only) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
     <a href="dashboard.html" class="bnav-item">
-        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
     </a>
     <a href="jadwal.html" class="bnav-item">
-        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-icon">📅</span>
         <span class="bnav-label">Jadwal</span>
     </a>
     <a href="materi.html" class="bnav-item active">
-        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-icon">📚</span>
         <span class="bnav-label">Materi</span>
     </a>
     <a href="ai.html" class="bnav-item">
-        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-icon">🤖</span>
         <span class="bnav-label">AI</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">💸</span>
+        <span class="bnav-label">Keuangan</span>
     </a>
     <a href="profil.html" class="bnav-item">
         <span class="bnav-icon">👤</span>
         <span class="bnav-label">Profil</span>
-    </a>
-    <a href="keuangan.html" class="bnav-item">
-        <span class="bnav-icon">&#128184;</span>
-        <span class="bnav-label">Keuangan</span>
     </a>
 </nav>
 

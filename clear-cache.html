@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html><head><title>ULMET - Membersihkan Cache...</title>
+<html><head>
+    <link rel="manifest" href="manifest.json"><title>ULMET - Membersihkan Cache...</title>
 <style>body{background:#0f172a;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;}
 .box{max-width:400px;padding:40px;}.spinner{font-size:48px;animation:spin 1s linear infinite;display:inline-block;}
 @keyframes spin{to{transform:rotate(360deg);}}</style></head>
@@ -29,4 +30,7 @@
     }
 })();
 </script>
-</div></body></html>
+</div><script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+</script>
+</body></html>

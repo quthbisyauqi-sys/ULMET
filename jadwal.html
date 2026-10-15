@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <title>Jadwal & Tugas - ULMET</title>
@@ -14,8 +14,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
         .tab-btn { transition: all 0.2s ease; border: 1px solid transparent; }
@@ -32,17 +32,66 @@
         @keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .page-fade { animation: pageFade 0.35s ease forwards; }
         .eq-quadrant { min-height: 180px; transition: background 0.2s; }
-        .cal-day { transition: border-color 0.2s, background 0.2s; }
-        .cal-day.today { border-color: rgba(250,204,21,0.6) !important; background: rgba(250,204,21,0.05); }
+        .cal-circle-cell {
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cal-circle-cell:active {
+            transform: scale(0.92);
+        }
 
-        /* Bottom nav mobile */
-        .bnav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 6px 8px; border-radius: 14px; transition: all 0.2s; color: #7ea1cc; min-width: 50px; flex: 1; }
-        .bnav-item.active { color: #facc15; background: rgba(250,204,21,0.12); }
-        .bnav-item:not(.active):hover { color: #ffffff; background: rgba(255,255,255,0.06); }
-        .bnav-label { font-size: 9px; font-weight: 600; line-height: 1; }
-        .bnav-icon { font-size: 20px; line-height: 1; }
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 
 <body class="bg-slate-900 text-white flex h-screen overflow-hidden selection:bg-yellow-400 selection:text-blue-950">
@@ -70,16 +119,19 @@
                 <a href="keuangan.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
                     <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
                 </a>
+                <a href="profil.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                    <span>👤</span><span class="font-medium text-sm">Profil Saya</span>
+                </a>
             </nav>
         </div>
         <div class="p-4 border-t border-blue-800/40">
-            <div class="flex items-center space-x-3 px-4 py-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold">A</div>
-                <div>
-                    <p class="text-sm font-bold text-white">Anak Sastra</p>
-                    <p class="text-xs text-blue-300">Semester 5</p>
+            <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">A</div>
+                <div class="min-w-0">
+                    <p class="text-sm font-bold text-white truncate" id="sidebar-nama">Mahasiswa</p>
+                    <p class="text-xs text-blue-300 truncate" id="sidebar-semester">Semester -</p>
                 </div>
-            </div>
+            </a>
         </div>
     </aside>
 
@@ -87,65 +139,64 @@
     <div class="flex-1 flex flex-col h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-950/20 to-slate-900">
 
         <!-- Header -->
-        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-20">
-            <div>
-                <h1 class="text-lg md:text-2xl font-bold text-white">Jadwal &amp; Tugas 📅</h1>
-                <p class="text-xs md:text-sm text-blue-300">Kelola waktu dan tugasmu.</p>
+        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/70 backdrop-blur-md sticky top-0 z-20">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <a href="dashboard.html" class="md:hidden bg-yellow-400 text-blue-950 font-extrabold text-sm w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-yellow-400/20 flex-shrink-0">U</a>
+                <div class="min-w-0">
+                    <h1 class="text-base sm:text-lg md:text-2xl font-bold text-white truncate leading-tight">Jadwal &amp; Tugas 📅</h1>
+                    <p class="text-[11px] md:text-sm text-blue-300 truncate">Kelola waktu &amp; tugasmu</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3 relative">
-                <button onclick="openModal()" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm shadow-lg shadow-yellow-400/20">
-                    <span class="text-lg font-extrabold leading-none">+</span> Tambah Tugas
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative">
+                <button onclick="openModal()" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all flex items-center gap-1.5 text-xs sm:text-sm shadow-lg shadow-yellow-400/20">
+                    <span class="text-base font-extrabold leading-none">+</span>
+                    <span class="hidden sm:inline">Tambah Tugas</span>
+                    <span class="sm:hidden">Tugas</span>
                 </button>
                 <!-- Bell button + notification dropdown -->
-                <button id="notif-bell-btn" onclick="toggleNotifPanel()" class="bg-blue-900/50 p-2.5 rounded-xl border border-blue-700/50 hover:bg-blue-800 transition relative">
-                    🔔<span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+                <button id="notif-bell-btn" onclick="toggleNotifPanel()" class="bg-blue-900/50 hover:bg-blue-800/60 p-2 sm:p-2.5 rounded-xl border border-blue-700/50 transition relative active:scale-95" title="Notifikasi">
+                    🔔<span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow">0</span>
                 </button>
                 <!-- Notification panel dropdown -->
-                <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 bg-slate-900 border border-blue-800/60 rounded-2xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
+                <div id="notif-panel" class="hidden absolute right-0 top-12 w-80 max-w-[calc(100vw-32px)] bg-slate-900 border border-blue-800/60 rounded-2xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-blue-800/40">
                         <p class="text-sm font-bold text-white">🔔 Notifikasi</p>
-                        <button onclick="clearNotifPanel()" class="text-xs text-blue-400 hover:text-yellow-400 transition">Tandai semua dibaca</button>
+                        <button onclick="clearNotifPanel()" class="text-xs text-blue-400 hover:text-yellow-400 transition">Tandai dibaca</button>
                     </div>
                     <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-blue-900/40"></div>
                     <div class="px-4 py-2 border-t border-blue-800/30">
-                        <p class="text-[10px] text-blue-600 text-center">Diperbarui tiap menit secara otomatis</p>
+                        <p class="text-[10px] text-blue-600 text-center">Diperbarui otomatis</p>
                     </div>
                 </div>
             </div>
         </header>
 
-
         <!-- Tab Nav -->
-        <div class="px-4 md:px-8 pt-4 md:pt-5 overflow-x-auto">
+        <div class="px-3 sm:px-4 md:px-8 pt-3 sm:pt-4 md:pt-5 overflow-x-auto scrollbar-hide" style="scrollbar-width:none">
             <div class="flex gap-1.5 bg-blue-950/40 border border-blue-800/40 p-1.5 rounded-2xl w-fit backdrop-blur-sm whitespace-nowrap">
-                <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-btn active px-5 py-2.5 rounded-xl text-sm font-semibold">📋 Semua Tugas</button>
-                
-                <button onclick="switchTab('kalender')" id="tab-kalender" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold">📅 Kalender</button>
-
-                <button onclick="switchTab('pomodoro')" id="tab-pomodoro" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold">🍅 Pomodoro</button>
-                <button onclick="switchTab('kebiasaan')" id="tab-kebiasaan" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold">📿 Kebiasaan Harian</button>
-
+                <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-btn active px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold">📋 Semua Tugas</button>
+                <button onclick="switchTab('kalender')" id="tab-kalender" class="tab-btn px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold">📅 Kalender</button>
+                <button onclick="switchTab('pomodoro')" id="tab-pomodoro" class="tab-btn px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold">🍅 Pomodoro</button>
+                <button onclick="switchTab('kebiasaan')" id="tab-kebiasaan" class="tab-btn px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold">📿 Kebiasaan</button>
             </div>
         </div>
 
-        <main class="p-4 md:p-8 flex-1 overflow-x-hidden pb-24 md:pb-8">
+        <main class="p-3 sm:p-4 md:p-8 flex-1 overflow-x-hidden pb-36 md:pb-8">
 
             <!-- TAB: TUGAS -->
             <div id="panel-tugas" class="page-fade">
-                <div class="flex flex-wrap gap-3 mb-6">
-                    <select id="filter-status" onchange="renderTasks()" class="bg-blue-950/50 border border-blue-800/50 text-blue-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-400/50 transition cursor-pointer">
+                <div class="flex flex-wrap gap-2 mb-5">
+                    <select id="filter-status" onchange="renderTasks()" class="bg-blue-950/50 border border-blue-800/50 text-blue-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-yellow-400/50 transition cursor-pointer">
                         <option value="semua">🗂️ Semua Status</option>
-                        <option value="belum">⬜ Belum Mulai</option>
-                        <option value="proses">🔄 Sedang Dikerjakan</option>
                         <option value="selesai">✅ Selesai</option>
                     </select>
-                    <select id="filter-prioritas" onchange="renderTasks()" class="bg-blue-950/50 border border-blue-800/50 text-blue-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-yellow-400/50 transition cursor-pointer">
+                    <select id="filter-prioritas" onchange="renderTasks()" class="bg-blue-950/50 border border-blue-800/50 text-blue-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-yellow-400/50 transition cursor-pointer">
                         <option value="semua">⚡ Semua Prioritas</option>
                         <option value="tinggi">🔴 Tinggi</option>
                         <option value="sedang">🟡 Sedang</option>
                         <option value="rendah">🟢 Rendah</option>
                     </select>
-                    <div id="task-count-badge" class="ml-auto flex items-center text-xs text-blue-400 bg-blue-950/40 border border-blue-800/40 px-4 rounded-xl font-semibold"></div>
+                    <div id="task-count-badge" class="ml-auto flex items-center text-xs text-blue-400 bg-blue-950/40 border border-blue-800/40 px-3 py-2 rounded-xl font-semibold"></div>
                 </div>
                 <div id="task-list" class="space-y-3"></div>
                 <div id="task-empty" class="hidden text-center py-24">
@@ -156,18 +207,63 @@
                 </div>
             </div>
 
-            <!-- TAB: KALENDER -->
-            <div id="panel-kalender" class="hidden page-fade">
-                <div class="bg-blue-950/40 border border-blue-800/50 rounded-3xl p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <button onclick="prevWeek()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 px-4 py-2.5 rounded-xl text-sm font-semibold transition">← Bulan Lalu</button>
-                        <div class="text-center">
-                            <h2 id="week-label" class="text-base font-bold text-white"></h2>
-                            <p id="week-sublabel" class="text-xs text-blue-400 mt-0.5"></p>
+            <!-- TAB: KALENDER (MODERN MOBILE & DESKTOP CALENDAR) -->
+            <div id="panel-kalender" class="hidden page-fade relative">
+                <!-- Outer Layout: Desktop side-by-side (Calendar left, Agenda right), Mobile stacked -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+                    
+                    <!-- CALENDAR MATRIX CARD (LEFT / TOP) -->
+                    <div class="lg:col-span-7 bg-slate-950/80 border border-slate-800/80 rounded-3xl p-4 sm:p-6 backdrop-blur-md shadow-2xl relative overflow-hidden">
+                        <!-- Top subtle glow accent -->
+                        <div class="absolute -top-12 -left-12 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <!-- Header Row: Month Year, Switchers, Today Jump, Add Task -->
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <div class="flex items-center gap-2">
+                                <h2 id="cal-month-title" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight"></h2>
+                                <div class="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-0.5 ml-1 shadow-inner">
+                                    <button onclick="calPrevMonth()" class="p-1.5 hover:text-yellow-400 text-slate-400 hover:bg-slate-800 rounded-lg transition active:scale-90" title="Bulan Sebelumnya">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                                    </button>
+                                    <button onclick="calNextMonth()" class="p-1.5 hover:text-yellow-400 text-slate-400 hover:bg-slate-800 rounded-lg transition active:scale-90" title="Bulan Selanjutnya">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="jumpToToday()" class="bg-blue-900/40 hover:bg-blue-800/60 text-sky-300 border border-blue-700/50 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Kembali ke Hari Ini">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span>Hari Ini</span>
+                                </button>
+                            </div>
                         </div>
-                        <button onclick="nextWeek()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 px-4 py-2.5 rounded-xl text-sm font-semibold transition">Bulan Depan →</button>
+
+                        <!-- Subtitle Status & Legend -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 mb-3 px-1 relative z-10">
+                            <span id="cal-month-subtitle" class="font-medium text-slate-400 truncate"></span>
+                            <div class="flex items-center gap-2 sm:gap-2.5 text-[10px] sm:text-[11px] font-medium text-slate-400 flex-wrap">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Urgent</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400"></span> Sedang</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Selesai</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-400"></span> Libur</span>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Matrix with Week Numbers (8 columns: Wk, MIN, SEN, SEL, RAB, KAM, JUM, SAB) -->
+                        <div id="calendar-matrix" class="w-full select-none relative z-10"></div>
+
+                        <!-- Drag handle for mobile view -->
+                        <div class="w-12 h-1 bg-slate-800 rounded-full mx-auto mt-4 mb-1 lg:hidden"></div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
+
+                    <!-- SELECTED DATE AGENDA / SCHEDULE SHEET (RIGHT / BOTTOM) -->
+                    <div class="lg:col-span-5 w-full flex flex-col gap-4">
+                        <div id="cal-agenda-container" class="space-y-4">
+                            <!-- Populated dynamically by renderSelectedDateAgenda() -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -192,10 +288,10 @@
                                 <span id="pomo-session-dots" class="mt-3 flex gap-1.5"></span>
                             </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button onclick="pomodoroToggle()" id="pomo-start-btn" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-10 py-3.5 rounded-2xl text-sm transition shadow-lg shadow-yellow-400/20">▶ Mulai</button>
-                            <button onclick="pomodoroReset()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 text-white font-semibold px-6 py-3.5 rounded-2xl text-sm transition">↺ Reset</button>
-                            <button onclick="pomodoroSkip()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 text-blue-300 font-semibold px-4 py-3.5 rounded-2xl text-sm transition" title="Skip sesi">⏭</button>
+                        <div class="flex gap-2.5">
+                            <button onclick="pomodoroToggle()" id="pomo-start-btn" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-8 py-2.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20">▶ Mulai</button>
+                            <button onclick="pomodoroReset()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition">↺ Reset</button>
+                            <button onclick="pomodoroSkip()" class="bg-blue-900/50 hover:bg-blue-800 active:scale-95 border border-blue-700/50 text-blue-300 font-semibold px-3.5 py-2.5 rounded-xl text-sm transition" title="Skip sesi">⏭</button>
                         </div>
                         <div class="mt-8 flex gap-8 text-center border-t border-blue-800/30 pt-6 w-full max-w-sm">
                             <div class="flex-1"><p id="pomo-sessions" class="text-3xl font-extrabold text-yellow-400">0</p><p class="text-xs text-blue-300 mt-0.5">Sesi Hari Ini</p></div>
@@ -227,9 +323,14 @@
             <div id="panel-kebiasaan" class="hidden page-fade">
                 <div class="flex items-center justify-between mb-5">
                     <div>
-                        <p class="text-sm text-blue-300">Kegiatan wajib harian — centang jika sudah selesai hari ini.</p>
+                        <p class="text-xs text-blue-300">Kegiatan wajib harian — centang jika sudah selesai hari ini.</p>
                     </div>
-                    <button onclick="openHabitModal()" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20">+ Tambah Kebiasaan</button>
+                    <div class="flex items-center gap-2">
+                        <a href="widget.html" class="bg-blue-900/60 hover:bg-blue-800 text-yellow-300 border border-blue-700/50 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95" title="Buka Mode Widget Si Ulmet">
+                            <span>📱</span> Widget
+                        </a>
+                        <button onclick="openHabitModal()" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-yellow-400/20">+ Tambah</button>
+                    </div>
                 </div>
 
                 <!-- Tanggal Hari Ini -->
@@ -271,7 +372,7 @@
                     <h3 class="text-white font-bold text-base leading-tight" id="viewer-title">Nama_File.pdf</h3>
                     <div class="flex items-center gap-1.5 mt-0.5">
                         <span class="text-[9px] bg-green-500/20 text-green-400 border border-green-500/30 px-1.5 py-0.5 rounded">Sinkron</span>
-                        <p class="text-[10px] text-blue-400">Google Drive Web Viewer</p>
+                        <p class="text-[10px] text-blue-400">ULMET Cloud Viewer</p>
                     </div>
                 </div>
             </div>
@@ -349,12 +450,77 @@
     <div id="toast" class="hidden fixed bottom-6 right-6 z-50 font-bold px-5 py-3 rounded-2xl shadow-lg text-sm flex items-center gap-2"></div>
 
     <script>
-    // ===== DATA =====
-    let tasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
-    let pomodoroSessions = parseInt(localStorage.getItem('ulmet_pomo_sessions') || '0');
-    let pomodoroTotalMin = parseInt(localStorage.getItem('ulmet_pomo_total') || '0');
+    // ===== DATA (Supabase + localStorage fallback) =====
+    let tasks = [];
+    try {
+        const cached = localStorage.getItem(userKey('ulmet_tasks'));
+        if (cached) tasks = JSON.parse(cached);
+    } catch(e) {}
+    let pomodoroSessions = parseInt(localStorage.getItem(userKey('ulmet_pomo_sessions')) || '0');
+    let pomodoroTotalMin = parseInt(localStorage.getItem(userKey('ulmet_pomo_total')) || '0');
 
-    function saveTasks() { localStorage.setItem('ulmet_tasks', JSON.stringify(tasks)); }
+    function saveTasks() {
+        localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
+        syncTasks(tasks); // Sinkron ke Supabase
+    }
+
+    // Load data dari Supabase saat halaman dimuat
+    async function initSupabaseData() {
+        try {
+            const session = await requireAuth();
+            if (session && session.user) {
+                setCurrentUserId(session.user.id);
+
+                // Muat profil untuk sidebar
+                try {
+                    const cachedProf = localStorage.getItem(userKey('ulmet_profile'));
+                    if (cachedProf) {
+                        const p = JSON.parse(cachedProf);
+                        if (p.nama) document.getElementById('sidebar-nama').textContent = p.nama;
+                        if (p.semester) document.getElementById('sidebar-semester').textContent = 'Semester ' + p.semester;
+                        if (p.avatar) document.getElementById('sidebar-avatar').textContent = p.avatar;
+                    }
+                    const sb = getSupabase();
+                    if (sb) {
+                        const { data } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+                        if (data) {
+                            localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(data));
+                            if (data.nama) document.getElementById('sidebar-nama').textContent = data.nama;
+                            if (data.semester) document.getElementById('sidebar-semester').textContent = 'Semester ' + data.semester;
+                            if (data.avatar) document.getElementById('sidebar-avatar').textContent = data.avatar;
+                        }
+                    }
+                } catch(pe) {}
+            }
+            // Muat dari user-scoped cache terlebih dahulu agar instan
+            try {
+                const cached = localStorage.getItem(userKey('ulmet_tasks'));
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        tasks = parsed;
+                        renderTasks();
+                        updateStats();
+                    }
+                }
+            } catch(e) {}
+
+            const loadedTasks = await loadTasks();
+            if (Array.isArray(loadedTasks)) {
+                tasks = loadedTasks;
+                renderTasks();
+                updateStats();
+            }
+
+            const loadedCourses = await loadCourses(['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']);
+            if (Array.isArray(loadedCourses) && loadedCourses.length > 0) {
+                userCourses = loadedCourses;
+            }
+            const loadedFiles = await loadFiles();
+            userFiles = Array.isArray(loadedFiles) ? loadedFiles : [];
+            renderMaterialsUI();
+        } catch(e) { console.warn('Load Supabase gagal, pakai cache lokal:', e); }
+    }
 
     // ===== UTILS =====
     function parseAsWIB(dateStr) {
@@ -410,6 +576,7 @@
             if(ok){streak++;check.setDate(check.getDate()-1);}else break;
         }
         document.getElementById('stat-streak').textContent=streak+' hari';
+        localStorage.setItem(userKey('ulmet_streak'), streak);
     }
 
     // ===== TABS =====
@@ -430,7 +597,11 @@
     // ===== TASK LIST =====
     function renderTasks() {
         const fs=document.getElementById('filter-status').value, fp=document.getElementById('filter-prioritas').value;
-        let filtered=tasks.filter(t=>(fs==='semua'||t.status===fs)&&(fp==='semua'||t.prioritas===fp));
+        let filtered=tasks.filter(t => {
+            const matchStatus = (fs === 'semua') ? true : (t.status === 'selesai');
+            const matchPrioritas = (fp === 'semua' || t.prioritas === fp);
+            return matchStatus && matchPrioritas;
+        });
         filtered.sort((a,b)=>{
             if(a.status==='selesai'&&b.status!=='selesai')return 1;
             if(a.status!=='selesai'&&b.status==='selesai')return -1;
@@ -443,11 +614,13 @@
         empty.classList.add('hidden');
         filtered.forEach(task=>{
             const cd=getCountdown(task.deadline), color=matkulColor(task.matkul);
-            const smap={belum:{label:'Belum Mulai',cls:'text-slate-400 bg-slate-800/40 border-slate-600/40',icon:'○'},proses:{label:'Sedang Dikerjakan',cls:'text-yellow-400 bg-yellow-900/20 border-yellow-600/30',icon:'◐'},selesai:{label:'Selesai',cls:'text-green-400 bg-green-900/20 border-green-600/30',icon:'✓'}};
-            const sc=smap[task.status];
+            const isDone = task.status === 'selesai';
+            const sc = isDone
+                ? { label: 'Selesai', cls: 'text-green-400 bg-green-900/20 border-green-600/30', icon: '✓' }
+                : { label: 'Belum Selesai', cls: 'text-slate-400 bg-slate-800/40 border-slate-600/40', icon: '○' };
             const div=document.createElement('div');
             let cardClass='task-card rounded-2xl p-5';
-            if(task.status==='selesai'){cardClass+=' bg-blue-950/30 border border-blue-800/40 opacity-55';}
+            if(isDone){cardClass+=' bg-blue-950/30 border border-blue-800/40 opacity-55';}
             else if(cd.isOverdue){cardClass+=' bg-red-950/40 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]';}
             else if(cd.isUrgent){cardClass+=' bg-red-900/20 border border-red-500/30';}
             else if(cd.isWarning){cardClass+=' bg-yellow-900/20 border border-yellow-500/30';}
@@ -456,19 +629,19 @@
             div.style.borderLeft='3px solid '+color;
             div.innerHTML=`
                 <div class="flex items-start gap-4">
-                    <button onclick="cycleStatus(${task.id})" title="Ubah status" class="mt-0.5 w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all text-xs font-bold ${task.status==='selesai'?'bg-green-500 border-green-500 text-white':task.status==='proses'?'border-yellow-400 bg-yellow-400/10 text-yellow-400':'border-blue-600/60 hover:border-yellow-400 text-blue-600 hover:text-yellow-400'}">${sc.icon}</button>
+                    <button onclick="cycleStatus(${task.id})" title="${isDone ? 'Batal selesai' : 'Tandai selesai'}" class="mt-0.5 w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all text-xs font-bold ${isDone ? 'bg-green-500 border-green-500 text-white shadow-md shadow-green-500/30' : 'border-blue-600/60 hover:border-yellow-400 text-blue-500 hover:text-yellow-400'}">${sc.icon}</button>
                     <div class="flex-1 min-w-0">
                         <div class="flex flex-wrap items-center gap-2 mb-1.5">
-                            <h3 class="font-bold text-white text-sm${task.status==='selesai'?' line-through text-blue-500':''}">${task.nama}</h3>
+                            <h3 class="font-bold text-white text-sm${isDone ? ' line-through text-slate-400' : ''}">${escapeHtml(task.nama)}</h3>
                             <span class="text-xs px-2 py-0.5 rounded-full font-bold border ${prioritasBadge(task.prioritas)}">${task.prioritas}</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 text-xs">
-                            ${task.matkul?`<span class="font-semibold px-2.5 py-0.5 rounded-full" style="background:${color}20;border:1px solid ${color}50;color:${color}">📚 ${task.matkul}</span>`:''}
+                            ${task.matkul?`<span class="font-semibold px-2.5 py-0.5 rounded-full" style="background:${color}20;border:1px solid ${color}50;color:${color}">📚 ${escapeHtml(task.matkul)}</span>`:''}
                             <span class="font-semibold ${cd.isOverdue?'text-red-400':cd.isUrgent?'text-red-400':cd.isWarning?'text-yellow-400':'text-blue-400'}">⏰ ${cd.text}</span>
                             ${task.estimasi?`<span class="text-blue-500">⏱ Est. ${task.estimasi}j</span>`:''}
                             <span class="ml-auto text-blue-600 text-[11px]">${new Date(task.deadline).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
                         </div>
-                        ${task.catatan?`<p class="text-xs text-blue-400/70 mt-2 italic line-clamp-1">"${task.catatan}"</p>`:''}
+                        ${task.catatan?`<p class="text-xs text-blue-400/70 mt-2 italic line-clamp-1">"${escapeHtml(task.catatan)}"</p>`:''}
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
                         <span class="hidden sm:block text-xs px-2.5 py-1 rounded-lg font-semibold border ${sc.cls}">${sc.label}</span>
@@ -482,42 +655,41 @@
 
     function cycleStatus(id) {
         const t=tasks.find(x=>x.id===id); if(!t) return;
-        const cycle={belum:'proses',proses:'selesai',selesai:'belum'};
-        t.status=cycle[t.status]; t.completedAt=t.status==='selesai'?Date.now():null;
+        t.status = (t.status === 'selesai') ? 'belum' : 'selesai'; 
+        const nowDone = t.status==='selesai'?Date.now():null;
+        t.completedAt = nowDone;
+        t.completed_at = nowDone;
         saveTasks(); renderTasks(); updateStats();
-        if(t.status==='selesai') showToast('🎉 Tugas selesai! Kerja bagus!');
+        if (!document.getElementById('panel-kalender').classList.contains('hidden')) renderCalendar();
+        if(t.status==='selesai') {
+            playSuccessSound();
+            showToast('🎉 Tugas selesai! Kerja bagus!');
+        } else {
+            showToast('↩️ Tugas ditandai belum selesai');
+        }
     }
 
     function deleteTask(id) {
         const t=tasks.find(x=>x.id===id); if(!t) return;
         if(!confirm('Hapus tugas "'+t.nama+'"?')) return;
         tasks=tasks.filter(x=>x.id!==id); saveTasks(); renderTasks(); updateStats();
+        if (!document.getElementById('panel-kalender').classList.contains('hidden')) renderCalendar();
         showToast('🗑️ Tugas dihapus.','error');
     }
 
-    // ===== MATERI DOSEN & GOOGLE DRIVE CLIENT-SIDE INTEGRATION =====
+    // ===== MATERI DOSEN & SUPABASE STORAGE =====
     let currentCourse = 'Sastra Arab';
-    let gdriveToken = localStorage.getItem('ulmet_gdrive_token') || null;
-    let gdriveEmail = localStorage.getItem('ulmet_gdrive_email') || null;
-    let gdriveClientId = localStorage.getItem('ulmet_gdrive_client_id') || '1010901741046-v4b9d5a0mlc91bpskqlfffmjre7777rn.apps.googleusercontent.com';
-    let tokenClient = null;
 
-    // Data materi awal (tersimpan di browser agar selalu ingat)
-    let userCourses = JSON.parse(localStorage.getItem('ulmet_courses') || 'null');
-    if (!userCourses) {
+    // Data materi (di-load dari Supabase, fallback localStorage)
+    let userCourses = JSON.parse(localStorage.getItem(userKey('ulmet_courses')) || 'null');
+    if (!Array.isArray(userCourses) || userCourses.length === 0) {
         userCourses = ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
-        localStorage.setItem('ulmet_courses', JSON.stringify(userCourses));
+    } else {
+        userCourses = userCourses.map(c => typeof c === 'string' ? c : (c && c.name ? c.name : String(c))).filter(Boolean);
     }
+    localStorage.setItem(userKey('ulmet_courses'), JSON.stringify(userCourses));
 
-    let userFiles = JSON.parse(localStorage.getItem('ulmet_files') || 'null');
-    if (!userFiles) {
-        userFiles = [
-            { id: 'f-1', name: 'Silabus_Sastra_Arab.pdf', course: 'Sastra Arab', size: '2.4 MB', ext: 'pdf', date: 'Hari ini, 09:30' },
-            { id: 'f-2', name: 'Tugas_Mingguan_1.docx', course: 'Sastra Arab', size: '145 KB', ext: 'docx', date: 'Kemarin, 14:15' },
-            { id: 'f-3', name: 'Pengantar_Filsafat_Bab1.pdf', course: 'Filsafat Ilmu', size: '1.8 MB', ext: 'pdf', date: 'Kemarin, 10:00' }
-        ];
-        localStorage.setItem('ulmet_files', JSON.stringify(userFiles));
-    }
+    let userFiles = JSON.parse(localStorage.getItem(userKey('ulmet_files')) || '[]');
 
     // Inisialisasi tampilan
     function renderMaterialsUI() {
@@ -532,11 +704,15 @@
         if(confirm('Apakah Anda yakin ingin menghapus folder "' + courseName + '" beserta semua file di dalamnya?')) {
             // Hapus folder
             userCourses = userCourses.filter(c => c !== courseName);
-            localStorage.setItem('ulmet_courses', JSON.stringify(userCourses));
+            localStorage.setItem(userKey('ulmet_courses'), JSON.stringify(userCourses));
+            syncCourses(userCourses);
             
-            // Hapus semua file di dalam folder tersebut (secara lokal)
+            // Hapus semua file di dalam folder tersebut
+            const filesToDelete = userFiles.filter(f => f.course === courseName);
+            filesToDelete.forEach(f => { if (f.storage_path) deleteStorageFile(f.storage_path); });
             userFiles = userFiles.filter(f => f.course !== courseName);
-            localStorage.setItem('ulmet_files', JSON.stringify(userFiles));
+            localStorage.setItem(userKey('ulmet_files'), JSON.stringify(userFiles));
+            syncFiles(userFiles);
             
             // Reset ke Semua Mata Kuliah (jika ada) atau folder pertama
             if (currentCourse === courseName) {
@@ -611,7 +787,7 @@
                 theme = { bg: 'bg-purple-950/40', border: 'border-purple-800/50', text: 'text-purple-400', badge: 'FOTO' };
             }
 
-            const isGDrive = !!file.gdriveId;
+            const isCloud = !!file.storage_path;
 
             return `
             <div class="flex items-center justify-between p-3 bg-slate-900/60 border border-blue-800/40 rounded-xl hover:border-blue-600/50 transition group cursor-pointer" onclick="openFileViewer('${file.id}')">
@@ -622,7 +798,7 @@
                         <div class="flex items-center gap-2 mt-0.5">
                             <p class="text-[10px] text-blue-400">${file.size}</p>
                             <span class="w-1 h-1 rounded-full bg-blue-800"></span>
-                            <p class="text-[10px] ${isGDrive ? 'text-green-400' : 'text-blue-400'}">${isGDrive ? '☁️ Google Drive' : file.date || 'Tersimpan'}</p>
+                            <p class="text-[10px] ${isCloud ? 'text-green-400' : 'text-blue-400'}">${isCloud ? '☁️ Supabase Cloud' : file.date || 'Tersimpan'}</p>
                         </div>
                     </div>
                 </div>
@@ -634,51 +810,7 @@
         }).join('');
     }
 
-    // Buat atau dapatkan ID folder di Google Drive
-    async function getOrCreateDriveFolder(folderName, parentId = null) {
-        if (!gdriveToken) return null;
-        
-        let query = `mimeType='application/vnd.google-apps.folder' and name='${folderName.replace(/'/g, "\\'")}' and trashed=false`;
-        if (parentId) {
-            query += ` and '${parentId}' in parents`;
-        }
-        
-        // Cek apakah folder sudah ada
-        const resSearch = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id, name)`, {
-            headers: { 'Authorization': 'Bearer ' + gdriveToken }
-        });
-        
-        if (resSearch.ok) {
-            const data = await resSearch.json();
-            if (data.files && data.files.length > 0) {
-                return data.files[0].id;
-            }
-        }
-        
-        // Buat folder baru jika belum ada
-        const metadata = {
-            name: folderName,
-            mimeType: 'application/vnd.google-apps.folder'
-        };
-        if (parentId) metadata.parents = [parentId];
-        
-        const resCreate = await fetch('https://www.googleapis.com/drive/v3/files', {
-            method: 'POST',
-            headers: { 
-                'Authorization': 'Bearer ' + gdriveToken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(metadata)
-        });
-        
-        if (resCreate.ok) {
-            const data = await resCreate.json();
-            return data.id;
-        }
-        return null;
-    }
-
-    // Handle Upload File (Langsung di browser & ke Google Drive jika terhubung)
+    // Handle Upload File ke Supabase Storage
     async function handleFileUpload(e) {
         const file = e.target.files ? e.target.files[0] : e;
         if (!file) return;
@@ -688,93 +820,71 @@
             ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' 
             : Math.max(1, Math.round(file.size / 1024)) + ' KB';
 
-        showToast('⏳ Menyimpan "' + file.name + '"...');
+        showToast('⏳ Mengunggah "' + file.name + '"...');
 
-        // Baca file ke format data lokal untuk disimpan
-        const reader = new FileReader();
-        reader.onload = async function(evt) {
-            const newFileObj = {
-                id: 'file-' + Date.now(),
-                name: file.name,
-                course: currentCourse,
-                size: sizeFormatted,
-                ext: ext,
-                date: 'Hari ini',
-                dataUrl: evt.target.result,
-                gdriveId: null
-            };
-
-            // Jika Google Drive sudah terhubung, upload secara invisible di background
-            if (gdriveToken) {
-                showToast(`☁️ Mengatur folder & mengunggah ${file.name}...`);
-                try {
-                    // Buat/ambil folder utama ULMET
-                    const ulmetFolderId = await getOrCreateDriveFolder('ULMET');
-                    
-                    // Buat/ambil folder sesuai nama Mata Kuliah
-                    let courseFolderId = ulmetFolderId;
-                    if (ulmetFolderId && currentCourse) {
-                        courseFolderId = await getOrCreateDriveFolder(currentCourse, ulmetFolderId);
-                    }
-                    
-                    const gId = await uploadFileToGoogleDriveDirect(file, courseFolderId);
-                    if (gId) {
-                        newFileObj.gdriveId = gId;
-                        showToast(`✅ Tersimpan di Drive: ULMET / ${currentCourse}`);
-                    }
-                } catch (gErr) {
-                    console.warn('Gagal upload ke Google Drive:', gErr);
-                    showToast('⚠️ Gagal ke Drive, namun disimpan lokal di ULMET.');
-                }
-            } else {
-                showToast('✅ Berhasil disimpan di ULMET!');
-            }
-
-            userFiles.unshift(newFileObj);
-            localStorage.setItem('ulmet_files', JSON.stringify(userFiles));
-            renderCourseFolders();
-            renderFilesList();
+        const newFileObj = {
+            id: 'file-' + Date.now(),
+            name: file.name,
+            course: currentCourse,
+            size: sizeFormatted,
+            ext: ext,
+            date: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}),
+            storage_path: null
         };
 
-        reader.readAsDataURL(file);
+        let uploadedToCloud = false;
+        // Upload ke Supabase Storage
+        try {
+            const folderPath = (currentCourse || 'Umum').replace(/[^a-zA-Z0-9_\-\s]/g, '').replace(/\s+/g, '_');
+            const result = await uploadFile(file, folderPath);
+            if (result && (result.fullPath || result.path)) {
+                newFileObj.storage_path = result.fullPath || result.path;
+                uploadedToCloud = true;
+                showToast(`☁️ Berkas berhasil diunggah ke Cloud: ${currentCourse}`);
+            }
+        } catch (uploadErr) {
+            console.warn('Upload ke Supabase Storage gagal:', uploadErr);
+            showToast('⚠️ Upload cloud gagal: ' + (uploadErr.message || 'Error'));
+        }
+
+        // Fallback hanya jika cloud gagal dan ukuran file kecil (<2MB)
+        if (!uploadedToCloud && file.size < 2 * 1024 * 1024) {
+            try {
+                const dataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => resolve(evt.target.result);
+                    reader.readAsDataURL(file);
+                });
+                newFileObj.dataUrl = dataUrl;
+            } catch (e) {}
+        }
+
+        userFiles.unshift(newFileObj);
+
+        // Simpan cache lokal aman dari QuotaExceededError
+        try {
+            const cleanForLocal = userFiles.map(f => {
+                const { dataUrl, ...rest } = f;
+                return rest;
+            });
+            localStorage.setItem(userKey('ulmet_files'), JSON.stringify(cleanForLocal));
+        } catch (e) {
+            console.warn('LocalStorage error:', e);
+        }
+
+        // Sinkronisasi metadata ke tabel files Supabase
+        try {
+            await syncFiles(userFiles);
+        } catch (syncErr) {
+            console.error('Gagal sync files ke DB:', syncErr);
+        }
+
+        renderCourseFolders();
+        renderFilesList();
 
         // Reset input
         const input = document.getElementById('upload-input');
         if (input) input.value = '';
-    }
-
-    // Upload langsung ke Google Drive API (Multipart headless)
-    async function uploadFileToGoogleDriveDirect(file, folderId = null) {
-        if (!gdriveToken) return null;
-
-        const metadata = {
-            name: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            description: 'Materi Pembelajaran ULMET - ' + currentCourse
-        };
-        
-        // Masukkan ke dalam folder jika ada
-        if (folderId) {
-            metadata.parents = [folderId];
-        }
-
-        const formData = new FormData();
-        formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        formData.append('file', file);
-
-        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + gdriveToken },
-            body: formData
-        });
-
-        if (res.ok) {
-            const data = await res.json();
-            return data.id;
-        } else {
-            const err = await res.json();
-            throw new Error(err.error ? err.error.message : 'Upload gagal');
-        }
     }
 
     // Unduh File
@@ -782,7 +892,17 @@
         const file = userFiles.find(f => f.id === fileId);
         if (!file) return;
 
-        if (file.dataUrl) {
+        if (file.storage_path) {
+            const url = getFileUrl(file.storage_path);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.name;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('⬇️ Mengunduh ' + file.name);
+        } else if (file.dataUrl) {
             const a = document.createElement('a');
             a.href = file.dataUrl;
             a.download = file.name;
@@ -795,11 +915,16 @@
         }
     }
 
-    // Hapus File
+    // Hapus File (dari Supabase Storage + DB)
     async function deleteFileItem(fileId, fileName) {
         if (!confirm('Hapus berkas "' + fileName + '"?')) return;
+        const file = userFiles.find(f => f.id === fileId);
+        if (file && file.storage_path) {
+            try { await deleteStorageFile(file.storage_path); } catch(e) {}
+        }
         userFiles = userFiles.filter(f => f.id !== fileId);
-        localStorage.setItem('ulmet_files', JSON.stringify(userFiles));
+        localStorage.setItem(userKey('ulmet_files'), JSON.stringify(userFiles));
+        syncFiles(userFiles);
         renderCourseFolders();
         renderFilesList();
         showToast('🗑️ Berkas telah dihapus');
@@ -813,7 +938,8 @@
         const clean = name.trim();
         if (!userCourses.includes(clean)) {
             userCourses.push(clean);
-            localStorage.setItem('ulmet_courses', JSON.stringify(userCourses));
+            localStorage.setItem(userKey('ulmet_courses'), JSON.stringify(userCourses));
+            syncCourses(userCourses);
         }
         selectCourse(clean);
         showToast('📁 Folder "' + clean + '" berhasil ditambahkan');
@@ -851,7 +977,7 @@
         });
     }
 
-    // Viewer In-App (Real Document & Image Preview)
+    // Viewer In-App (Real Document & Image Preview — Supabase Storage)
     let currentViewingFileId = null;
     function openFileViewer(fileId) {
         const file = userFiles.find(f => f.id === fileId);
@@ -862,23 +988,23 @@
         document.getElementById('viewer-title').textContent = file.name;
         document.getElementById('viewer-icon').textContent = ext === 'pdf' ? '📕' : ['doc', 'docx'].includes(ext) ? '📘' : ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext) ? '🖼️' : '📄';
 
+        // Tentukan URL sumber file
+        const fileUrl = file.storage_path ? getFileUrl(file.storage_path) : (file.dataUrl || '');
+
         const container = document.getElementById('viewer-container');
         if (container) {
             if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext)) {
-                // Tampilkan Gambar Asli!
                 container.innerHTML = `
                     <div class="flex flex-col items-center justify-center max-w-5xl w-full p-2">
-                        <img src="${file.dataUrl || ''}" alt="${file.name}" class="max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40 bg-slate-950/50">
+                        <img src="${fileUrl}" alt="${file.name}" class="max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40 bg-slate-950/50">
                         <p class="text-xs text-blue-300 mt-3 font-medium">📷 Pratinjau Gambar (${file.size})</p>
                     </div>`;
-            } else if (ext === 'pdf' && file.dataUrl) {
-                // Tampilkan PDF Asli!
+            } else if (ext === 'pdf' && fileUrl) {
                 container.innerHTML = `
                     <div class="w-full max-w-5xl h-[80vh] rounded-2xl overflow-hidden border border-blue-800/40 shadow-2xl bg-white">
-                        <iframe src="${file.dataUrl}" class="w-full h-full border-none"></iframe>
+                        <iframe src="${fileUrl}" class="w-full h-full border-none"></iframe>
                     </div>`;
             } else {
-                // Tampilkan Dokumen Card Elegan
                 container.innerHTML = `
                     <div class="bg-slate-900/90 border border-blue-800/60 rounded-3xl p-8 max-w-md w-full shadow-2xl text-center space-y-4">
                         <div class="w-20 h-20 bg-blue-950 border border-blue-800 rounded-2xl flex items-center justify-center text-4xl mx-auto shadow-lg">
@@ -901,109 +1027,10 @@
         document.getElementById('modal-viewer').classList.remove('hidden');
     }
 
-    // ===== MODAL & GOOGLE OAUTH POPUP =====
-    function openGDriveModal() {
-        const modal = document.getElementById('modal-gdrive');
-        if (!modal) return;
-
-        const input = document.getElementById('gdrive-client-id-input');
-        if (input) input.value = gdriveClientId || '';
-
-        updateModalStatusUI();
-        modal.classList.remove('hidden');
-    }
-
-    function closeGDriveModal() {
-        const modal = document.getElementById('modal-gdrive');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    function toggleClientIdHelp() {
-        const el = document.getElementById('client-id-help');
-        if (el) el.classList.toggle('hidden');
-    }
-
-    function updateModalStatusUI() {
-        const label = document.getElementById('gdrive-status-label');
-        const desc = document.getElementById('gdrive-status-desc');
-        const dot = document.getElementById('gdrive-status-dot');
-        const btn = document.getElementById('btn-login-gdrive');
-
-        if (gdriveToken) {
-            if (label) label.textContent = 'Terhubung ke Google Drive 🟢';
-            if (desc) desc.textContent = 'Akun Google Anda aktif. Berkas materi akan otomatis tersinkron ke Google Drive di latar belakang.';
-            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-green-400';
-            if (btn) btn.innerHTML = '🔄 Hubungkan Ulang / Ganti Akun';
-        } else {
-            if (label) label.textContent = 'Belum Terhubung ⚪';
-            if (desc) desc.textContent = 'Hubungkan sekali, agar semua tugas & materi tersimpan otomatis di Google Drive Anda.';
-            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse';
-            if (btn) btn.innerHTML = '<span>🔐</span> Hubungkan Akun Google';
-        }
-    }
-
-    function updateSyncStatusUI() {
-        const text = document.getElementById('sync-status-text');
-        const icon = document.getElementById('sync-icon');
-        if (!text) return;
-
-        if (gdriveToken) {
-            text.textContent = 'Google Drive Terhubung';
-            text.className = 'text-[10px] font-bold text-green-400';
-            if (icon) icon.textContent = '🟢';
-        } else {
-            text.textContent = 'Sinkron dgn Google Drive';
-            text.className = 'text-[10px] font-bold text-blue-400';
-            if (icon) icon.textContent = '☁️';
-        }
-    }
-
-    // Hubungkan akun Google pengguna (1 Kali Login Saja)
-    function connectGoogleAccount() {
-        const input = document.getElementById('gdrive-client-id-input');
-        const inputId = input ? input.value.trim() : '';
-
-        if (inputId) {
-            gdriveClientId = inputId;
-            localStorage.setItem('ulmet_gdrive_client_id', gdriveClientId);
-        }
-
-        if (!gdriveClientId) {
-            alert('Silakan masukkan Google Client ID Anda terlebih dahulu.\nKlik "Cara Dapatkan ID" untuk panduannya.');
-            return;
-        }
-
-        if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-            alert('Pustaka Google sedang dimuat... Pastikan laptop Anda terhubung ke internet.');
-            return;
-        }
-
-        try {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: gdriveClientId,
-                scope: 'https://www.googleapis.com/auth/drive.file',
-                callback: (tokenResponse) => {
-                    if (tokenResponse && tokenResponse.access_token) {
-                        gdriveToken = tokenResponse.access_token;
-                        localStorage.setItem('ulmet_gdrive_token', gdriveToken);
-                        updateSyncStatusUI();
-                        updateModalStatusUI();
-                        closeGDriveModal();
-                        showToast('🎉 Berhasil terhubung ke Google Drive Anda!');
-                    }
-                }
-            });
-
-            // Minta akses (popup Google resmi 1 kali)
-            tokenClient.requestAccessToken({ prompt: 'consent' });
-        } catch (err) {
-            alert('Gagal menghubungkan: ' + err.message);
-        }
-    }
-
     // Inisialisasi awal saat halaman terbuka
     document.addEventListener('DOMContentLoaded', () => {
         renderMaterialsUI();
+        initSupabaseData(); // Load data dari Supabase
     });
 
     // ===== MODAL =====
@@ -1109,10 +1136,20 @@
             Object.assign(tasks.find(t => t.id == editId), data);
             showToast('✅ Tugas berhasil diperbarui!');
         } else {
-            tasks.push({ id: Date.now(), ...data, status: 'belum', createdAt: Date.now(), completedAt: null });
+            const nowTime = Date.now();
+            tasks.push({ 
+                id: nowTime, 
+                ...data, 
+                status: 'belum', 
+                createdAt: nowTime, 
+                created_at: nowTime, 
+                completedAt: null, 
+                completed_at: null 
+            });
             showToast('✅ Tugas baru ditambahkan!');
         }
         saveTasks(); closeModal(); renderTasks(); updateStats();
+        if (!document.getElementById('panel-kalender').classList.contains('hidden')) renderCalendar();
     }
 
     document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -1174,117 +1211,731 @@
         return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     }
     // Helper: get just the date portion from a stored deadline string
-    // Supports both "YYYY-MM-DDTHH:MM" (datetime-local) and ISO strings
+    // Supports both "YYYY-MM-DDTHH:MM" (datetime-local) and ISO strings safely
     function deadlineDateStr(deadline) {
-        // Parse the deadline safely in local time to avoid UTC shift
+        if (!deadline) return '';
+        if (typeof deadline === 'string' && deadline.length >= 10 && deadline[4] === '-' && deadline[7] === '-') {
+            return deadline.slice(0, 10);
+        }
         const dt = new Date(deadline);
-        return toDateStr(dt);
+        return isNaN(dt.getTime()) ? '' : toDateStr(dt);
     }
 
+    // ===== KALENDER MODERN MOBILE & DESKTOP =====
+    const BULAN_INDONESIA = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const BULAN_PENDEK = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+        'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    const HARI_INDONESIA = [
+        'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+    ];
+    const HARI_PENDEK = [
+        'Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'
+    ];
+
     let monthOffset = 0; // 0 = current month
+    let selectedCalDate = toDateStr(new Date()); // default: today ("YYYY-MM-DD")
+
+    function getWeekNumber(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    function formatDisplayDateFull(dateStr) {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-');
+        if (parts.length < 3) return dateStr;
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        const dateObj = new Date(y, m, d);
+        const hari = HARI_INDONESIA[dateObj.getDay()];
+        const bulan = BULAN_INDONESIA[m];
+        return `${hari}, ${d} ${bulan} ${y}`;
+    }
+
+    function getRelativeDateLabel(dateStr) {
+        const todayStr = toDateStr(new Date());
+        if (dateStr === todayStr) return 'Hari Ini';
+        
+        const parts = dateStr.split('-');
+        const tParts = todayStr.split('-');
+        const d1 = new Date(parts[0], parts[1]-1, parts[2]);
+        const d0 = new Date(tParts[0], tParts[1]-1, tParts[2]);
+        const diffDays = Math.round((d1 - d0) / 86400000);
+        
+        if (diffDays === 1) return 'Besok';
+        if (diffDays === -1) return 'Kemarin';
+        if (diffDays > 1) return `${diffDays} hari lagi`;
+        if (diffDays < -1) return `${Math.abs(diffDays)} hari lalu`;
+        return '';
+    }
+
+    function formatDeadlineTime(deadline) {
+        if (!deadline) return '23:59';
+        if (typeof deadline === 'string' && deadline.includes('T')) {
+            const timePart = deadline.split('T')[1];
+            if (timePart) return timePart.slice(0, 5);
+        }
+        try {
+            const dt = new Date(deadline);
+            if (!isNaN(dt.getTime())) {
+                const h = String(dt.getHours()).padStart(2, '0');
+                const m = String(dt.getMinutes()).padStart(2, '0');
+                return `${h}:${m}`;
+            }
+        } catch(e) {}
+        return '23:59';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // ===== LIVE REAL-TIME WEATHER SERVICE (BMKG Resmi: Desa Tlekung, Kec. Junrejo, Kota Batu / Locari Kampus 3) =====
+    const LOCARI_LAT = -7.9197;
+    const LOCARI_LON = 112.5516;
+    const LOCARI_CITY = 'Locari, Kampus 3 UIN Malang';
+    const BMKG_ADM4_TLEKUNG = '35.79.03.2004'; // Desa Tlekung, Kec. Junrejo, Kota Batu
+
+    let liveWeather = {
+        temp: 24,
+        condition: 'Cerah Berawan',
+        icon: '🌤️',
+        city: LOCARI_CITY,
+        source: 'BMKG',
+        humidity: 65,
+        wind: 8,
+        isDay: 1,
+        loaded: false,
+        loading: false,
+        lastUpdated: null,
+        tip: 'Suasana sejuk di kawasan Locari & Kampus 3, waktu pas buat fokus kuliah dan tugas!'
+    };
+
+    function getBmkgIcon(desc) {
+        if (!desc) return '🌤️';
+        const d = desc.toLowerCase();
+        if (d.includes('petir')) return '⚡';
+        if (d.includes('lebat') || d.includes('sedang')) return '🌧️';
+        if (d.includes('hujan') || d.includes('gerimis')) return '🌦️';
+        if (d.includes('kabut') || d.includes('kabur')) return '🌫️';
+        if (d.includes('tebal')) return '☁️';
+        if (d.includes('berawan')) return '⛅';
+        if (d.includes('cerah')) return '☀️';
+        return '🌤️';
+    }
+
+    function getWmoInfo(code, isDay = 1) {
+        if (code === 0) return { text: isDay ? 'Cerah' : 'Cerah Malam', icon: isDay ? '☀️' : '🌙' };
+        if (code === 1 || code === 2) return { text: 'Cerah Berawan', icon: isDay ? '🌤️' : '⛅' };
+        if (code === 3) return { text: 'Berawan', icon: '☁️' };
+        if (code === 45 || code === 48) return { text: 'Berkabut', icon: '🌫️' };
+        if (code >= 51 && code <= 57) return { text: 'Gerimis Ringan', icon: '🌦️' };
+        if (code >= 61 && code <= 65) return { text: 'Hujan', icon: '🌧️' };
+        if (code >= 66 && code <= 67) return { text: 'Hujan Dingin', icon: '🌧️' };
+        if (code >= 71 && code <= 77) return { text: 'Hujan Salju', icon: '❄️' };
+        if (code >= 80 && code <= 82) return { text: 'Hujan Lebat', icon: '⛈️' };
+        if (code >= 95 && code <= 99) return { text: 'Badai Petir', icon: '⚡' };
+        return { text: 'Cerah Berawan', icon: '🌤️' };
+    }
+
+    function getWeatherStudyTip(temp, condition) {
+        if (condition.includes('Hujan') || condition.includes('Badai') || condition.includes('Gerimis')) {
+            return '🌧️ Hujan di sekitar Locari & Kampus 3, suasana sejuk dan adem buat fokus ngerjain tugas di kos!';
+        }
+        if (temp >= 30) {
+            return '☀️ Cuaca cukup terik di Kampus 3 Locari, jangan lupa banyak minum air dan cicil tugasmu.';
+        }
+        if (temp <= 22) {
+            return '☕ Hawa sejuk khas pegunungan Locari Junrejo, nikmat untuk membaca materi atau istirahat.';
+        }
+        return '🎯 Suasana belajar yang pas di sekitar Locari & Kampus 3, yuk selesaikan target tugasmu hari ini!';
+    }
+
+    function initCachedWeather() {
+        try {
+            const cached = localStorage.getItem('ulmet_live_weather');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data && typeof data.temp === 'number' && data.source === 'BMKG') {
+                    liveWeather = { ...liveWeather, ...data, loaded: true, city: LOCARI_CITY };
+                } else {
+                    localStorage.removeItem('ulmet_live_weather');
+                }
+            }
+        } catch(e) {}
+    }
+
+    async function fetchLiveWeather(force = false) {
+        if (liveWeather.loading) return;
+        const now = Date.now();
+        if (!force && liveWeather.lastUpdated && (now - liveWeather.lastUpdated < 15 * 60 * 1000) && liveWeather.source === 'BMKG') {
+            return;
+        }
+
+        liveWeather.loading = true;
+        updateWeatherUIOnly();
+
+        // 1. Coba ambil dari BMKG Resmi terlebih dahulu (Desa Tlekung, Kec. Junrejo, Kota Batu)
+        try {
+            const bmkgUrl = `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=${BMKG_ADM4_TLEKUNG}`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+            const bRes = await fetch(bmkgUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (bRes.ok) {
+                const bData = await bRes.json();
+                const cuacaDays = (bData.data && bData.data[0] && bData.data[0].cuaca) || [];
+                const allSlots = [];
+                cuacaDays.forEach(day => {
+                    if (Array.isArray(day)) day.forEach(s => allSlots.push(s));
+                });
+
+                if (allSlots.length > 0) {
+                    const nowTs = Date.now();
+                    let bestSlot = allSlots[0];
+                    let minDiff = Infinity;
+                    allSlots.forEach(s => {
+                        const sTime = new Date(s.datetime || s.utc_datetime).getTime();
+                        const diff = Math.abs(nowTs - sTime);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            bestSlot = s;
+                        }
+                    });
+
+                    // Rentang suhu & kelembaban hari ini dari slot BMKG
+                    const todayStr = toDateStr(new Date());
+                    const todaySlots = allSlots.filter(s => {
+                        const dt = (s.local_datetime || s.datetime || '').slice(0, 10);
+                        return dt === todayStr;
+                    });
+                    const validSlots = todaySlots.length > 0 ? todaySlots : allSlots.slice(0, 8);
+                    const temps = validSlots.map(s => Number(s.t)).filter(n => !isNaN(n));
+                    const hus = validSlots.map(s => Number(s.hu)).filter(n => !isNaN(n));
+                    const tMin = temps.length ? Math.min(...temps) : 17;
+                    const tMax = temps.length ? Math.max(...temps) : 28;
+                    const huMin = hus.length ? Math.min(...hus) : 30;
+                    const huMax = hus.length ? Math.max(...hus) : 91;
+
+                    const temp = Math.round(Number(bestSlot.t) || 24);
+                    const cond = bestSlot.weather_desc || 'Cerah Berawan';
+                    const icon = getBmkgIcon(cond);
+                    const hum = Number(bestSlot.hu) || 60;
+                    const wind = Math.round(Number(bestSlot.ws) || 5);
+
+                    liveWeather = {
+                        temp: temp,
+                        tRange: `${tMin}–${tMax} °C`,
+                        huRange: `${huMin}–${huMax}%`,
+                        condition: cond,
+                        icon: icon,
+                        city: LOCARI_CITY,
+                        source: 'BMKG',
+                        humidity: hum,
+                        wind: wind,
+                        isDay: 1,
+                        loaded: true,
+                        loading: false,
+                        lastUpdated: Date.now(),
+                        tip: getWeatherStudyTip(temp, cond)
+                    };
+
+                    localStorage.setItem('ulmet_live_weather', JSON.stringify(liveWeather));
+                    updateWeatherUIOnly();
+                    return;
+                }
+            }
+        } catch(bmkgErr) {
+            console.warn('[ULMET Weather] BMKG API fallback to Open-Meteo:', bmkgErr);
+        }
+
+        // 2. Fallback: Open-Meteo
+        try {
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LOCARI_LAT}&longitude=${LOCARI_LON}&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=Asia%2FJakarta`;
+            const wRes = await fetch(weatherUrl);
+            if (!wRes.ok) throw new Error('Weather API error');
+            const wData = await wRes.json();
+            
+            const curr = wData.current || {};
+            const rawTemp = curr.temperature_2m;
+            const wCode = curr.weather_code ?? 1;
+            const isDay = curr.is_day ?? 1;
+            const humidity = curr.relative_humidity_2m ?? 70;
+            const wind = curr.wind_speed_10m ?? 5;
+            const wmo = getWmoInfo(wCode, isDay);
+            const roundedTemp = Math.round(rawTemp);
+
+            liveWeather = {
+                temp: roundedTemp,
+                tRange: '17–28 °C',
+                huRange: '30–91%',
+                condition: wmo.text,
+                icon: wmo.icon,
+                city: LOCARI_CITY,
+                source: 'BMKG Ref',
+                humidity: humidity,
+                wind: wind,
+                isDay: isDay,
+                loaded: true,
+                loading: false,
+                lastUpdated: Date.now(),
+                tip: getWeatherStudyTip(roundedTemp, wmo.text)
+            };
+
+            localStorage.setItem('ulmet_live_weather', JSON.stringify(liveWeather));
+            updateWeatherUIOnly();
+        } catch(err) {
+            console.warn('[ULMET Weather] Gagal memuat cuaca Locari Kampus 3:', err);
+            liveWeather.loading = false;
+            updateWeatherUIOnly();
+        }
+    }
+
+    function updateWeatherUIOnly() {
+        const tempEl = document.getElementById('live-weather-temp');
+        const condEl = document.getElementById('live-weather-cond');
+        const rangeEl = document.getElementById('live-weather-range');
+        const cityEl = document.getElementById('live-weather-city');
+        const tipEl = document.getElementById('live-weather-tip');
+        const refreshBtn = document.getElementById('live-weather-refresh');
+
+        if (tempEl) tempEl.textContent = `${liveWeather.temp}°C`;
+        if (condEl) condEl.textContent = `${liveWeather.icon} ${liveWeather.condition}`;
+        if (rangeEl) rangeEl.textContent = `${liveWeather.tRange || '17–28 °C'} • Kelembapan ${liveWeather.huRange || '30–91%'}`;
+        if (cityEl) cityEl.textContent = `📍 ${liveWeather.city}`;
+        if (tipEl) tipEl.textContent = liveWeather.tip;
+        if (refreshBtn) {
+            if (liveWeather.loading) {
+                refreshBtn.classList.add('animate-spin');
+            } else {
+                refreshBtn.classList.remove('animate-spin');
+            }
+        }
+    }
+
+    function calPrevMonth() {
+        monthOffset--;
+        renderCalendar();
+    }
+
+    function calNextMonth() {
+        monthOffset++;
+        renderCalendar();
+    }
+
+    function jumpToToday() {
+        monthOffset = 0;
+        selectedCalDate = toDateStr(new Date());
+        renderCalendar();
+    }
+
+    // Backward compatibility
+    function prevWeek() { calPrevMonth(); }
+    function nextWeek() { calNextMonth(); }
+
+    function openModalForDate(dateStr) {
+        const targetDate = dateStr || selectedCalDate || toDateStr(new Date());
+        openModal();
+        setTimeout(() => {
+            const dlInput = document.getElementById('form-deadline');
+            if (dlInput) {
+                dlInput.value = `${targetDate}T23:59`;
+                updateDeadlinePreview();
+            }
+        }, 70);
+    }
+
+    function calCycleTaskStatus(id) {
+        cycleStatus(id);
+        renderCalendar();
+    }
+
+    function calDeleteTask(id) {
+        deleteTask(id);
+        renderCalendar();
+    }
 
     function renderCalendar() {
+        const matrix = document.getElementById('calendar-matrix');
+        if (!matrix) return;
+
         const now = new Date();
-        // Calculate the month we're viewing
         const viewDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
         const year = viewDate.getFullYear();
         const month = viewDate.getMonth(); // 0-indexed
 
-        // Month label
-        document.getElementById('week-label').textContent =
-            viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        // Header Title: e.g. "2026 Okt" (matching mobile screenshot)
+        const titleEl = document.getElementById('cal-month-title');
+        if (titleEl) {
+            titleEl.textContent = `${year} ${BULAN_PENDEK[month]}`;
+        }
 
-        // Count tasks this month
-        const msStr  = toDateStr(new Date(year, month, 1));
-        const meStr  = toDateStr(new Date(year, month + 1, 0)); // last day of month
-        const wt = tasks.filter(t => {
+        // Subtitle: month and total tasks
+        const msStr = toDateStr(new Date(year, month, 1));
+        const meStr = toDateStr(new Date(year, month + 1, 0));
+        const monthTasks = tasks.filter(t => {
             const ds = deadlineDateStr(t.deadline);
             return ds >= msStr && ds <= meStr;
         });
-        document.getElementById('week-sublabel').textContent = wt.length + ' tugas bulan ini';
 
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '';
+        const subTitleEl = document.getElementById('cal-month-subtitle');
+        if (subTitleEl) {
+            subTitleEl.textContent = `${BULAN_INDONESIA[month]} ${year} • ${monthTasks.length} tugas bulan ini`;
+        }
 
-        // Day-of-week headers (Mon=0 ... Sun=6)
-        const dayNames = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-        dayNames.forEach(name => {
-            const hdr = document.createElement('div');
-            hdr.className = 'text-center text-xs font-bold text-blue-400 py-2';
-            hdr.textContent = name;
-            grid.appendChild(hdr);
+        matrix.innerHTML = '';
+
+        // Day of week headers: [Wk, MIN, SEN, SEL, RAB, KAM, JUM, SAB]
+        const headerRow = document.createElement('div');
+        headerRow.className = 'grid grid-cols-[24px_repeat(7,1fr)] sm:grid-cols-[28px_repeat(7,1fr)] gap-1 text-center text-xs font-bold py-2 mb-1 border-b border-slate-800/80';
+        
+        // Blank cell for week number column
+        const wkHdr = document.createElement('div');
+        wkHdr.className = 'text-[10px] font-mono text-slate-600 flex items-center justify-center';
+        wkHdr.textContent = '';
+        headerRow.appendChild(wkHdr);
+
+        const dayHeaders = [
+            { label: 'MIN', isSun: true },
+            { label: 'SEN', isSun: false },
+            { label: 'SEL', isSun: false },
+            { label: 'RAB', isSun: false },
+            { label: 'KAM', isSun: false },
+            { label: 'JUM', isSun: false },
+            { label: 'SAB', isSun: false }
+        ];
+
+        dayHeaders.forEach(dh => {
+            const dDiv = document.createElement('div');
+            dDiv.className = dh.isSun ? 'text-red-400 font-semibold' : 'text-slate-400 font-semibold';
+            dDiv.textContent = dh.label;
+            headerRow.appendChild(dDiv);
         });
+        matrix.appendChild(headerRow);
 
-        // Blank cells before 1st of month (Mon=0, so getDay(): Sun=0→6, Mon=1→0...)
-        const firstDay = new Date(year, month, 1).getDay(); // 0=Sun,1=Mon...
-        const blanksBefore = firstDay === 0 ? 6 : firstDay - 1; // Mon-start
-
-        for (let b = 0; b < blanksBefore; b++) {
-            const empty = document.createElement('div');
-            empty.className = 'rounded-2xl p-2 min-h-24 bg-blue-950/10 border border-blue-900/20 opacity-30';
-            grid.appendChild(empty);
-        }
-
-        // Days of the month
+        // Calculate calendar bounds (Sunday-start)
+        const firstDay = new Date(year, month, 1);
+        const startDayOfWeek = firstDay.getDay(); // 0 = Sun, 1 = Mon ...
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        for (let d = 1; d <= daysInMonth; d++) {
-            const dayObj = new Date(year, month, d);
-            const dayStr = toDateStr(dayObj);
-            const isToday = dayStr === toDateStr(now);
-            const isSun = dayObj.getDay() === 0;
-            const isSat = dayObj.getDay() === 6;
-            const holiday = getHoliday(dayStr);
-            const dt = tasks.filter(t => deadlineDateStr(t.deadline) === dayStr);
-            const prefillDeadline = dayStr + 'T23:59';
 
-            const div = document.createElement('div');
-            let cls = 'rounded-2xl p-2 min-h-24 border cursor-pointer transition-all ';
-            if (isToday)          cls += 'border-yellow-400/60 bg-yellow-400/5 ring-1 ring-yellow-400/30 ';
-            else if (holiday)     cls += 'border-red-700/40 bg-red-950/15 ';
-            else if (isSun||isSat) cls += 'border-blue-800/30 bg-blue-950/30 ';
-            else                  cls += 'border-blue-800/40 bg-blue-950/20 hover:border-blue-600/60 ';
+        // Start date (Sunday of the first row)
+        const startDate = new Date(year, month, 1 - startDayOfWeek);
+        
+        // Determine number of weeks (5 or 6)
+        const totalDaysNeeded = startDayOfWeek + daysInMonth;
+        const numWeeks = totalDaysNeeded > 35 ? 6 : 5;
 
-            div.className = cls;
-            div.innerHTML = `
-                <div class="mb-1.5">
-                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-extrabold
-                        ${isToday ? 'bg-yellow-400 text-blue-950' : holiday ? 'text-red-300' : isSun||isSat ? 'text-blue-400/70' : 'text-white'}">
-                        ${d}
-                    </span>
-                    ${holiday ? `<p class="text-[8px] font-bold text-red-400 mt-0.5 leading-tight">${holiday.icon} ${holiday.nama}</p>` : ''}
-                    ${isToday && !holiday ? `<p class="text-[8px] text-yellow-400/80 mt-0.5">● Hari ini</p>` : ''}
-                </div>
-                <div class="space-y-0.5">
-                    ${dt.slice(0,2).map(t => {
+        let currDate = new Date(startDate);
+        const todayStr = toDateStr(now);
+
+        for (let w = 0; w < numWeeks; w++) {
+            const weekRow = document.createElement('div');
+            weekRow.className = 'grid grid-cols-[24px_repeat(7,1fr)] sm:grid-cols-[28px_repeat(7,1fr)] gap-1 py-1 items-center';
+
+            // Calculate week number based on Thursday of this week
+            const thursDate = new Date(currDate.getFullYear(), currDate.getMonth(), currDate.getDate() + 4);
+            const weekNum = getWeekNumber(thursDate);
+
+            // Check if selectedCalDate falls in this week
+            const weekStartStr = toDateStr(currDate);
+            const weekEndDate = new Date(currDate.getFullYear(), currDate.getMonth(), currDate.getDate() + 6);
+            const weekEndStr = toDateStr(weekEndDate);
+            const isCurrentWeek = selectedCalDate >= weekStartStr && selectedCalDate <= weekEndStr;
+
+            const wkCell = document.createElement('div');
+            wkCell.className = `text-[10px] sm:text-[11px] font-mono text-center flex items-center justify-center transition-colors ${
+                isCurrentWeek ? 'text-sky-400 font-bold' : 'text-slate-600'
+            }`;
+            wkCell.textContent = weekNum;
+            weekRow.appendChild(wkCell);
+
+            // 7 days in this week (Sun=0 ... Sat=6)
+            for (let d = 0; d < 7; d++) {
+                const dayObj = new Date(currDate);
+                const dayStr = toDateStr(dayObj);
+                const dayNum = dayObj.getDate();
+                const isOutOfMonth = dayObj.getMonth() !== month;
+                const isSun = d === 0;
+                const isToday = dayStr === todayStr;
+                const isSelected = dayStr === selectedCalDate;
+                const holiday = getHoliday(dayStr);
+                const dayTasks = tasks.filter(t => deadlineDateStr(t.deadline) === dayStr);
+
+                const dayCell = document.createElement('div');
+                dayCell.className = 'cal-circle-cell flex flex-col items-center justify-center py-1 cursor-pointer group relative';
+                dayCell.dataset.date = dayStr;
+
+                // Circle pill styling
+                let circleCls = 'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ';
+                if (isSelected) {
+                    // Exact match with screenshot blue circular badge!
+                    circleCls += 'bg-sky-500 text-white font-extrabold shadow-lg shadow-sky-500/40 ring-2 ring-sky-400/60 scale-105';
+                } else if (isToday) {
+                    circleCls += 'ring-2 ring-yellow-400 text-yellow-300 font-bold hover:bg-slate-800/80';
+                } else if (isOutOfMonth) {
+                    circleCls += 'text-slate-600 hover:text-slate-400 hover:bg-slate-900/60';
+                } else if (isSun) {
+                    circleCls += 'text-red-400 font-semibold hover:bg-slate-800/80';
+                } else {
+                    circleCls += 'text-slate-200 hover:bg-slate-800/80';
+                }
+
+                // Indicator dots below the date number
+                let dotsHtml = '';
+                if (dayTasks.length > 0) {
+                    const hasOverdueOrUrgent = dayTasks.some(t => {
+                        if (t.status === 'selesai') return false;
                         const cd = getCountdown(t.deadline);
-                        const borderCol = cd.isOverdue||cd.isUrgent ? '#ef4444' : cd.isWarning ? '#eab308' : matkulColor(t.matkul);
-                        return `<div class="text-[10px] font-semibold rounded-md px-1.5 py-1 truncate"
-                            style="background:${borderCol}18;color:${borderCol};border-left:2px solid ${borderCol}"
-                            onclick="event.stopPropagation();editTask(${t.id});switchTab('tugas')">${t.nama}</div>`;
-                    }).join('')}
-                    ${dt.length > 2 ? `<p class="text-[9px] text-blue-500 text-right">+${dt.length-2} lagi</p>` : ''}
-                </div>`;
-            div.addEventListener('click', () => {
-                openModal();
-                setTimeout(() => {
-                    document.getElementById('form-deadline').value = prefillDeadline;
-                    updateDeadlinePreview();
-                }, 50);
-            });
-            grid.appendChild(div);
+                        return cd.isOverdue || cd.isUrgent || t.prioritas === 'tinggi';
+                    });
+                    const hasWarning = dayTasks.some(t => {
+                        if (t.status === 'selesai') return false;
+                        const cd = getCountdown(t.deadline);
+                        return cd.isWarning || t.prioritas === 'sedang';
+                    });
+                    const allCompleted = dayTasks.every(t => t.status === 'selesai');
+
+                    dotsHtml = '<div class="h-1.5 flex items-center justify-center gap-0.5 mt-0.5">';
+                    if (hasOverdueOrUrgent) {
+                        dotsHtml += '<span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-sm shadow-red-500/50"></span>';
+                    }
+                    if (hasWarning) {
+                        dotsHtml += '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400 shadow-sm shadow-yellow-400/50"></span>';
+                    }
+                    if (allCompleted) {
+                        dotsHtml += '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50"></span>';
+                    } else if (!hasOverdueOrUrgent && !hasWarning) {
+                        dotsHtml += '<span class="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50"></span>';
+                    }
+                    if (holiday) {
+                        dotsHtml += '<span class="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-sm shadow-purple-400/50" title="Libur Nasional: ' + escapeHtml(holiday.nama) + '"></span>';
+                    }
+                    dotsHtml += '</div>';
+                } else if (holiday) {
+                    dotsHtml = '<div class="h-1.5 flex items-center justify-center gap-0.5 mt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-sm shadow-purple-400/50" title="Libur Nasional: ' + escapeHtml(holiday.nama) + '"></span></div>';
+                } else {
+                    dotsHtml = '<div class="h-1.5 flex items-center justify-center gap-0.5 mt-0.5"><span class="w-1.5 h-1.5 opacity-0"></span></div>';
+                }
+
+                dayCell.innerHTML = `
+                    <div class="${circleCls}">${dayNum}</div>
+                    ${dotsHtml}
+                `;
+
+                dayCell.addEventListener('click', () => {
+                    selectedCalDate = dayStr;
+                    if (isOutOfMonth) {
+                        const targetMonth = dayObj.getMonth();
+                        const targetYear = dayObj.getFullYear();
+                        monthOffset = (targetYear - now.getFullYear()) * 12 + (targetMonth - now.getMonth());
+                    }
+                    renderCalendar();
+                });
+
+                weekRow.appendChild(dayCell);
+                currDate.setDate(currDate.getDate() + 1);
+            }
+
+            matrix.appendChild(weekRow);
         }
 
-        // Blank cells after last day (to complete the grid)
-        const lastDay = new Date(year, month, daysInMonth).getDay();
-        const blanksAfter = lastDay === 0 ? 0 : 7 - lastDay;
-        for (let b = 0; b < blanksAfter; b++) {
-            const empty = document.createElement('div');
-            empty.className = 'rounded-2xl p-2 min-h-24 bg-blue-950/10 border border-blue-900/20 opacity-30';
-            grid.appendChild(empty);
-        }
+        renderSelectedDateAgenda(selectedCalDate);
     }
-    function prevWeek() { monthOffset--; renderCalendar(); }
-    function nextWeek() { monthOffset++; renderCalendar(); }
+
+    function renderSelectedDateAgenda(dateStr) {
+        const container = document.getElementById('cal-agenda-container');
+        if (!container) return;
+
+        const dayTasks = tasks.filter(t => deadlineDateStr(t.deadline) === dateStr);
+        const holiday = getHoliday(dateStr);
+        const relLabel = getRelativeDateLabel(dateStr);
+        const fullDateDisplay = formatDisplayDateFull(dateStr);
+
+        const parts = dateStr.split('-');
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        const dateObj = new Date(y, m, d);
+        const dayNameShort = HARI_PENDEK[dateObj.getDay()];
+        const dayNumber = d;
+        const monthShort = BULAN_PENDEK[m];
+
+        const doneCount = dayTasks.filter(t => t.status === 'selesai').length;
+
+        let html = '';
+
+        // 1. Header Card for Selected Date
+        html += `
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex flex-col items-center justify-center font-bold shadow-inner flex-shrink-0">
+                        <span class="text-[10px] uppercase tracking-wider">${dayNameShort}</span>
+                        <span class="text-base font-extrabold leading-none">${dayNumber}</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-white text-sm sm:text-base truncate">${fullDateDisplay}</h3>
+                        <p class="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
+                            ${relLabel ? `<span class="px-2 py-0.5 rounded-md font-semibold text-[10px] ${relLabel === 'Hari Ini' ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' : 'bg-slate-800 text-slate-300'}">${relLabel}</span>` : ''}
+                            <span>${dayTasks.length} Jadwal Tugas</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="text-right text-xs text-slate-400 flex-shrink-0">
+                    <span class="font-bold text-slate-200 text-sm">${doneCount}/${dayTasks.length}</span>
+                    <p class="text-[10px] text-slate-500">Selesai</p>
+                </div>
+            </div>
+        `;
+
+        // 2. Holiday Banner if Applicable
+        if (holiday) {
+            html += `
+                <div class="bg-gradient-to-r from-purple-950/60 via-purple-900/40 to-slate-900 border border-purple-700/60 rounded-2xl p-3.5 flex items-center gap-3 shadow-md">
+                    <span class="text-2xl">${holiday.icon}</span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[11px] font-bold text-purple-400 tracking-wide uppercase">Hari Libur Nasional Indonesia</p>
+                        <p class="text-sm font-extrabold text-white truncate">${escapeHtml(holiday.nama)}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Task Cards for this Date (Matching Card 1 in user's reference image)
+        if (dayTasks.length > 0) {
+            // Sort: incomplete first, then by priority/time
+            const sorted = [...dayTasks].sort((a, b) => {
+                if (a.status === 'selesai' && b.status !== 'selesai') return 1;
+                if (a.status !== 'selesai' && b.status === 'selesai') return -1;
+                return (a.deadline || '').localeCompare(b.deadline || '');
+            });
+
+            html += `<div class="space-y-2.5">`;
+            sorted.forEach(t => {
+                const isDone = t.status === 'selesai';
+                const timeStr = formatDeadlineTime(t.deadline);
+
+                let prioBadge = 'bg-blue-900/50 text-blue-300 border-blue-700/50';
+                if (t.prioritas === 'tinggi') prioBadge = 'bg-red-500/20 text-red-300 border-red-500/40';
+                else if (t.prioritas === 'sedang') prioBadge = 'bg-yellow-400/20 text-yellow-300 border-yellow-400/40';
+                else if (t.prioritas === 'rendah') prioBadge = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+
+                html += `
+                    <div class="bg-slate-900/90 border border-slate-800/90 hover:border-slate-700 rounded-2xl p-4 shadow-md transition-all flex items-start gap-3.5 group">
+                        <!-- Checkbox Circle (Click to toggle status) -->
+                        <button onclick="calCycleTaskStatus(${t.id})" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                            isDone 
+                            ? 'bg-emerald-500 border-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/30' 
+                            : 'border-slate-600 hover:border-sky-400 text-transparent'
+                        }" title="${isDone ? 'Batal selesai' : 'Tandai selesai'}">
+                            ${isDone ? '✓' : '○'}
+                        </button>
+
+                        <!-- Task Details -->
+                        <div class="flex-1 min-w-0 cursor-pointer" onclick="editTask(${t.id})">
+                            <h4 class="font-bold text-sm sm:text-base text-white ${isDone ? 'line-through text-slate-400' : ''} truncate">
+                                ${escapeHtml(t.nama)}
+                            </h4>
+                            
+                            <!-- Metadata line: Course dot, Time, Priority -->
+                            <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-slate-300">
+                                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${matkulColor(t.matkul)}"></span>
+                                    <span class="truncate max-w-[130px] sm:max-w-[180px]">${escapeHtml(t.matkul || 'Umum')}</span>
+                                </span>
+                                <span class="text-slate-600">•</span>
+                                <span class="font-medium text-slate-300">⏰ ${timeStr}</span>
+                                <span class="text-slate-600">•</span>
+                                <span class="px-2 py-0.5 rounded-md font-bold text-[10px] border ${prioBadge}">${t.prioritas.toUpperCase()}</span>
+                            </div>
+
+                            ${t.catatan ? `<p class="text-xs text-slate-400 mt-2 bg-slate-950/60 rounded-xl p-2 border border-slate-800/80 italic line-clamp-2">💬 ${escapeHtml(t.catatan)}</p>` : ''}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button onclick="editTask(${t.id})" class="p-1.5 text-slate-400 hover:text-yellow-400 hover:bg-slate-800 rounded-lg transition" title="Edit">✏️</button>
+                            <button onclick="calDeleteTask(${t.id})" class="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/30 rounded-lg transition" title="Hapus">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        } else {
+            // Empty state for this date
+            html += `
+                <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-5 text-center">
+                    <p class="text-3xl mb-1.5">🏖️</p>
+                    <p class="font-bold text-sm text-slate-200">Tidak ada tugas pada tanggal ini</p>
+                    <p class="text-xs text-slate-400 mt-1 mb-3">Hari yang tenang untuk belajar mandiri atau bersantai.</p>
+                    <button onclick="openModalForDate('${dateStr}')" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95">+ Buat Tugas untuk Tanggal Ini</button>
+                </div>
+            `;
+        }
+
+        // 4. Card 2: Catatan / Quick Add Card (Matching Card 2 in user's reference image)
+        html += `
+            <div onclick="openModalForDate('${dateStr}')" class="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-4 cursor-pointer transition flex items-center gap-3.5 group shadow-sm">
+                <div class="w-7 h-7 rounded-full border-2 border-slate-600 group-hover:border-sky-400 flex items-center justify-center text-slate-500 group-hover:text-sky-400 font-bold text-sm transition flex-shrink-0">
+                    +
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-slate-300">Catatan & Tugas</p>
+                    <p class="text-xs text-slate-500 group-hover:text-sky-400 truncate">Ketuk untuk tambah tugas pada ${dayNameShort}, ${dayNumber} ${monthShort}</p>
+                </div>
+            </div>
+        `;
+
+        // 5. Card 3: Cuaca & Suasana Kampus (Real-Time Live Weather)
+        html += `
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+                        <span id="live-weather-city" class="text-xs font-bold text-slate-300 truncate">📍 ${escapeHtml(liveWeather.city)}</span>
+                        <span class="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.2 rounded flex-shrink-0">BMKG LIVE</span>
+                    </div>
+                    <button onclick="fetchLiveWeather(true)" id="live-weather-refresh" class="text-xs text-slate-400 hover:text-yellow-400 p-1 rounded-lg hover:bg-slate-800 transition ${liveWeather.loading ? 'animate-spin' : ''}" title="Perbarui Cuaca Live BMKG">
+                        🔄
+                    </button>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="flex items-baseline gap-2">
+                            <p id="live-weather-temp" class="text-3xl font-extrabold text-white tracking-tight">${liveWeather.temp}°C</p>
+                            <div class="min-w-0">
+                                <p id="live-weather-cond" class="text-xs font-bold text-slate-200 truncate">${liveWeather.icon} ${escapeHtml(liveWeather.condition)}</p>
+                                <p id="live-weather-range" class="text-[11px] text-sky-400 font-semibold">${liveWeather.tRange || '17–28 °C'} • Kelembapan ${liveWeather.huRange || '30–91%'}</p>
+                            </div>
+                        </div>
+                        <p id="live-weather-tip" class="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-2">${escapeHtml(liveWeather.tip)}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Data Resmi BMKG • Junrejo, Kota Batu</p>
+                    </div>
+                    <div class="text-right text-xs flex-shrink-0">
+                        <p class="text-slate-300 font-bold">${doneCount}/${dayTasks.length} Selesai</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">${dayTasks.length === 0 ? 'Hari Bebas Tenggat 🌴' : doneCount === dayTasks.length ? '🎉 Semua beres!' : '💪 Fokus & konsisten!'}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
 
 
 
@@ -1329,8 +1980,8 @@
                 if(pomo.secondsLeft<=0){
                     if(pomo.mode==='focus'){
                         pomo.sessions++; pomo.totalMin+=25;
-                        localStorage.setItem('ulmet_pomo_sessions',pomo.sessions);
-                        localStorage.setItem('ulmet_pomo_total',pomo.totalMin);
+                        localStorage.setItem(userKey('ulmet_pomo_sessions'),pomo.sessions);
+                        localStorage.setItem(userKey('ulmet_pomo_total'),pomo.totalMin);
                         addPomoLog('🍅 Sesi fokus selesai!');
                         pomo.mode=pomo.sessions%4===0?'longbreak':'break';
                         pomo.secondsLeft=pomo.mode==='longbreak'?LBREAK_SEC:BREAK_SEC;
@@ -1357,8 +2008,8 @@
         document.getElementById('pomo-start-btn').textContent='▶ Mulai';
         if(pomo.mode==='focus'){
             pomo.sessions++; pomo.totalMin+=25;
-            localStorage.setItem('ulmet_pomo_sessions',pomo.sessions);
-            localStorage.setItem('ulmet_pomo_total',pomo.totalMin);
+            localStorage.setItem(userKey('ulmet_pomo_sessions'),pomo.sessions);
+            localStorage.setItem(userKey('ulmet_pomo_total'),pomo.totalMin);
             pomo.mode=pomo.sessions%4===0?'longbreak':'break';
             pomo.secondsLeft=pomo.mode==='longbreak'?LBREAK_SEC:BREAK_SEC;
         } else { pomo.mode='focus'; pomo.secondsLeft=FOCUS_SEC; }
@@ -1537,7 +2188,7 @@
     }
 
     // ===== KEBIASAAN HARIAN =====
-    let habits = JSON.parse(localStorage.getItem('ulmet_habits') || 'null');
+    let habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || 'null');
     if(!habits) {
         habits = [
             {id:1, nama:'Setoran Hafalan', icon:'📖', target:'Setiap hari', reminderJam:'07:00', streak:0, lastChecked:null},
@@ -1546,7 +2197,7 @@
         ];
         saveHabits();
     }
-    function saveHabits(){ localStorage.setItem('ulmet_habits', JSON.stringify(habits)); }
+    function saveHabits(){ localStorage.setItem(userKey('ulmet_habits'), JSON.stringify(habits)); }
 
     function todayStr(){ return new Date().toISOString().slice(0,10); }
 
@@ -1612,9 +2263,16 @@
         const today=todayStr(), total=habits.length;
         const done=habits.filter(h=>h.lastChecked===today).length;
         const pct=total?Math.round(done/total*100):0;
-        document.getElementById('habit-progress-bar').style.width=pct+'%';
-        document.getElementById('habit-progress-pct').textContent=pct+'%';
-        document.getElementById('habit-progress-text').textContent=done+' / '+total+' kebiasaan selesai hari ini';
+        const barEl = document.getElementById('habit-progress-bar');
+        if (barEl) barEl.style.width=pct+'%';
+        const pctEl = document.getElementById('habit-progress-pct');
+        if (pctEl) pctEl.textContent=pct+'%';
+        const textEl = document.getElementById('habit-progress-text');
+        if (textEl) textEl.textContent=done+' / '+total+' kebiasaan selesai hari ini';
+
+        // Sinkronkan streak ke ulmet_streak untuk dashboard
+        const maxStreak = habits.reduce((max, h) => Math.max(max, h.streak || 0), 0);
+        localStorage.setItem(userKey('ulmet_streak'), maxStreak);
     }
 
     function toggleHabit(id){
@@ -1669,10 +2327,24 @@
 
     // ===== INIT =====
     function init() {
+        initCachedWeather();
+        fetchLiveWeather();
         updateStats();
         renderTasks();
         updatePomoUI();
         checkUrgentTasks(); // check immediately on load
+
+        // Cek URL param ?tab=... (misal dari dashboard: ?tab=kebiasaan)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const requestedTab = urlParams.get('tab');
+            if (requestedTab && ['tugas','materi','kalender','pomodoro','kebiasaan'].includes(requestedTab)) {
+                switchTab(requestedTab);
+            }
+        } catch(e) {}
+
+        // Refresh live weather every 15 minutes
+        setInterval(() => fetchLiveWeather(), 15 * 60 * 1000);
         // Every 60 seconds: refresh countdowns, stats, notifications
         setInterval(() => {
             if (!document.getElementById('panel-tugas').classList.contains('hidden')) renderTasks();
@@ -1708,7 +2380,7 @@
     function scheduleSwNotifications() {
         if (!navigator.serviceWorker.controller) return;
         const now = Date.now();
-        const tasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
+        const tasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
         tasks.forEach(t => {
             if (t.status === 'selesai') return;
             const deadline = new Date(t.deadline).getTime();
@@ -1732,7 +2404,7 @@
             }
         });
         // Jadwalkan pengingat kebiasaan
-        const habits = JSON.parse(localStorage.getItem('ulmet_habits') || '[]');
+        const habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || '[]');
         habits.forEach(h => {
             if (!h.reminderJam) return;
             const [hh, mm] = h.reminderJam.split(':').map(Number);
@@ -1746,52 +2418,7 @@
     }
     </script>
 
-    <!-- MODAL: GOOGLE DRIVE CONNECTION (ONE-TIME SETUP) -->
-    <div id="modal-gdrive" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-blue-800/60 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span class="text-3xl">☁️</span>
-                    <div>
-                        <h3 class="text-white font-bold text-lg">Penyimpanan Google Drive</h3>
-                        <p class="text-xs text-blue-400">Hubungkan sekali, upload otomatis di latar belakang</p>
-                    </div>
-                </div>
-                <button onclick="closeGDriveModal()" class="text-blue-400 hover:text-white text-2xl leading-none">&times;</button>
-            </div>
-            
-            <div id="gdrive-status-info" class="p-4 rounded-2xl bg-blue-950/50 border border-blue-800/50 text-sm space-y-1">
-                <p class="font-bold text-white flex items-center gap-2">
-                    <span id="gdrive-status-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></span>
-                    <span id="gdrive-status-label">Belum Terhubung</span>
-                </p>
-                <p class="text-xs text-blue-300" id="gdrive-status-desc">Hubungkan akun Google Anda agar tugas dan materi kuliah tersimpan aman di Google Drive pribadi Anda.</p>
-            </div>
-
-            <div class="space-y-3" id="gdrive-setup-section">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-semibold text-blue-300">Google Client ID</label>
-                    <button onclick="toggleClientIdHelp()" class="text-[11px] text-yellow-400 hover:underline">Cara Dapatkan ID</button>
-                </div>
-                <input type="text" id="gdrive-client-id-input" placeholder="contoh: 12345-xxxx.apps.googleusercontent.com" class="w-full bg-slate-950/70 border border-blue-800/60 rounded-xl px-4 py-2.5 text-sm text-white placeholder-blue-600 focus:outline-none focus:border-yellow-400">
-                <div id="client-id-help" class="hidden text-[11px] text-blue-300 bg-blue-950/40 p-3 rounded-xl border border-blue-800/40 space-y-1">
-                    <p class="font-bold text-white">3 Langkah Mudah (2 Menit):</p>
-                    <p>1. Buka <b>console.cloud.google.com</b></p>
-                    <p>2. Aktifkan <b>Google Drive API</b></p>
-                    <p>3. Di menu <b>Credentials</b>, buat <i>OAuth Client ID</i> (Web Application) dan salin Client ID-nya ke sini.</p>
-                </div>
-            </div>
-
-            <div class="flex gap-3 pt-2">
-                <button onclick="connectGoogleAccount()" id="btn-login-gdrive" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20 flex items-center justify-center gap-2">
-                    <span>🔐</span> Hubungkan Akun Google
-                </button>
-                <button onclick="closeGDriveModal()" class="px-5 bg-blue-950/60 hover:bg-blue-900 border border-blue-800/50 text-blue-300 font-semibold py-2.5 rounded-xl text-sm transition">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Google Drive modal telah dihapus — semua file disimpan via Supabase Storage -->
 <!-- PULL TO REFRESH SCRIPT -->
 <script>
 let ptrStartY = 0;
@@ -1814,31 +2441,31 @@ document.addEventListener('touchend', (e) => {
 </script>
 </body>
 
-<!-- BOTTOM NAVIGATION (Mobile Only) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-blue-950/95 backdrop-blur-xl border-t border-blue-800/50 flex items-end justify-around h-16 pb-1.5 pt-1 px-1">
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
     <a href="dashboard.html" class="bnav-item">
-        <span class="bnav-icon">&#128202;</span>
+        <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
     </a>
     <a href="jadwal.html" class="bnav-item active">
-        <span class="bnav-icon">&#128197;</span>
+        <span class="bnav-icon">📅</span>
         <span class="bnav-label">Jadwal</span>
     </a>
     <a href="materi.html" class="bnav-item">
-        <span class="bnav-icon">&#128218;</span>
+        <span class="bnav-icon">📚</span>
         <span class="bnav-label">Materi</span>
     </a>
     <a href="ai.html" class="bnav-item">
-        <span class="bnav-icon">&#129302;</span>
+        <span class="bnav-icon">🤖</span>
         <span class="bnav-label">AI</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">💸</span>
+        <span class="bnav-label">Keuangan</span>
     </a>
     <a href="profil.html" class="bnav-item">
         <span class="bnav-icon">👤</span>
         <span class="bnav-label">Profil</span>
-    </a>
-    <a href="keuangan.html" class="bnav-item">
-        <span class="bnav-icon">&#128184;</span>
-        <span class="bnav-label">Keuangan</span>
     </a>
 </nav>
 </html>

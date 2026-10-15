@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a101f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Widget ULMET — Pengingat Tugas & Karakter Si Ulmet</title>
+
+    <!-- Supabase SDK & Config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #060a12;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism for Android Widget */
+        .widget-glass {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Mascot Glows */
+        .glow-reward {
+            box-shadow: 0 0 35px -5px rgba(250, 204, 21, 0.45), 0 0 15px rgba(234, 179, 8, 0.3);
+            border-color: rgba(250, 204, 21, 0.7);
+        }
+        .glow-angry {
+            box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.55), 0 0 15px rgba(220, 38, 38, 0.4);
+            border-color: rgba(239, 68, 68, 0.8);
+            animation: pulse-angry 1.5s infinite;
+        }
+        .glow-worried {
+            box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.45);
+            border-color: rgba(249, 115, 22, 0.7);
+        }
+
+        @keyframes pulse-angry {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake-angry {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px) rotate(-1deg); }
+            40% { transform: translateX(4px) rotate(1deg); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+        .shake-animation {
+            animation: shake-angry 0.5s ease-in-out;
+        }
+
+        @keyframes bounce-reward {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px) scale(1.03); }
+        }
+        .bounce-animation {
+            animation: bounce-reward 0.7s ease-in-out;
+        }
+
+        /* Custom Scrollbar for list inside widget */
+        .widget-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .widget-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 9999px;
+        }
+
+        /* Canvas Confetti */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-start p-3 sm:p-5 relative">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Background ambient lighting -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div id="ambient-orb-1" class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl transition-all duration-700"></div>
+        <div id="ambient-orb-2" class="absolute top-1/3 -right-32 w-96 h-96 bg-yellow-500/15 rounded-full blur-3xl transition-all duration-700"></div>
+        <div id="ambient-orb-3" class="absolute -bottom-32 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl transition-all duration-700"></div>
+    </div>
+
+    <!-- TOP HEADER / CONTROL BAR -->
+    <header class="w-full max-w-lg flex items-center justify-between py-2 mb-3">
+        <div class="flex items-center gap-2">
+            <a href="dashboard.html" class="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center justify-center text-slate-200 transition text-sm shadow">
+                ←
+            </a>
+            <div>
+                <h1 class="text-base sm:text-lg font-black text-white flex items-center gap-1.5">
+                    <span>📱</span> Widget ULMET
+                </h1>
+                <p class="text-[11px] text-slate-400 font-medium">Asisten Pengingat Mahasiswa</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+            <button onclick="triggerNativeInstall()" class="flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-xl shadow-lg shadow-yellow-500/20 active:scale-95 transition">
+                <span>➕</span> Pasang di HP
+            </button>
+        </div>
+    </header>
+
+    <!-- WIDGET SIZE TOGGLES (Mimicking Android 1x1, 4x2, 4x4) -->
+    <div class="w-full max-w-lg flex items-center justify-between bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800/80 mb-4 backdrop-blur-md">
+        <span class="text-[11px] text-slate-400 font-bold px-2 flex items-center gap-1">
+            <span>📐</span> Ukuran Widget:
+        </span>
+        <div class="flex items-center gap-1">
+            <button onclick="setWidgetSize('4x2')" id="btn-size-4x2" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
+                4 x 2 (Banner)
+            </button>
+            <button onclick="setWidgetSize('4x4')" id="btn-size-4x4" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-yellow-400 text-slate-950 shadow-md">
+                4 x 4 (Lengkap)
+            </button>
+            <button onclick="setWidgetSize('2x2')" id="btn-size-2x2" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
+                2 x 2 (Karakter)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN WIDGET CONTAINER -->
+    <main class="w-full max-w-lg transition-all duration-300">
+
+        <!-- ====================================================
+             1. WIDGET 4 x 4 (Comprehensive Full Interactive Widget)
+             ==================================================== -->
+        <div id="widget-view-4x4" class="widget-glass rounded-3xl p-5 border border-white/10 relative overflow-hidden transition-all duration-500">
+            <!-- Mood Accent Glow Strip -->
+            <div id="mood-glow-bar-4x4" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"></div>
+
+            <!-- Top Header: Mascot Avatar + Speech Bubble + Live Badge -->
+            <div class="flex items-start gap-4 mb-4">
+                <!-- Mascot Image with Dynamic Mood Glow -->
+                <div class="relative flex-shrink-0 cursor-pointer" onclick="pokeMascot()" title="Sentuh Si Ulmet!">
+                    <div id="mascot-img-wrapper-4x4" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900 relative">
+                        <img id="mascot-avatar-img-4x4" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                        <span id="mascot-touch-hint" class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm text-[9px] px-1 rounded text-white font-bold">👆 Sentuh</span>
+                    </div>
+                    <div id="mascot-mood-tag-4x4" class="absolute -bottom-2 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1">
+                        🏆 REWARD
+                    </div>
+                </div>
+
+                <!-- Mascot Speech & Status -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1 mb-1">
+                        <span id="mascot-name-badge-4x4" class="text-xs font-black text-yellow-400 tracking-wider flex items-center gap-1">
+                            <span>🦉</span> SI ULMET
+                        </span>
+                        <span id="live-time-pill" class="text-[10px] bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full font-semibold border border-slate-700/60">
+                            12:00
+                        </span>
+                    </div>
+
+                    <!-- Speech Bubble -->
+                    <div id="speech-bubble-4x4" class="bg-slate-900/90 border border-slate-700/70 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-200 transition-all duration-300 relative shadow-inner">
+                        <p id="mascot-speech-text-4x4" class="font-medium">
+                            Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya! 🎓✨
+                        </p>
+                    </div>
+
+                    <!-- Activity Streak & Quick Stats -->
+                    <div class="flex items-center gap-2 mt-2 text-[11px]">
+                        <span id="streak-pill-4x4" class="bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+                            🔥 <span id="streak-count-4x4">1</span> Hari Aktif
+                        </span>
+                        <span id="today-score-pill-4x4" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-lg font-bold">
+                            ✅ <span id="done-ratio-4x4">0/0</span> Selesai
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB SWITCHER: TUGAS KULIAH vs KEBIASAAN HARIAN -->
+            <div class="flex border-b border-slate-800/80 mb-3 text-xs font-bold">
+                <button onclick="setWidgetTab('tasks')" id="tab-tasks-btn" class="flex-1 py-2 text-center text-yellow-400 border-b-2 border-yellow-400 flex items-center justify-center gap-1.5 transition">
+                    <span>📚</span> Tugas Kuliah <span id="badge-count-tasks" class="bg-blue-900 text-blue-200 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
+                </button>
+                <button onclick="setWidgetTab('habits')" id="tab-habits-btn" class="flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+                    <span>📿</span> Kebiasaan Sehari-hari <span id="badge-count-habits" class="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
+                </button>
+            </div>
+
+            <!-- LIST CONTAINER (TUGAS & KEBIASAAN) -->
+            <div class="space-y-2 max-h-56 overflow-y-auto widget-scroll pr-1" id="widget-list-container">
+                <!-- Dynamically rendered items -->
+                <p class="text-center text-slate-400 py-6 text-xs">Memuat daftar tugas & kebiasaan...</p>
+            </div>
+
+            <!-- FOOTER SHORTCUTS (DASHBOARD & JADWAL) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                <a href="dashboard.html" class="flex items-center gap-1.5 text-slate-400 hover:text-white font-bold transition">
+                    <span>🏠</span> Buka ULMET
+                </a>
+                <a href="jadwal.html" class="flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-extrabold transition">
+                    <span>+</span> Tambah Tugas <span class="text-slate-500 font-normal">→</span>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- ====================================================
+             2. WIDGET 4 x 2 (Horizontal Banner Layout)
+             ==================================================== -->
+        <div id="widget-view-4x2" class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden transition-all duration-500">
+            <!-- Mood Accent Glow Strip -->
+            <div id="mood-glow-bar-4x2" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500"></div>
+
+            <div class="flex items-center gap-3.5">
+                <!-- Mascot Thumbnail -->
+                <div class="relative flex-shrink-0 cursor-pointer" onclick="pokeMascot()">
+                    <div id="mascot-img-wrapper-4x2" class="w-16 h-16 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
+                        <img id="mascot-avatar-img-4x2" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                    </div>
+                    <span id="mascot-mood-tag-4x2" class="absolute -bottom-1.5 -right-1 bg-yellow-400 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow">
+                        🏆
+                    </span>
+                </div>
+
+                <!-- Info Banner -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <h3 id="banner-title-4x2" class="text-xs font-black text-yellow-400 truncate">Si Ulmet Bangga! 🏆</h3>
+                        <span id="banner-urgent-badge-4x2" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
+                            Tugas Terkendali
+                        </span>
+                    </div>
+                    <p id="banner-subtext-4x2" class="text-[11px] text-slate-300 line-clamp-1 mt-0.5">
+                        Tugas aktif beres, kebiasaan terjaga rapi hari ini!
+                    </p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <a href="jadwal.html" class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg transition active:scale-95 shadow">
+                            📝 Cek Tugas (<span id="banner-active-task-count">0</span>)
+                        </a>
+                        <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[10px] px-2.5 py-1 rounded-lg transition border border-slate-700">
+                            Buka ULMET
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ====================================================
+             3. WIDGET 2 x 2 (Square Compact Mascot Focus)
+             ==================================================== -->
+        <div id="widget-view-2x2" class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden text-center max-w-[280px] mx-auto transition-all duration-500">
+            <div id="mood-glow-bar-2x2" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 to-amber-500"></div>
+
+            <div class="relative w-24 h-24 mx-auto mb-2 cursor-pointer" onclick="pokeMascot()">
+                <div id="mascot-img-wrapper-2x2" class="w-full h-full rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
+                    <img id="mascot-avatar-img-2x2" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                </div>
+                <div id="mascot-mood-tag-2x2" class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow">
+                    🏆 BANGGA
+                </div>
+            </div>
+
+            <h4 id="compact-title-2x2" class="text-xs font-black text-white mt-3">Rajin Buka ULMET!</h4>
+            <p id="compact-sub-2x2" class="text-[10px] text-slate-400 mt-0.5"><span id="compact-task-count">0</span> tugas tersisa</p>
+
+            <a href="dashboard.html" class="mt-3 block w-full bg-slate-800/80 hover:bg-slate-700 text-yellow-400 text-[11px] font-extrabold py-1.5 rounded-xl border border-slate-700 transition">
+                Masuk ULMET →
+            </a>
+        </div>
+
+    </main>
+
+    <!-- MOOD TESTER & SIMULATION TOOLBAR (For instant testing & evaluation) -->
+    <div class="w-full max-w-lg mt-5 p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 backdrop-blur-md">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <span>🎮</span> Tes Ekspresi Karakter Si Ulmet:
+            </p>
+            <span id="current-mode-label" class="text-[10px] text-yellow-400 font-extrabold">Auto (Real-time)</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="setTestMood('happy')" id="btn-mood-happy" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 hover:bg-yellow-400 hover:text-slate-950 transition active:scale-95">
+                🏆 Reward
+            </button>
+            <button onclick="setTestMood('angry')" id="btn-mood-angry" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500 hover:text-white transition active:scale-95">
+                😡 Marah
+            </button>
+            <button onclick="setTestMood('worried')" id="btn-mood-worried" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-orange-500/20 text-orange-400 border border-orange-500/40 hover:bg-orange-500 hover:text-white transition active:scale-95">
+                ⏰ Panik
+            </button>
+            <button onclick="setTestMood('auto')" id="btn-mood-auto" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-600 hover:text-white transition active:scale-95">
+                🤖 Auto
+            </button>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-2 text-center">
+            *Mode <b>Marah</b> otomatis aktif jika ada tugas yang overdue atau tidak membuka ULMET > 1 hari. Mode <b>Reward</b> aktif jika kamu rajin buka ULMET dan mengerjakan tugas!
+        </p>
+    </div>
+
+    <!-- HOW TO INSTALL MODAL (Cara Pasang di HP Android) -->
+    <div id="install-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-sm w-full p-6 text-slate-200 shadow-2xl relative">
+            <button onclick="closeInstallModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold">
+                ✕
+            </button>
+
+            <div class="text-center mb-4">
+                <div class="w-16 h-16 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-yellow-400 to-amber-500 p-0.5 shadow-lg shadow-yellow-500/30">
+                    <img src="mascot-happy.jpg" alt="ULMET Icon" class="w-full h-full object-cover rounded-2xl">
+                </div>
+                <h3 class="text-lg font-black text-white">Pasang Widget di Layar HP</h3>
+                <p class="text-xs text-slate-400">Jadikan ULMET widget di Home Screen Android-mu!</p>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">1</span>
+                    <p><b class="text-white">Buka di Google Chrome</b> pada HP Android kamu.</p>
+                </div>
+                <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">2</span>
+                    <p>Ketuk tombol <b>Titik Tiga (⋮)</b> di pojok kanan atas browser Chrome.</p>
+                </div>
+                <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">3</span>
+                    <p>Pilih menu <b>"Tambahkan ke Layar Utama" (Add to Home screen)</b> atau <b>"Install App"</b>.</p>
+                </div>
+                <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
+                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">4</span>
+                    <p>Selesai! Widget Si Ulmet langsung berada di layar utama untuk mengingatkan tugasmu setiap hari! 🎉</p>
+                </div>
+            </div>
+
+            <button onclick="closeInstallModal()" class="mt-5 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black py-2.5 rounded-xl transition shadow-lg shadow-yellow-500/20 active:scale-95 text-xs">
+                Mengerti, Siap Pasang!
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        // Audio Context Synthesizer (Zero-dependency Web Audio API)
+        let audioCtx;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playRewardChime() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                // Play 3 happy ascending notes (C5 -> E5 -> G5 -> C6)
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.1);
+                    osc.stop(now + idx * 0.1 + 0.35);
+                });
+            } catch(e) {}
+        }
+
+        function playAngryBuzz() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.setValueAtTime(110, now + 0.15);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            } catch(e) {}
+        }
+
+        function playWorriedBeep() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } catch(e) {}
+        }
+
+        // Lightweight Canvas Confetti Engine
+        function fireConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#facc15', '#38bdf8', '#4ade80', '#fb7185', '#a855f7', '#fb923c'];
+
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 100,
+                    y: canvas.height / 3 + (Math.random() - 0.5) * 60,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 1.8) * 10,
+                    size: Math.random() * 7 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10,
+                    alpha: 1
+                });
+            }
+
+            let animationFrame;
+            function update() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.35; // gravity
+                    p.rot += p.vRot;
+                    p.alpha -= 0.015;
+                    if (p.alpha > 0) {
+                        alive = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rot * Math.PI) / 180);
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+                if (alive) {
+                    animationFrame = requestAnimationFrame(update);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            update();
+        }
+
+        // State Variables
+        let currentSize = '4x4';
+        let currentTab = 'tasks'; // 'tasks' or 'habits'
+        let currentMood = 'happy'; // 'happy', 'angry', 'worried'
+        let testMoodOverride = localStorage.getItem('ulmet_widget_preview_mood') || 'auto';
+
+        // Update Clock
+        function updateLiveClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const clockEl = document.getElementById('live-time-pill');
+            if (clockEl) clockEl.textContent = timeStr;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        // Widget Size Switcher
+        function setWidgetSize(size) {
+            currentSize = size;
+            ['4x4', '4x2', '2x2'].forEach(s => {
+                const el = document.getElementById(`widget-view-${s}`);
+                const btn = document.getElementById(`btn-size-${s}`);
+                if (s === size) {
+                    if (el) el.classList.remove('hidden');
+                    if (btn) {
+                        btn.classList.add('bg-yellow-400', 'text-slate-950', 'shadow-md');
+                        btn.classList.remove('bg-slate-800', 'text-slate-300');
+                    }
+                } else {
+                    if (el) el.classList.add('hidden');
+                    if (btn) {
+                        btn.classList.remove('bg-yellow-400', 'text-slate-950', 'shadow-md');
+                        btn.classList.add('bg-slate-800', 'text-slate-300');
+                    }
+                }
+            });
+        }
+
+        // Widget Tab Switcher (Tasks vs Habits)
+        function setWidgetTab(tab) {
+            currentTab = tab;
+            const tasksBtn = document.getElementById('tab-tasks-btn');
+            const habitsBtn = document.getElementById('tab-habits-btn');
+
+            if (tab === 'tasks') {
+                tasksBtn.className = "flex-1 py-2 text-center text-yellow-400 border-b-2 border-yellow-400 flex items-center justify-center gap-1.5 transition";
+                habitsBtn.className = "flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5 transition";
+            } else {
+                tasksBtn.className = "flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5 transition";
+                habitsBtn.className = "flex-1 py-2 text-center text-emerald-400 border-b-2 border-emerald-400 flex items-center justify-center gap-1.5 transition";
+            }
+            renderWidgetList();
+        }
+
+        // Track ULMET App Open Activity
+        function trackActivity() {
+            const today = new Date().toISOString().slice(0, 10);
+            const lastActive = localStorage.getItem(userKey('ulmet_last_active_date'));
+            let streakDays = parseInt(localStorage.getItem(userKey('ulmet_active_streak_days')) || '1');
+
+            if (!lastActive) {
+                localStorage.setItem(userKey('ulmet_last_active_date'), today);
+                localStorage.setItem(userKey('ulmet_active_streak_days'), '1');
+            } else if (lastActive !== today) {
+                const lastDate = new Date(lastActive);
+                const currDate = new Date(today);
+                const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    streakDays += 1;
+                } else if (diffDays > 1) {
+                    streakDays = 1;
+                }
+                localStorage.setItem(userKey('ulmet_active_streak_days'), streakDays.toString());
+                localStorage.setItem(userKey('ulmet_last_active_date'), today);
+            }
+            localStorage.setItem(userKey('ulmet_last_active_time'), Date.now().toString());
+        }
+
+        // Calculate and Determine Mood
+        function calculateMascotMood(tasks, habits) {
+            if (testMoodOverride && testMoodOverride !== 'auto') {
+                return testMoodOverride;
+            }
+
+            const today = new Date().toISOString().slice(0, 10);
+            const now = new Date();
+
+            const activeTasks = (tasks || []).filter(t => t.status !== 'selesai' && t.status !== 'completed');
+            const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now);
+
+            // Last active check
+            const lastActive = localStorage.getItem(userKey('ulmet_last_active_date'));
+            let daysInactive = 0;
+            if (lastActive) {
+                const d1 = new Date(lastActive);
+                const d2 = new Date(today);
+                daysInactive = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+            }
+
+            // If user has overdue tasks OR hasn't opened app in 2+ days -> ANGRY
+            if (overdueTasks.length > 0 || daysInactive >= 2) {
+                return 'angry';
+            }
+
+            // If urgent deadline within 24 hours -> WORRIED
+            const urgentTasks = activeTasks.filter(t => {
+                if (!t.deadline) return false;
+                const diffHours = (new Date(t.deadline) - now) / 3600000;
+                return diffHours > 0 && diffHours <= 24;
+            });
+            if (urgentTasks.length > 0) {
+                return 'worried';
+            }
+
+            // Normal or active user -> HAPPY / REWARD
+            return 'happy';
+        }
+
+        // Apply Mascot Visuals according to Mood
+        function applyMascotMood(mood) {
+            currentMood = mood;
+            const mascotHappyImg = 'mascot-happy.jpg';
+            const mascotAngryImg = 'mascot-angry.jpg';
+            const mascotWorriedImg = 'mascot-worried.jpg';
+
+            const moodGlowBars = [
+                document.getElementById('mood-glow-bar-4x4'),
+                document.getElementById('mood-glow-bar-4x2'),
+                document.getElementById('mood-glow-bar-2x2')
+            ];
+
+            const avatars = [
+                document.getElementById('mascot-avatar-img-4x4'),
+                document.getElementById('mascot-avatar-img-4x2'),
+                document.getElementById('mascot-avatar-img-2x2')
+            ];
+
+            const wrappers = [
+                document.getElementById('mascot-img-wrapper-4x4'),
+                document.getElementById('mascot-img-wrapper-4x2'),
+                document.getElementById('mascot-img-wrapper-2x2')
+            ];
+
+            const speechText = document.getElementById('mascot-speech-text-4x4');
+            const moodTag4x4 = document.getElementById('mascot-mood-tag-4x4');
+            const moodTag4x2 = document.getElementById('mascot-mood-tag-4x2');
+            const moodTag2x2 = document.getElementById('mascot-mood-tag-2x2');
+            const nameBadge = document.getElementById('mascot-name-badge-4x4');
+            const bubbleEl = document.getElementById('speech-bubble-4x4');
+            const bannerTitle = document.getElementById('banner-title-4x2');
+            const bannerSub = document.getElementById('banner-subtext-4x2');
+            const bannerBadge = document.getElementById('banner-urgent-badge-4x2');
+            const compactTitle = document.getElementById('compact-title-2x2');
+
+            // Reset glow classes
+            wrappers.forEach(w => {
+                if (w) w.className = w.className.replace(/glow-\w+/g, '');
+            });
+
+            if (mood === 'happy') {
+                avatars.forEach(a => { if (a) a.src = mascotHappyImg; });
+                wrappers.forEach(w => { if (w) w.classList.add('glow-reward'); });
+                moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"; });
+                
+                if (moodTag4x4) {
+                    moodTag4x4.innerHTML = "🏆 REWARD";
+                    moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1";
+                }
+                if (moodTag4x2) { moodTag4x2.textContent = "🏆"; moodTag4x2.className = "absolute -bottom-1.5 -right-1 bg-yellow-400 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow"; }
+                if (moodTag2x2) { moodTag2x2.textContent = "🏆 BANGGA"; moodTag2x2.className = "absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow"; }
+                if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-amber-300 font-bold">• Bangga Padamu!</span>';
+                if (speechText) speechText.innerHTML = "Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya, calon sarjana sukses! 🎓✨";
+                if (bubbleEl) bubbleEl.className = "bg-slate-900/90 border border-yellow-500/40 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-200 transition-all duration-300 relative shadow-inner";
+                
+                if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Bangga! 🏆";
+                if (bannerSub) bannerSub.textContent = "Kamu rajin dan disiplin mengurus tugas kuliahmu!";
+                if (bannerBadge) {
+                    bannerBadge.textContent = "Tugas Terkendali";
+                    bannerBadge.className = "text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold";
+                }
+                if (compactTitle) compactTitle.textContent = "Rajin Buka ULMET!";
+
+            } else if (mood === 'angry') {
+                avatars.forEach(a => { if (a) a.src = mascotAngryImg; });
+                wrappers.forEach(w => { if (w) w.classList.add('glow-angry'); });
+                moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-red-500 transition-all duration-500"; });
+                
+                if (moodTag4x4) {
+                    moodTag4x4.innerHTML = "😡 MARAH!";
+                    moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1 animate-pulse";
+                }
+                if (moodTag4x2) { moodTag4x2.textContent = "😡"; moodTag4x2.className = "absolute -bottom-1.5 -right-1 bg-red-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full shadow"; }
+                if (moodTag2x2) { moodTag2x2.textContent = "😡 MARAH"; moodTag2x2.className = "absolute -bottom-2 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow"; }
+                if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-red-400 font-bold">• Sedang Marah!</span>';
+                if (speechText) speechText.innerHTML = "<b>HEI KAMU! 💢</b> Kemana aja kok jarang buka ULMET?! Ada tugas numpuk yang kamu abaikan! Buka & kerjakan <b>SEKARANG JUGA!</b>";
+                if (bubbleEl) bubbleEl.className = "bg-red-950/40 border border-red-500/60 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-red-200 transition-all duration-300 relative shadow-inner";
+                
+                if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Marah! 😡";
+                if (bannerSub) bannerSub.textContent = "Jangan malas! Ada tugas atau kebiasaan yang terabaikan!";
+                if (bannerBadge) {
+                    bannerBadge.textContent = "PERHATIAN!";
+                    bannerBadge.className = "text-[10px] bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full font-bold animate-pulse";
+                }
+                if (compactTitle) compactTitle.textContent = "Kerjakan Tugasmu!";
+
+            } else if (mood === 'worried') {
+                avatars.forEach(a => { if (a) a.src = mascotWorriedImg; });
+                wrappers.forEach(w => { if (w) w.classList.add('glow-worried'); });
+                moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500 transition-all duration-500"; });
+                
+                if (moodTag4x4) {
+                    moodTag4x4.innerHTML = "⏰ PANIK!";
+                    moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1";
+                }
+                if (moodTag4x2) { moodTag4x2.textContent = "⏰"; moodTag4x2.className = "absolute -bottom-1.5 -right-1 bg-orange-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow"; }
+                if (moodTag2x2) { moodTag2x2.textContent = "⏰ PANIK"; moodTag2x2.className = "absolute -bottom-2 left-1/2 -translate-x-1/2 bg-orange-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow"; }
+                if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-orange-300 font-bold">• Deadline Mepet!</span>';
+                if (speechText) speechText.innerHTML = "<b>GAWAT! ⏰</b> Deadline tugas tinggal hitungan jam lagi! Segera selesaikan sebelum terlambat dan kena amuk dosen!";
+                if (bubbleEl) bubbleEl.className = "bg-amber-950/30 border border-orange-500/50 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-amber-200 transition-all duration-300 relative shadow-inner";
+                
+                if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Panik! ⏰";
+                if (bannerSub) bannerSub.textContent = "Ada tugas mendekati deadline! Ayo gas beresin!";
+                if (bannerBadge) {
+                    bannerBadge.textContent = "Mendesak <24 Jam";
+                    bannerBadge.className = "text-[10px] bg-orange-500/20 text-orange-300 border border-orange-500/40 px-2 py-0.5 rounded-full font-bold";
+                }
+                if (compactTitle) compactTitle.textContent = "Deadline Mepet!";
+            }
+        }
+
+        // Tap Mascot Interaction
+        function pokeMascot() {
+            const wrappers = [
+                document.getElementById('mascot-img-wrapper-4x4'),
+                document.getElementById('mascot-img-wrapper-4x2'),
+                document.getElementById('mascot-img-wrapper-2x2')
+            ];
+
+            if (currentMood === 'happy') {
+                wrappers.forEach(w => {
+                    if (w) {
+                        w.classList.remove('bounce-animation');
+                        void w.offsetWidth;
+                        w.classList.add('bounce-animation');
+                    }
+                });
+                playRewardChime();
+                fireConfetti();
+            } else if (currentMood === 'angry') {
+                wrappers.forEach(w => {
+                    if (w) {
+                        w.classList.remove('shake-animation');
+                        void w.offsetWidth;
+                        w.classList.add('shake-animation');
+                    }
+                });
+                playAngryBuzz();
+            } else {
+                playWorriedBeep();
+            }
+        }
+
+        // Manual Mood Testing Control
+        function setTestMood(mood) {
+            testMoodOverride = mood;
+            localStorage.setItem('ulmet_widget_preview_mood', mood);
+
+            const label = document.getElementById('current-mode-label');
+            if (label) {
+                if (mood === 'auto') label.textContent = 'Auto (Real-time)';
+                else if (mood === 'happy') label.textContent = 'Simulasi: 🏆 Reward Aktif';
+                else if (mood === 'angry') label.textContent = 'Simulasi: 😡 Sedang Marah';
+                else if (mood === 'worried') label.textContent = 'Simulasi: ⏰ Panik Deadline';
+            }
+
+            refreshWidgetData();
+
+            if (mood === 'happy') {
+                playRewardChime();
+                fireConfetti();
+            } else if (mood === 'angry') {
+                playAngryBuzz();
+            } else if (mood === 'worried') {
+                playWorriedBeep();
+            }
+        }
+
+        // Render Widget Content (Tasks / Habits)
+        function renderWidgetList() {
+            const container = document.getElementById('widget-list-container');
+            if (!container) return;
+
+            const today = new Date().toISOString().slice(0, 10);
+            const now = new Date();
+
+            if (currentTab === 'tasks') {
+                const tasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
+                const activeTasks = tasks.filter(t => t.status !== 'selesai' && t.status !== 'completed');
+                const completedTasks = tasks.filter(t => t.status === 'selesai' || t.status === 'completed');
+
+                document.getElementById('badge-count-tasks').textContent = activeTasks.length;
+                document.getElementById('banner-active-task-count').textContent = activeTasks.length;
+                document.getElementById('compact-task-count').textContent = activeTasks.length;
+
+                if (tasks.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-6 text-slate-400">
+                            <p class="text-2xl mb-1">🎉</p>
+                            <p class="text-xs font-bold text-white">Tidak ada tugas terdaftar!</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Semua tugas kuliahmu sudah beres.</p>
+                            <a href="jadwal.html" class="inline-block mt-2 text-xs font-extrabold text-yellow-400 hover:underline">+ Buat Tugas Baru</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort: overdue first, then upcoming, then completed
+                const sorted = [...tasks].sort((a, b) => {
+                    const isDoneA = a.status === 'selesai' || a.status === 'completed';
+                    const isDoneB = b.status === 'selesai' || b.status === 'completed';
+                    if (isDoneA && !isDoneB) return 1;
+                    if (!isDoneA && isDoneB) return -1;
+                    return new Date(a.deadline || 0) - new Date(b.deadline || 0);
+                });
+
+                container.innerHTML = sorted.map(t => {
+                    const isDone = t.status === 'selesai' || t.status === 'completed';
+                    const isOverdue = !isDone && t.deadline && new Date(t.deadline) < now;
+                    const diffHours = (!isDone && t.deadline) ? ((new Date(t.deadline) - now) / 3600000) : 999;
+                    const isUrgent = diffHours > 0 && diffHours <= 24;
+
+                    let tagHtml = '';
+                    if (isDone) {
+                        tagHtml = `<span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Selesai</span>`;
+                    } else if (isOverdue) {
+                        tagHtml = `<span class="text-[10px] bg-red-500/20 text-red-400 font-bold px-2 py-0.5 rounded-full border border-red-500/40 animate-pulse">⚠️ Overdue</span>`;
+                    } else if (isUrgent) {
+                        tagHtml = `<span class="text-[10px] bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full border border-orange-500/40">⏰ ${Math.max(1, Math.round(diffHours))} Jam Lagi</span>`;
+                    } else if (t.deadline) {
+                        const dl = new Date(t.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                        tagHtml = `<span class="text-[10px] bg-blue-900/40 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-700/30">📅 ${dl}</span>`;
+                    }
+
+                    return `
+                        <div class="p-2.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${isDone ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : (isOverdue ? 'bg-red-950/20 border-red-500/40' : 'bg-slate-900/70 border-slate-700/50 hover:border-yellow-400/40')}">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <button onclick="toggleWidgetTask(${t.id})" title="${isDone ? 'Batal Selesai' : 'Tandai Selesai'}"
+                                    class="w-7 h-7 rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all active:scale-90 flex-shrink-0
+                                    ${isDone ? 'bg-emerald-500 border-emerald-400 text-white shadow-sm' : 'border-slate-600 hover:border-yellow-400 text-transparent hover:text-yellow-400'}">
+                                    ✓
+                                </button>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-xs ${isDone ? 'line-through text-slate-400' : 'text-white'} truncate">${escapeWidgetHtml(t.nama || t.title || 'Tugas Kuliah')}</p>
+                                    <p class="text-[10px] text-blue-300/80 truncate">${escapeWidgetHtml(t.matkul || t.course || 'Umum')}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                ${tagHtml}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } else {
+                // HABITS TAB
+                const habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || '[]');
+                document.getElementById('badge-count-habits').textContent = habits.length;
+
+                if (habits.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-6 text-slate-400">
+                            <p class="text-2xl mb-1">📿</p>
+                            <p class="text-xs font-bold text-white">Belum ada kebiasaan harian</p>
+                            <a href="jadwal.html?tab=kebiasaan" class="inline-block mt-2 text-xs font-extrabold text-emerald-400 hover:underline">+ Tambah Kebiasaan</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = habits.map(h => {
+                    const done = h.lastChecked === today;
+                    return `
+                        <div class="p-2.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${done ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-slate-900/70 border-slate-700/50 hover:border-emerald-400/40'}">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <button onclick="toggleWidgetHabit(${h.id})" title="${done ? 'Batal Selesai' : 'Tandai Selesai'}"
+                                    class="w-7 h-7 rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all active:scale-90 flex-shrink-0
+                                    ${done ? 'bg-emerald-500 border-emerald-400 text-white shadow-sm' : 'border-slate-600 hover:border-emerald-400 text-slate-400'}">
+                                    ${done ? '✓' : (h.icon || '📌')}
+                                </button>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-xs ${done ? 'line-through text-emerald-300/80' : 'text-white'} truncate">${escapeWidgetHtml(h.nama)}</p>
+                                    <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                                        <span class="text-orange-400 font-bold">🔥 ${h.streak || 0} hari</span>
+                                        <span>•</span>
+                                        <span>⏰ ${h.reminderJam || '07:00'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${done ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'}">
+                                    ${done ? '✓ Beres' : 'Belum'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Toggle Task directly inside Widget
+        function toggleWidgetTask(taskId) {
+            let tasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
+            const t = tasks.find(x => x.id === taskId);
+            if (!t) return;
+
+            const wasDone = (t.status === 'selesai' || t.status === 'completed');
+            t.status = wasDone ? 'belum' : 'selesai';
+            t.completedAt = wasDone ? null : Date.now();
+
+            localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
+            if (typeof syncTasksToSupabase === 'function') {
+                syncTasksToSupabase(tasks);
+            }
+
+            if (!wasDone) {
+                playRewardChime();
+                fireConfetti();
+            }
+
+            refreshWidgetData();
+        }
+
+        // Toggle Habit directly inside Widget
+        function toggleWidgetHabit(habitId) {
+            let habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || '[]');
+            const h = habits.find(x => x.id === habitId);
+            if (!h) return;
+
+            const today = new Date().toISOString().slice(0, 10);
+            const wasDone = (h.lastChecked === today);
+
+            if (wasDone) {
+                h.lastChecked = null;
+                h.streak = Math.max(0, (Number(h.streak) || 1) - 1);
+            } else {
+                h.lastChecked = today;
+                h.streak = (Number(h.streak) || 0) + 1;
+                playRewardChime();
+                fireConfetti();
+            }
+
+            localStorage.setItem(userKey('ulmet_habits'), JSON.stringify(habits));
+            if (typeof syncArrayToSupabase === 'function') {
+                syncArrayToSupabase('habits', 'ulmet_habits', habits);
+            }
+
+            refreshWidgetData();
+        }
+
+        // Refresh All Data & Mood
+        function refreshWidgetData() {
+            const today = new Date().toISOString().slice(0, 10);
+            const tasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
+            const habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || '[]');
+
+            // Calculate habits done today
+            const doneHabitsCount = habits.filter(h => h.lastChecked === today).length;
+            const totalHabits = habits.length;
+
+            const streak = parseInt(localStorage.getItem(userKey('ulmet_active_streak_days')) || '1');
+            const streakEl = document.getElementById('streak-count-4x4');
+            if (streakEl) streakEl.textContent = streak;
+
+            const doneRatioEl = document.getElementById('done-ratio-4x4');
+            if (doneRatioEl) doneRatioEl.textContent = `${doneHabitsCount}/${totalHabits}`;
+
+            // Calculate Mood
+            const mood = calculateMascotMood(tasks, habits);
+            applyMascotMood(mood);
+
+            // Re-render list
+            renderWidgetList();
+        }
+
+        function escapeWidgetHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Install Modal Controls
+        function openInstallModal() {
+            document.getElementById('install-modal').classList.remove('hidden');
+        }
+        function closeInstallModal() {
+            document.getElementById('install-modal').classList.add('hidden');
+        }
+
+        let deferredWidgetPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredWidgetPrompt = e;
+        });
+
+        function triggerNativeInstall() {
+            if (deferredWidgetPrompt) {
+                deferredWidgetPrompt.prompt();
+                deferredWidgetPrompt.userChoice.then(() => {
+                    deferredWidgetPrompt = null;
+                });
+            } else {
+                openInstallModal();
+            }
+        }
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./sw.js").catch(() => {});
+        }
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', async () => {
+            trackActivity();
+            refreshWidgetData();
+
+            // Try syncing background tasks & habits from Supabase
+            try {
+                if (typeof loadTasks === 'function') {
+                    const sbTasks = await loadTasks();
+                    if (sbTasks && Array.isArray(sbTasks)) {
+                        refreshWidgetData();
+                    }
+                }
+            } catch(e) {}
+        });
+    </script>
+</body>
+
+</html>
