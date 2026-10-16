@@ -184,6 +184,42 @@
             </div>
         </header>
 
+        <!-- Mobile Folder Quick Chips (Mudah pilih & ganti folder langsung di HP) -->
+        <div class="md:hidden flex items-center gap-2 overflow-x-auto px-3 py-2 bg-slate-900/90 border-b border-blue-900/40 scrollbar-hide flex-shrink-0" id="mobile-course-chips-container" style="scrollbar-width: none;">
+            <!-- Diisi otomatis oleh renderMobileCourseChips() -->
+        </div>
+
+        <!-- BANNER TEMPEL / TARUH FILE DARI WHATSAPP -->
+        <div id="wa-paste-banner" class="hidden mx-3 md:mx-6 mt-3 sm:mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-blue-950/90 to-emerald-950/90 border-2 border-emerald-400 shadow-xl flex-shrink-0 transition-all">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div id="wa-paste-icon" class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-2xl flex-shrink-0 shadow">
+                        📥
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full">
+                                📥 File dari WhatsApp
+                            </span>
+                            <span id="wa-paste-size" class="text-[11px] text-blue-300 font-medium">0 KB</span>
+                        </div>
+                        <p id="wa-paste-name" class="text-sm font-black text-white truncate mt-0.5">Dokumen.pdf</p>
+                        <p class="text-xs text-blue-200 mt-0.5">
+                            Tempat tujuan: <b id="wa-paste-target-course" class="text-yellow-400 font-extrabold">Pilih folder di bawah</b>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                    <button id="btn-paste-to-course" onclick="saveSharedFileToCurrentCourse()" class="flex-1 sm:flex-initial bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 active:scale-95 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-yellow-500/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>📋</span> Taruh / Tempel File di Sini
+                    </button>
+                    <button onclick="dismissShareAction()" class="px-3 py-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs rounded-xl font-bold transition cursor-pointer">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div id="materi-dropzone" class="mx-4 md:mx-6 mt-4 md:mt-5 border-2 border-dashed border-blue-800/60 hover:border-yellow-400/50 bg-blue-950/10 rounded-2xl p-4 md:p-5 text-center transition cursor-pointer flex-shrink-0" 
              onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); } else { document.getElementById('upload-input').click(); }">
             <span class="text-3xl mb-1 block">&#11015;&#65039;</span>
@@ -277,7 +313,7 @@
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">Berbagi dari WhatsApp</span>
                 <h3 class="text-white font-extrabold text-lg leading-tight mt-0.5 truncate">Simpan ke Folder Materi</h3>
             </div>
-            <button onclick="dismissShareModal()" class="text-blue-400 hover:text-white transition text-2xl leading-none flex-shrink-0 p-1">&times;</button>
+            <button onclick="closeShareModalToBrowse()" title="Tutup & pilih folder sendiri" class="text-blue-400 hover:text-white transition text-2xl leading-none flex-shrink-0 p-1">&times;</button>
         </div>
 
         <!-- File Preview Card -->
@@ -296,11 +332,11 @@
         </div>
 
         <p class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <span>📁</span> Tekan Folder Tujuan untuk Menyimpan:
+            <span>📁</span> Tekan Folder Tujuan untuk Menaruh File:
         </p>
 
         <!-- Course Selection Grid -->
-        <div id="share-course-options" class="max-h-56 overflow-y-auto space-y-1.5 pr-1 mb-3">
+        <div id="share-course-options" class="max-h-56 overflow-y-auto space-y-2 pr-1 mb-3">
             <!-- Diisi otomatis oleh renderShareCourseOptions() -->
         </div>
 
@@ -317,9 +353,14 @@
                 <button onclick="toggleShareNewFolder(true)" id="btn-toggle-share-new" class="text-xs font-bold text-yellow-400 hover:text-yellow-300 flex items-center gap-1.5 py-1 transition cursor-pointer">
                     <span>➕</span> Buat Folder Baru
                 </button>
-                <button onclick="dismissShareModal()" class="text-xs text-blue-400 hover:text-red-400 transition font-medium cursor-pointer">
-                    Abaikan / Batal
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="closeShareModalToBrowse()" class="text-xs text-blue-300 hover:text-yellow-400 transition font-bold cursor-pointer">
+                        Buka Folder Dulu ➔
+                    </button>
+                    <button onclick="dismissShareAction()" class="text-xs text-red-400 hover:text-red-300 transition font-medium cursor-pointer">
+                        Batal
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -401,6 +442,8 @@ function showToast(msg, type) {
 function renderCourseFolders() {
     var container = document.getElementById("course-list-container");
     if (!container) return;
+    renderMobileCourseChips();
+    updatePasteBanner();
     container.innerHTML = "";
     if (!userCourses.length) {
         var emptyP = document.createElement("p");
@@ -417,7 +460,7 @@ function renderCourseFolders() {
         var div = document.createElement("div");
         div.className = "folder-item flex items-center gap-3 p-3 rounded-xl cursor-pointer group " +
             (isActive ? "bg-blue-900/60 border border-blue-700/50" : "hover:bg-blue-900/30 border border-transparent");
-        div.setAttribute("onclick", "if(typeof toggleMobileDrawer === 'function') toggleMobileDrawer(); selectCourse('" + name.replace(/'/g, "\\'") + "')");
+        div.setAttribute("onclick", "if(typeof toggleMobileDrawer === 'function' && document.getElementById('mobile-folder-drawer')?.classList.contains('open')) toggleMobileDrawer(); selectCourse('" + name.replace(/'/g, "\\'") + "')");
 
         var iconSpan = document.createElement("span");
         iconSpan.className = "text-xl flex-shrink-0";
@@ -460,6 +503,8 @@ function selectCourse(courseName) {
     document.getElementById("file-list-wrapper").classList.remove("hidden");
     renderCourseFolders();
     renderFilesList();
+    renderMobileCourseChips();
+    updatePasteBanner();
 }
 
 function deleteCourseFolder(courseName) {
@@ -944,10 +989,140 @@ function clearPendingSharedFile() {
     });
 }
 
+// XSS Escape Helper
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Mobile Folder Quick Chips (1-tap switch di HP)
+function renderMobileCourseChips() {
+    const container = document.getElementById("mobile-course-chips-container");
+    if (!container) return;
+    if (!userCourses || !userCourses.length) {
+        container.innerHTML = `
+            <span class="text-xs text-blue-400/80 italic px-2 py-1">Belum ada folder</span>
+            <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-3 py-1 rounded-xl text-xs font-bold bg-blue-900/60 text-yellow-400 border border-blue-700/60 cursor-pointer">+ Buat Folder</button>
+        `;
+        return;
+    }
+    const chipsHtml = userCourses.map(rawCourse => {
+        const name = typeof rawCourse === 'string' ? rawCourse : (rawCourse && rawCourse.name ? rawCourse.name : String(rawCourse));
+        const isActive = name === currentCourse;
+        const safe = escapeHtml(name);
+        const safeAttr = name.replace(/'/g, "\\'");
+        return `<button onclick="selectCourse('${safeAttr}')" class="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${isActive ? 'bg-yellow-400 text-slate-950 shadow-md shadow-yellow-500/20' : 'bg-slate-800/80 text-blue-200 hover:bg-slate-700 hover:text-white border border-blue-900/60'}">
+            <span>${isActive ? '📂' : '📁'}</span>
+            <span class="max-w-[140px] truncate">${safe}</span>
+        </button>`;
+    }).join('');
+
+    container.innerHTML = chipsHtml + `
+        <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-950/60 hover:bg-blue-900/60 text-yellow-400 border border-dashed border-blue-700/60 transition cursor-pointer flex items-center gap-1 whitespace-nowrap">
+            <span>+</span> Folder
+        </button>
+    `;
+}
+
+// Banner Tempel / Taruh File dari WhatsApp
+function updatePasteBanner() {
+    const banner = document.getElementById('wa-paste-banner');
+    if (!banner) return;
+    if (!pendingSharedData || !pendingSharedData.file) {
+        banner.classList.add('hidden');
+        return;
+    }
+
+    const fileName = pendingSharedData.name || (pendingSharedData.file && pendingSharedData.file.name) || 'Dokumen_WhatsApp.pdf';
+    const sz = pendingSharedData.size || (pendingSharedData.file && pendingSharedData.file.size) || 0;
+    const fileSize = sz > 1048576 ? (sz / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(sz / 1024)) + " KB";
+    const ext = fileName.split('.').pop().toLowerCase();
+
+    const iconEl = document.getElementById('wa-paste-icon');
+    if (iconEl) {
+        if (ext === 'pdf') iconEl.textContent = '📕';
+        else if (['doc', 'docx'].includes(ext)) iconEl.textContent = '📘';
+        else if (['ppt', 'pptx'].includes(ext)) iconEl.textContent = '📙';
+        else if (['xls', 'xlsx'].includes(ext)) iconEl.textContent = '📗';
+        else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) iconEl.textContent = '🖼️';
+        else iconEl.textContent = '📥';
+    }
+
+    const nameEl = document.getElementById('wa-paste-name');
+    if (nameEl) nameEl.textContent = fileName;
+
+    const sizeEl = document.getElementById('wa-paste-size');
+    if (sizeEl) sizeEl.textContent = fileSize;
+
+    const targetCourseEl = document.getElementById('wa-paste-target-course');
+    const pasteBtn = document.getElementById('btn-paste-to-course');
+
+    if (currentCourse) {
+        if (targetCourseEl) {
+            targetCourseEl.textContent = currentCourse;
+            targetCourseEl.className = 'text-yellow-300 font-black';
+        }
+        if (pasteBtn) {
+            pasteBtn.innerHTML = `<span>📋</span> Taruh / Tempel di Folder Ini`;
+        }
+    } else {
+        if (targetCourseEl) {
+            targetCourseEl.textContent = 'Pilih folder mata kuliah di bawah';
+            targetCourseEl.className = 'text-orange-400 font-bold';
+        }
+        if (pasteBtn) {
+            pasteBtn.innerHTML = `<span>📋</span> Pilih Folder Tujuan...`;
+        }
+    }
+
+    banner.classList.remove('hidden');
+}
+
+function closeShareModalToBrowse() {
+    const modal = document.getElementById('modal-share-destination');
+    if (modal) modal.classList.add('hidden');
+    updatePasteBanner();
+    showToast("💡 File tersimpan di banner atas. Buka folder tujuan lalu klik 'Taruh / Tempel File di Sini'.");
+}
+
+async function dismissShareAction() {
+    if (!confirm("Batalkan menaruh file dari WhatsApp ini? File tidak akan disimpan ke folder materi.")) {
+        return;
+    }
+    const modal = document.getElementById('modal-share-destination');
+    if (modal) modal.classList.add('hidden');
+    await clearPendingSharedFile();
+    pendingSharedData = null;
+    updatePasteBanner();
+    showToast("File WhatsApp dibatalkan.");
+}
+
+async function saveSharedFileToCurrentCourse() {
+    if (!pendingSharedData || !pendingSharedData.file) {
+        showToast("⚠️ Tidak ada file WhatsApp yang sedang menunggu.", "error");
+        updatePasteBanner();
+        return;
+    }
+    if (!currentCourse) {
+        showSharedFileModal(pendingSharedData);
+        showToast("ℹ️ Silakan pilih folder tujuan pada modal.");
+        return;
+    }
+    await selectCourseAndSaveSharedFile(currentCourse);
+}
+
 async function checkPendingSharedFile() {
     try {
         const shared = await getPendingSharedFile();
-        if (!shared || !shared.file) return;
+        if (!shared || !shared.file) {
+            updatePasteBanner();
+            return;
+        }
 
         // Bersihkan parameter ?shared=1 dari URL agar rapi
         if (window.location.search.includes('shared=1')) {
@@ -955,6 +1130,7 @@ async function checkPendingSharedFile() {
         }
 
         pendingSharedData = shared;
+        updatePasteBanner();
         showSharedFileModal(shared);
     } catch(err) {
         console.warn("Gagal cek pending shared file:", err);
@@ -983,6 +1159,7 @@ function showSharedFileModal(shared) {
 
     renderShareCourseOptions();
     toggleShareNewFolder(false);
+    updatePasteBanner();
     const modal = document.getElementById('modal-share-destination');
     if (modal) modal.classList.remove('hidden');
 }
@@ -995,7 +1172,7 @@ function renderShareCourseOptions() {
         container.innerHTML = `
             <div class="text-center py-4 bg-blue-950/50 rounded-xl border border-blue-800/40">
                 <p class="text-xs text-blue-300">Belum ada folder Mata Kuliah.</p>
-                <p class="text-[11px] text-yellow-400 mt-1 font-semibold">Buat folder baru di bawah untuk menyimpan file ini.</p>
+                <p class="text-[11px] text-yellow-400 mt-1 font-semibold">Buat folder baru di bawah untuk menaruh file ini.</p>
             </div>
         `;
         return;
@@ -1005,18 +1182,22 @@ function renderShareCourseOptions() {
         const cName = typeof c === 'string' ? c : (c && c.name ? c.name : String(c));
         const count = userFiles.filter(f => f.course === cName).length;
         const safeName = cName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+        const isCurrent = cName === currentCourse;
         return `
-            <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-3 bg-blue-900/40 hover:bg-yellow-400/20 border border-blue-700/50 hover:border-yellow-400/60 rounded-xl transition cursor-pointer group active:scale-[0.98]">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="text-lg">📁</span>
+            <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-3 bg-blue-900/40 hover:bg-yellow-400/20 border ${isCurrent ? 'border-yellow-400/80 bg-blue-900/70' : 'border-blue-700/50 hover:border-yellow-400/60'} rounded-xl transition cursor-pointer group active:scale-[0.98]">
+                <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                    <span class="text-xl flex-shrink-0">${isCurrent ? '📂' : '📁'}</span>
                     <div class="min-w-0">
-                        <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${cName}</p>
+                        <div class="flex items-center gap-1.5">
+                            <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${escapeHtml(cName)}</p>
+                            ${isCurrent ? '<span class="text-[9px] bg-yellow-400 text-slate-950 font-black px-1.5 py-0.2 rounded">Aktif</span>' : ''}
+                        </div>
                         <p class="text-[10px] text-blue-300">${count} file tersimpan</p>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-yellow-400 opacity-80 group-hover:opacity-100 flex items-center gap-1">
-                    Simpan ➔
-                </span>
+                <button type="button" class="flex-shrink-0 px-3 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow transition flex items-center gap-1 cursor-pointer">
+                    <span>📋</span> Taruh di Sini
+                </button>
             </div>
         `;
     }).join('');
@@ -1128,6 +1309,7 @@ async function selectCourseAndSaveSharedFile(courseName) {
     // Bersihkan pending_share dari IndexedDB
     await clearPendingSharedFile();
     pendingSharedData = null;
+    updatePasteBanner();
 
     // Refresh tampilan
     selectCourse(courseName);
@@ -1137,10 +1319,7 @@ async function selectCourseAndSaveSharedFile(courseName) {
 }
 
 async function dismissShareModal() {
-    const modal = document.getElementById('modal-share-destination');
-    if (modal) modal.classList.add('hidden');
-    await clearPendingSharedFile();
-    pendingSharedData = null;
+    closeShareModalToBrowse();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1166,7 +1345,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "Escape") {
             document.getElementById("modal-viewer")?.classList.add("hidden");
             closeAddFolderModal();
-            dismissShareModal();
+            closeShareModalToBrowse();
         }
     });
 });

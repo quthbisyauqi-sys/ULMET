@@ -1,7 +1,7 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v54';
+const CACHE_NAME = 'ulmet-v55';
 const ASSETS = [
     './',
     './jadwal.html',
