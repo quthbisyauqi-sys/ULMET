@@ -1,7 +1,8 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v57';
+const CACHE_NAME = 'ulmet-v58';
+const SHARED_CACHE_NAME = 'ulmet-shared-cache';
 const ASSETS = [
     './',
     './jadwal.html',
@@ -33,11 +34,15 @@ self.addEventListener('install', event => {
     self.skipWaiting();
 });
 
-// ===== ACTIVATE: hapus semua cache lama =====
+// ===== ACTIVATE: hapus semua cache lama (kecuali shared cache) =====
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys =>
-            Promise.all(keys.map(k => caches.delete(k)))
+            Promise.all(keys.map(k => {
+                if (k !== CACHE_NAME && k !== SHARED_CACHE_NAME) {
+                    return caches.delete(k);
+                }
+            }))
         )
     );
     self.clients.claim();
@@ -45,18 +50,33 @@ self.addEventListener('activate', event => {
 
 // ===== FETCH: Network First (selalu ambil versi terbaru dari server) =====
 const saveSharedFile = async (file) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let arrayBuffer = null;
-            try {
-                if (typeof file.arrayBuffer === 'function') {
-                    arrayBuffer = await file.arrayBuffer();
-                }
-            } catch(e) {
-                console.warn("ArrayBuffer convert failed:", e);
+    // 1. Simpan ke Cache Storage (Paling reliabel & kebal issue IndexedDB)
+    try {
+        const cache = await caches.open(SHARED_CACHE_NAME);
+        const fileResponse = new Response(file, {
+            headers: {
+                'X-File-Name': encodeURIComponent(file.name || 'Dokumen_WhatsApp.pdf'),
+                'X-File-Type': file.type || 'application/pdf',
+                'X-File-Size': String(file.size || 0),
+                'X-Timestamp': String(Date.now())
             }
+        });
+        await cache.put('/pending-shared-file', fileResponse);
+    } catch(err) {
+        console.warn("Gagal simpan shared file ke Cache Storage:", err);
+    }
 
-            const req = indexedDB.open('ULMET_Share_DB', 1);
+    // 2. Simpan juga ke IndexedDB sebagai cadangan
+    try {
+        let arrayBuffer = null;
+        try {
+            if (typeof file.arrayBuffer === 'function') {
+                arrayBuffer = await file.arrayBuffer();
+            }
+        } catch(e) {}
+
+        await new Promise((resolve, reject) => {
+            const req = indexedDB.open('ULMET_Share_DB', 2);
             req.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains('shared_files')) {
@@ -76,24 +96,27 @@ const saveSharedFile = async (file) => {
                     timestamp: Date.now() 
                 };
                 store.put(dataObj);
-                tx.oncomplete = () => {
-                    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-                        clients.forEach(c => c.postMessage({ type: 'PENDING_SHARE_READY', name: dataObj.name }));
-                    }).catch(() => {});
-                    resolve();
-                };
+                tx.oncomplete = () => resolve();
                 tx.onerror = () => reject(tx.error);
             };
             req.onerror = () => reject(req.error);
-        } catch(err) {
-            reject(err);
+        });
+    } catch(err) {
+        console.warn("Gagal simpan shared file ke IndexedDB:", err);
+    }
+
+    // 3. Notifikasi ke semua window client yang terbuka
+    try {
+        const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of clients) {
+            client.postMessage({ type: 'PENDING_SHARE_READY', name: file.name });
         }
-    });
+    } catch(e) {}
 };
 
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
-    if (event.request.method === 'POST' && (url.pathname.endsWith('/share-target') || url.pathname.endsWith('share-target'))) {
+    if (event.request.method === 'POST' && (url.pathname.endsWith('/share-target') || url.pathname.endsWith('share-target') || url.pathname.includes('share-target'))) {
         event.respondWith((async () => {
             try {
                 const formData = await event.request.formData();

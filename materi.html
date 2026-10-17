@@ -961,10 +961,37 @@ async function initSupabaseData() {
 // =============================================
 let pendingSharedData = null;
 
-function getPendingSharedFile() {
-    return new Promise((resolve) => {
-        try {
-            const req = indexedDB.open('ULMET_Share_DB', 1);
+async function getPendingSharedFile() {
+    // 1. Coba baca dari Cache Storage terlebih dahulu (Paling cepat, stabil, & kebal limit IDB)
+    try {
+        if ('caches' in window) {
+            const cache = await caches.open('ulmet-shared-cache');
+            const res = await cache.match('/pending-shared-file');
+            if (res) {
+                const blob = await res.blob();
+                const rawName = res.headers.get('X-File-Name');
+                const name = rawName ? decodeURIComponent(rawName) : (blob.name || 'Dokumen_WhatsApp.pdf');
+                const type = res.headers.get('X-File-Type') || blob.type || 'application/pdf';
+                const size = parseInt(res.headers.get('X-File-Size') || '0', 10) || blob.size;
+                const file = new File([blob], name, { type });
+                return {
+                    id: 'pending_share',
+                    file: file,
+                    name: name,
+                    size: size,
+                    type: type,
+                    source: 'cache'
+                };
+            }
+        }
+    } catch (e) {
+        console.warn('Gagal baca pending share dari Cache Storage:', e);
+    }
+
+    // 2. Coba baca dari IndexedDB (Cadangan)
+    try {
+        const idbResult = await new Promise((resolve) => {
+            const req = indexedDB.open('ULMET_Share_DB', 2);
             req.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains('shared_files')) {
@@ -973,6 +1000,10 @@ function getPendingSharedFile() {
             };
             req.onsuccess = (e) => {
                 const db = e.target.result;
+                if (!db.objectStoreNames.contains('shared_files')) {
+                    resolve(null);
+                    return;
+                }
                 const tx = db.transaction('shared_files', 'readonly');
                 const store = tx.objectStore('shared_files');
                 const getReq = store.get('pending_share');
@@ -997,29 +1028,33 @@ function getPendingSharedFile() {
                 getReq.onerror = () => resolve(null);
             };
             req.onerror = () => resolve(null);
-        } catch(e) {
-            resolve(null);
-        }
-    });
+        });
+        if (idbResult) return idbResult;
+    } catch(e) {
+        console.warn('Gagal baca pending share dari IDB:', e);
+    }
+
+    return null;
 }
 
-function clearPendingSharedFile() {
-    return new Promise((resolve) => {
-        try {
-            const req = indexedDB.open('ULMET_Share_DB', 1);
-            req.onsuccess = (e) => {
-                const db = e.target.result;
-                const tx = db.transaction('shared_files', 'readwrite');
-                const store = tx.objectStore('shared_files');
-                store.delete('pending_share');
-                tx.oncomplete = () => resolve(true);
-                tx.onerror = () => resolve(false);
-            };
-            req.onerror = () => resolve(false);
-        } catch(e) {
-            resolve(false);
+async function clearPendingSharedFile() {
+    try {
+        if ('caches' in window) {
+            const cache = await caches.open('ulmet-shared-cache');
+            await cache.delete('/pending-shared-file');
         }
-    });
+    } catch (e) {}
+
+    try {
+        const req = indexedDB.open('ULMET_Share_DB', 2);
+        req.onsuccess = (e) => {
+            const db = e.target.result;
+            if (db.objectStoreNames.contains('shared_files')) {
+                const tx = db.transaction('shared_files', 'readwrite');
+                tx.objectStore('shared_files').delete('pending_share');
+            }
+        };
+    } catch (e) {}
 }
 
 // XSS Escape Helper
@@ -1426,12 +1461,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Cek apakah ada file pending yang dibagikan dari WhatsApp / Android Share Target
+    checkPendingSharedFile();
     if (window.location.search.includes('shared=1')) {
         checkPendingSharedFileWithRetry();
+        setTimeout(checkPendingSharedFileWithRetry, 500);
+        setTimeout(checkPendingSharedFileWithRetry, 1200);
     } else {
-        setTimeout(() => {
-            checkPendingSharedFile();
-        }, 200);
+        setTimeout(checkPendingSharedFile, 300);
+        setTimeout(checkPendingSharedFile, 800);
     }
 
     // Keyboard shortcut: Escape tutup semua modal
