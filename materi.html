@@ -172,9 +172,13 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
+                <button type="button" id="btn-paste-header" onclick="handlePasteFromWhatsApp()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 active:scale-95 text-slate-950 font-black px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/25 cursor-pointer">
+                    <span>📋</span> <span>Tempel File WA</span>
+                    <span id="wa-badge" class="hidden px-1.5 py-0.2 rounded-full bg-red-600 text-white font-black text-[9px] animate-pulse">1</span>
+                </button>
                 <div class="relative inline-block overflow-hidden rounded-xl">
-                    <button type="button" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-yellow-400/20 pointer-events-none" tabindex="-1">
-                        &#128228; Upload File
+                    <button type="button" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-yellow-400/20 pointer-events-none" tabindex="-1">
+                        <span>📤</span> Upload File
                     </button>
                     <input type="file" id="upload-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.gif" 
                            onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); event.preventDefault(); return false; }"
@@ -366,7 +370,46 @@
     </div>
 </div>
 
-<!-- Google Drive modal telah dihapus — berkas kini disimpan otomatis via Supabase Storage -->
+<!-- MODAL: BANTUAN TEMPEL WHATSAPP -->
+<div id="modal-wa-helper" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl relative">
+        <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-2xl flex-shrink-0">
+                    📥
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base font-extrabold text-white leading-tight">Tempel File dari WhatsApp</h3>
+                    <p class="text-xs text-emerald-400 font-semibold mt-0.5 truncate">Folder Tujuan: <span class="text-yellow-400 font-bold" id="wa-helper-target-course">-</span></p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('modal-wa-helper').classList.add('hidden')" class="text-slate-400 hover:text-white text-2xl leading-none flex-shrink-0 p-1">&times;</button>
+        </div>
+
+        <div class="bg-slate-950/70 rounded-2xl p-4 border border-slate-800 text-xs text-slate-300 space-y-2.5 mb-5">
+            <p class="font-bold text-white flex items-center gap-1.5">
+                <span>💡</span> 2 Cara Mudah Memasukkan File WhatsApp:
+            </p>
+            <div class="p-2.5 bg-emerald-950/40 border border-emerald-500/30 rounded-xl">
+                <p class="font-black text-emerald-300">Cara 1 (Langsung dari HP):</p>
+                <p class="text-[11px] text-slate-300 mt-0.5">Klik tombol hijau di bawah untuk memilih file dokumen materi WhatsApp yang sudah tersimpan di HP.</p>
+            </div>
+            <div class="p-2.5 bg-blue-950/40 border border-blue-500/30 rounded-xl">
+                <p class="font-black text-blue-300">Cara 2 (Dari WhatsApp):</p>
+                <p class="text-[11px] text-slate-300 mt-0.5">Buka chat WhatsApp ➔ buka dokumen/materi ➔ klik <b>Bagikan (Share)</b> ➔ pilih aplikasi <b>ULMET</b>.</p>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <button onclick="document.getElementById('modal-wa-helper').classList.add('hidden'); document.getElementById('upload-input').click();" class="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <span>📂</span> Pilih File Dokumen WhatsApp dari HP
+            </button>
+            <button onclick="checkPendingSharedFileWithRetry(); document.getElementById('modal-wa-helper').classList.add('hidden');" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-blue-300 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                <span>🔄</span> Cek Ulang Antrean Otomatis
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- TOAST -->
 <div id="toast" class="hidden fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs"></div>
@@ -592,7 +635,21 @@ function renderFilesList() {
     if (!container || !currentCourse) return;
     const files = userFiles.filter(f => f.course === currentCourse);
     if (!files.length) {
-        container.innerHTML = "<div class='text-center py-20'><p class='text-5xl mb-3'>&#128235;</p><p class='font-bold text-base text-blue-200'>Folder ini masih kosong</p><p class='text-xs text-blue-400 mt-1'>Klik Upload File atau tarik file ke area di atas</p></div>";
+        container.innerHTML = `
+            <div class="text-center py-10 px-4">
+                <p class="text-5xl mb-3">&#128235;</p>
+                <p class="font-bold text-base text-blue-200">Folder ini masih kosong</p>
+                <p class="text-xs text-blue-400 mt-1 max-w-xs mx-auto">Pilih cara memasukkan materi kuliah ke folder ini:</p>
+                <div class="mt-5 flex flex-col sm:flex-row items-center justify-center gap-2.5 max-w-sm mx-auto">
+                    <button onclick="handlePasteFromWhatsApp()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-black text-xs py-3 px-4 rounded-xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 cursor-pointer transition active:scale-95">
+                        <span>📋</span> Tempel / Taruh File dari WA
+                    </button>
+                    <button onclick="document.getElementById('upload-input').click()" class="w-full bg-blue-900/60 hover:bg-blue-800 text-blue-200 font-bold text-xs py-3 px-4 rounded-xl border border-blue-700/50 flex items-center justify-center gap-2 cursor-pointer transition">
+                        <span>📁</span> Pilih File dari HP / Laptop
+                    </button>
+                </div>
+            </div>
+        `;
         return;
     }
     const getTheme = ext => {
@@ -960,7 +1017,24 @@ function getPendingSharedFile() {
                 const tx = db.transaction('shared_files', 'readonly');
                 const store = tx.objectStore('shared_files');
                 const getReq = store.get('pending_share');
-                getReq.onsuccess = () => resolve(getReq.result || null);
+                getReq.onsuccess = () => {
+                    const res = getReq.result;
+                    if (res) {
+                        if (!res.file && res.buffer) {
+                            try {
+                                res.file = new File([res.buffer], res.name || 'Dokumen_WhatsApp.pdf', {
+                                    type: res.type || 'application/pdf'
+                                });
+                            } catch(err) {
+                                res.file = new Blob([res.buffer], { type: res.type || 'application/pdf' });
+                                res.file.name = res.name || 'Dokumen_WhatsApp.pdf';
+                            }
+                        }
+                        resolve(res);
+                    } else {
+                        resolve(null);
+                    }
+                };
                 getReq.onerror = () => resolve(null);
             };
             req.onerror = () => resolve(null);
@@ -1032,11 +1106,14 @@ function renderMobileCourseChips() {
 // Banner Tempel / Taruh File dari WhatsApp
 function updatePasteBanner() {
     const banner = document.getElementById('wa-paste-banner');
-    if (!banner) return;
+    const badge = document.getElementById('wa-badge');
     if (!pendingSharedData || !pendingSharedData.file) {
-        banner.classList.add('hidden');
+        if (banner) banner.classList.add('hidden');
+        if (badge) badge.classList.add('hidden');
         return;
     }
+
+    if (badge) badge.classList.remove('hidden');
 
     const fileName = pendingSharedData.name || (pendingSharedData.file && pendingSharedData.file.name) || 'Dokumen_WhatsApp.pdf';
     const sz = pendingSharedData.size || (pendingSharedData.file && pendingSharedData.file.size) || 0;
@@ -1080,7 +1157,52 @@ function updatePasteBanner() {
         }
     }
 
-    banner.classList.remove('hidden');
+    if (banner) banner.classList.remove('hidden');
+}
+
+// Handler utama saat tombol "Tempel File WA" ditekan
+async function handlePasteFromWhatsApp() {
+    if (!currentCourse) {
+        alert("⚠️ Silakan pilih atau buat Folder Mata Kuliah terlebih dahulu!");
+        return;
+    }
+
+    showToast("🔍 Memeriksa file WhatsApp...");
+    let shared = await getPendingSharedFile();
+    if (!shared && pendingSharedData) shared = pendingSharedData;
+
+    if (shared && (shared.file || shared.buffer)) {
+        pendingSharedData = shared;
+        updatePasteBanner();
+        // Simpan langsung ke folder aktif
+        await selectCourseAndSaveSharedFile(currentCourse);
+        return;
+    }
+
+    // Jika antrean di IndexedDB belum ada, buka dialog panduan WhatsApp
+    openWhatsAppHelperModal();
+}
+
+function openWhatsAppHelperModal() {
+    const targetEl = document.getElementById('wa-helper-target-course');
+    if (targetEl) targetEl.textContent = currentCourse || 'Belum dipilih';
+    const modal = document.getElementById('modal-wa-helper');
+    if (modal) modal.classList.remove('hidden');
+}
+
+async function checkPendingSharedFileWithRetry() {
+    showToast("🔄 Mengecek ulang file dari WhatsApp...");
+    for (let i = 0; i < 4; i++) {
+        await new Promise(r => setTimeout(r, 350 * (i + 1)));
+        const shared = await getPendingSharedFile();
+        if (shared && (shared.file || shared.buffer)) {
+            pendingSharedData = shared;
+            updatePasteBanner();
+            showSharedFileModal(shared);
+            return;
+        }
+    }
+    showToast("ℹ️ File belum terdeteksi. Silakan klik tombol 'Pilih File Dokumen WhatsApp'.");
 }
 
 function closeShareModalToBrowse() {
@@ -1119,7 +1241,7 @@ async function saveSharedFileToCurrentCourse() {
 async function checkPendingSharedFile() {
     try {
         const shared = await getPendingSharedFile();
-        if (!shared || !shared.file) {
+        if (!shared || (!shared.file && !shared.buffer)) {
             updatePasteBanner();
             return;
         }
@@ -1139,7 +1261,8 @@ async function checkPendingSharedFile() {
 
 function showSharedFileModal(shared) {
     const fileName = shared.name || (shared.file && shared.file.name) || 'Dokumen_WhatsApp.pdf';
-    const fileSize = shared.size ? (shared.size > 1048576 ? (shared.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(shared.size/1024)) + " KB") : 'Dokumen';
+    const sz = shared.size || (shared.file && shared.file.size) || 0;
+    const fileSize = sz > 1048576 ? (sz/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(sz/1024)) + " KB";
     
     const ext = fileName.split('.').pop().toLowerCase();
     const iconEl = document.getElementById('share-file-icon');
@@ -1234,13 +1357,19 @@ async function confirmCreateCourseAndSaveShare() {
 }
 
 async function selectCourseAndSaveSharedFile(courseName) {
-    if (!pendingSharedData || !pendingSharedData.file) return;
+    if (!pendingSharedData || (!pendingSharedData.file && !pendingSharedData.buffer)) return;
 
     let file = pendingSharedData.file;
     if (!(file instanceof File)) {
-        file = new File([file], pendingSharedData.name || 'Dokumen_WhatsApp.pdf', {
-            type: pendingSharedData.type || file.type || 'application/pdf'
-        });
+        const buf = pendingSharedData.buffer || pendingSharedData;
+        try {
+            file = new File([buf], pendingSharedData.name || 'Dokumen_WhatsApp.pdf', {
+                type: pendingSharedData.type || 'application/pdf'
+            });
+        } catch(e) {
+            file = new Blob([buf], { type: pendingSharedData.type || 'application/pdf' });
+            file.name = pendingSharedData.name || 'Dokumen_WhatsApp.pdf';
+        }
     }
 
     // Tutup modal share
@@ -1333,17 +1462,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     initDropZone();
     initSupabaseData(); // Load realtime dari Supabase
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data && event.data.type === 'PENDING_SHARE_READY') {
+                checkPendingSharedFile();
+            }
+        });
+    }
 
     // Cek apakah ada file pending yang dibagikan dari WhatsApp / Android Share Target
-    setTimeout(() => {
-        checkPendingSharedFile();
-    }, 350);
+    if (window.location.search.includes('shared=1')) {
+        checkPendingSharedFileWithRetry();
+    } else {
+        setTimeout(() => {
+            checkPendingSharedFile();
+        }, 200);
+    }
 
     // Keyboard shortcut: Escape tutup semua modal
     document.addEventListener("keydown", e => {
         if (e.key === "Escape") {
             document.getElementById("modal-viewer")?.classList.add("hidden");
+            document.getElementById("modal-wa-helper")?.classList.add("hidden");
             closeAddFolderModal();
             closeShareModalToBrowse();
         }

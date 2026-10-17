@@ -1,7 +1,7 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v55';
+const CACHE_NAME = 'ulmet-v56';
 const ASSETS = [
     './',
     './jadwal.html',
@@ -45,30 +45,49 @@ self.addEventListener('activate', event => {
 
 // ===== FETCH: Network First (selalu ambil versi terbaru dari server) =====
 const saveSharedFile = async (file) => {
-    return new Promise((resolve, reject) => {
-        const req = indexedDB.open('ULMET_Share_DB', 1);
-        req.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains('shared_files')) {
-                db.createObjectStore('shared_files', { keyPath: 'id' });
+    return new Promise(async (resolve, reject) => {
+        try {
+            let arrayBuffer = null;
+            try {
+                if (typeof file.arrayBuffer === 'function') {
+                    arrayBuffer = await file.arrayBuffer();
+                }
+            } catch(e) {
+                console.warn("ArrayBuffer convert failed:", e);
             }
-        };
-        req.onsuccess = (e) => {
-            const db = e.target.result;
-            const tx = db.transaction('shared_files', 'readwrite');
-            const store = tx.objectStore('shared_files');
-            store.put({ 
-                id: 'pending_share', 
-                file: file, 
-                name: file.name || ('Dokumen_WhatsApp_' + Date.now()),
-                type: file.type || 'application/octet-stream',
-                size: file.size || 0,
-                timestamp: Date.now() 
-            });
-            tx.oncomplete = () => resolve();
-            tx.onerror = () => reject(tx.error);
-        };
-        req.onerror = () => reject(req.error);
+
+            const req = indexedDB.open('ULMET_Share_DB', 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('shared_files')) {
+                    db.createObjectStore('shared_files', { keyPath: 'id' });
+                }
+            };
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                const tx = db.transaction('shared_files', 'readwrite');
+                const store = tx.objectStore('shared_files');
+                const dataObj = { 
+                    id: 'pending_share', 
+                    name: file.name || ('Dokumen_WhatsApp_' + Date.now() + '.pdf'),
+                    type: file.type || 'application/pdf',
+                    size: file.size || (arrayBuffer ? arrayBuffer.byteLength : 0),
+                    buffer: arrayBuffer,
+                    timestamp: Date.now() 
+                };
+                store.put(dataObj);
+                tx.oncomplete = () => {
+                    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+                        clients.forEach(c => c.postMessage({ type: 'PENDING_SHARE_READY', name: dataObj.name }));
+                    }).catch(() => {});
+                    resolve();
+                };
+                tx.onerror = () => reject(tx.error);
+            };
+            req.onerror = () => reject(req.error);
+        } catch(err) {
+            reject(err);
+        }
     });
 };
 
@@ -93,7 +112,8 @@ self.addEventListener('fetch', event => {
             } catch (err) {
                 console.error("Error processing share target in SW:", err);
             }
-            return Response.redirect('./materi.html?shared=1', 303);
+            const redirectUrl = new URL('./materi.html?shared=1', self.location.origin).href;
+            return Response.redirect(redirectUrl, 303);
         })());
         return;
     }
