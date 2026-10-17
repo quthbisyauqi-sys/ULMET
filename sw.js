@@ -1,7 +1,7 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v56';
+const CACHE_NAME = 'ulmet-v57';
 const ASSETS = [
     './',
     './jadwal.html',
@@ -112,7 +112,7 @@ self.addEventListener('fetch', event => {
             } catch (err) {
                 console.error("Error processing share target in SW:", err);
             }
-            const redirectUrl = new URL('./materi.html?shared=1', self.location.origin).href;
+            const redirectUrl = new URL('./materi.html?shared=1', self.location.href).href;
             return Response.redirect(redirectUrl, 303);
         })());
         return;
