@@ -231,10 +231,37 @@
             <p class="text-xs text-blue-400 mt-0.5">PDF, Word, PPT, Excel, Foto - Otomatis masuk ke folder aktif</p>
         </div>
 
-        <div id="no-course-selected" class="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <p class="text-5xl mb-4">&#128072;</p>
-            <p class="font-bold text-lg text-blue-200">Pilih Folder Mata Kuliah</p>
-            <p class="text-sm text-blue-400 mt-2">Klik salah satu folder di sebelah kiri untuk melihat dan mengelola file di dalamnya.</p>
+        <div id="no-course-selected" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+            <div id="no-course-normal-view" class="text-center">
+                <p class="text-5xl mb-4">&#128072;</p>
+                <p class="font-bold text-lg text-blue-200">Pilih Folder Mata Kuliah</p>
+                <p class="text-sm text-blue-400 mt-2">Klik salah satu folder di sebelah kiri untuk melihat dan mengelola file di dalamnya.</p>
+            </div>
+            <div id="no-course-share-view" class="hidden w-full max-w-md mx-auto p-5 bg-gradient-to-b from-blue-950/90 via-slate-900 to-blue-950/90 border-2 border-emerald-400/80 rounded-3xl shadow-2xl text-center">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-3xl mb-3 shadow">
+                    📥
+                </div>
+                <span class="px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[11px] uppercase tracking-wide">
+                    File dari WhatsApp Siap Ditaruh
+                </span>
+                <p class="text-base font-extrabold text-white mt-2 truncate" id="no-course-share-name">
+                    Dokumen_WhatsApp.pdf
+                </p>
+                <p class="text-xs text-blue-300 mt-1">
+                    Pilih folder mata kuliah tujuan di bawah untuk langsung menaruh file:
+                </p>
+                <div class="mt-4 space-y-2 text-left max-h-60 overflow-y-auto pr-1" id="no-course-share-courses">
+                    <!-- Dynamic course buttons with Taruh di Sini -->
+                </div>
+                <div class="mt-4 pt-3 border-t border-blue-800/40 flex items-center justify-between gap-2">
+                    <button onclick="addNewCoursePrompt()" class="flex-1 py-2 px-3 border border-dashed border-yellow-400/60 rounded-xl text-xs font-bold text-yellow-400 hover:bg-yellow-400/10 transition cursor-pointer">
+                        + Folder Baru
+                    </button>
+                    <button onclick="dismissShareAction()" class="py-2 px-4 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+                        Batal
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-4 md:px-6 pb-36 md:pb-6 mt-3 sm:mt-4">
@@ -593,9 +620,29 @@ function renderFilesList() {
     const container = document.getElementById("file-list-container");
     if (!container || !currentCourse) return;
     const files = userFiles.filter(f => f.course === currentCourse);
+    const isShare = isSharingActive();
+    const fName = (pendingSharedData && pendingSharedData.name) || getUrlSharedFileName() || 'Dokumen_WhatsApp.pdf';
+
+    let shareCardHtml = '';
+    if (isShare) {
+        shareCardHtml = `
+            <div class="mb-3 p-3.5 bg-gradient-to-r from-emerald-950/90 via-slate-900 to-emerald-950/90 border-2 border-emerald-400 rounded-2xl flex items-center justify-between gap-3 shadow-xl">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="text-2xl flex-shrink-0">📥</span>
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full">File WhatsApp Siap Ditaruh</span>
+                        <p class="text-xs font-bold text-white truncate mt-1">"${escapeHtml(fName)}"</p>
+                    </div>
+                </div>
+                <button onclick="handlePasteFromWhatsApp()" class="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 active:scale-95 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 flex-shrink-0 cursor-pointer transition">
+                    <span>📋</span> Tempel di Sini
+                </button>
+            </div>
+        `;
+    }
+
     if (!files.length) {
-        if (pendingSharedData && (pendingSharedData.file || pendingSharedData.buffer)) {
-            const fName = pendingSharedData.name || 'Dokumen_WhatsApp.pdf';
+        if (isShare) {
             container.innerHTML = `
                 <div class="text-center py-8 px-4 bg-emerald-950/30 border border-emerald-500/40 rounded-3xl max-w-sm mx-auto my-6 shadow-xl">
                     <p class="text-4xl mb-2">📥</p>
@@ -642,6 +689,7 @@ function renderFilesList() {
             "</div>" +
         "</div>";
     }).join("");
+    container.innerHTML = shareCardHtml + container.innerHTML;
     document.getElementById("active-course-subtitle").textContent = files.length + " file tersimpan";
 }
 
@@ -961,6 +1009,76 @@ async function initSupabaseData() {
 // =============================================
 let pendingSharedData = null;
 
+function isSharingActive() {
+    return Boolean(
+        (pendingSharedData && (pendingSharedData.name || pendingSharedData.file || pendingSharedData.buffer || pendingSharedData.isPending)) ||
+        window.location.search.includes('shared=1') ||
+        sessionStorage.getItem('ulmet_wa_shared')
+    );
+}
+
+function getUrlSharedFileName() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('fn')) return decodeURIComponent(params.get('fn'));
+    const saved = sessionStorage.getItem('ulmet_wa_shared');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.name) return parsed.name;
+        } catch(e) {}
+    }
+    return null;
+}
+
+function updateNoCourseView(isShare, fileName) {
+    const normalView = document.getElementById('no-course-normal-view');
+    const shareView = document.getElementById('no-course-share-view');
+    const shareNameEl = document.getElementById('no-course-share-name');
+    const courseListEl = document.getElementById('no-course-share-courses');
+
+    if (!normalView || !shareView) return;
+
+    if (!isShare) {
+        normalView.classList.remove('hidden');
+        shareView.classList.add('hidden');
+        return;
+    }
+
+    normalView.classList.add('hidden');
+    shareView.classList.remove('hidden');
+    if (shareNameEl) shareNameEl.textContent = fileName || 'Dokumen_WhatsApp.pdf';
+
+    if (courseListEl) {
+        if (!userCourses || userCourses.length === 0) {
+            courseListEl.innerHTML = `
+                <div class="text-center py-3 bg-blue-950/60 rounded-xl border border-blue-800/40 text-blue-300 text-xs">
+                    Belum ada folder mata kuliah.<br>Klik "+ Folder Baru" di bawah untuk membuat folder.
+                </div>
+            `;
+        } else {
+            courseListEl.innerHTML = userCourses.map(c => {
+                const cName = typeof c === 'string' ? c : (c && c.name ? c.name : String(c));
+                const safeName = cName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                const count = userFiles.filter(f => f.course === cName).length;
+                return `
+                    <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-2.5 bg-blue-900/40 hover:bg-yellow-400/20 border border-blue-700/50 hover:border-yellow-400/70 rounded-xl transition cursor-pointer group active:scale-[0.98]">
+                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                            <span class="text-lg flex-shrink-0">📁</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${escapeHtml(cName)}</p>
+                                <p class="text-[10px] text-blue-300">${count} file</p>
+                            </div>
+                        </div>
+                        <button type="button" class="flex-shrink-0 px-2.5 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow flex items-center gap-1 cursor-pointer">
+                            <span>📋</span> Taruh
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+}
+
 async function getPendingSharedFile() {
     // 1. Coba baca dari Cache Storage terlebih dahulu (Paling cepat, stabil, & kebal limit IDB)
     try {
@@ -973,7 +1091,13 @@ async function getPendingSharedFile() {
                 const name = rawName ? decodeURIComponent(rawName) : (blob.name || 'Dokumen_WhatsApp.pdf');
                 const type = res.headers.get('X-File-Type') || blob.type || 'application/pdf';
                 const size = parseInt(res.headers.get('X-File-Size') || '0', 10) || blob.size;
-                const file = new File([blob], name, { type });
+                let file = null;
+                try {
+                    file = new File([blob], name, { type });
+                } catch(e) {
+                    file = blob;
+                    file.name = name;
+                }
                 return {
                     id: 'pending_share',
                     file: file,
@@ -1101,24 +1225,31 @@ function renderMobileCourseChips() {
 function updatePasteBanner() {
     const banner = document.getElementById('wa-paste-banner');
     const headerBtn = document.getElementById('btn-paste-header');
+    const active = isSharingActive();
 
-    if (!pendingSharedData || (!pendingSharedData.file && !pendingSharedData.buffer)) {
+    if (!active) {
         if (banner) banner.classList.add('hidden');
         if (headerBtn) {
             headerBtn.classList.add('hidden');
             headerBtn.classList.remove('flex');
         }
+        updateNoCourseView(false);
         return;
     }
 
+    // Tampilkan tombol hijau di header
     if (headerBtn) {
         headerBtn.classList.remove('hidden');
         headerBtn.classList.add('flex');
     }
 
-    const fileName = pendingSharedData.name || (pendingSharedData.file && pendingSharedData.file.name) || 'Dokumen_WhatsApp.pdf';
-    const sz = pendingSharedData.size || (pendingSharedData.file && pendingSharedData.file.size) || 0;
-    const fileSize = sz > 1048576 ? (sz / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(sz / 1024)) + " KB";
+    const fileName = (pendingSharedData && pendingSharedData.name) || 
+                     (pendingSharedData && pendingSharedData.file && pendingSharedData.file.name) || 
+                     getUrlSharedFileName() || 
+                     'Dokumen_WhatsApp.pdf';
+
+    const sz = (pendingSharedData && (pendingSharedData.size || (pendingSharedData.file && pendingSharedData.file.size))) || 0;
+    const fileSize = sz > 1048576 ? (sz / 1048576).toFixed(1) + " MB" : (sz > 0 ? Math.max(1, Math.round(sz / 1024)) + " KB" : "Siap Ditaruh");
     const ext = fileName.split('.').pop().toLowerCase();
 
     const iconEl = document.getElementById('wa-paste-icon');
@@ -1156,6 +1287,7 @@ function updatePasteBanner() {
         if (pasteBtn) {
             pasteBtn.innerHTML = `<span>📋</span> Pilih Folder Tujuan...`;
         }
+        updateNoCourseView(true, fileName);
     }
 
     if (banner) banner.classList.remove('hidden');
@@ -1164,7 +1296,8 @@ function updatePasteBanner() {
 // Handler utama saat tombol "Tempel File WA" ditekan
 async function handlePasteFromWhatsApp() {
     if (!currentCourse) {
-        alert("⚠️ Silakan pilih atau buat Folder Mata Kuliah terlebih dahulu!");
+        showSharedFileModal(pendingSharedData || { name: getUrlSharedFileName() || 'Dokumen_WhatsApp.pdf' });
+        showToast("ℹ️ Silakan pilih folder tujuan untuk menaruh berkas.");
         return;
     }
 
@@ -1176,18 +1309,22 @@ async function handlePasteFromWhatsApp() {
         updatePasteBanner();
         // Simpan langsung ke folder aktif
         await selectCourseAndSaveSharedFile(currentCourse);
+    } else {
+        showToast("📥 Menyiapkan berkas... Silakan konfirmasi berkas untuk folder " + currentCourse);
+        const up = document.getElementById('upload-input');
+        if (up) up.click();
     }
 }
 
 async function checkPendingSharedFileWithRetry() {
-    for (let i = 0; i < 4; i++) {
-        await new Promise(r => setTimeout(r, 300 * (i + 1)));
+    for (let i = 0; i < 6; i++) {
+        await new Promise(r => setTimeout(r, 350 * (i + 1)));
         const shared = await getPendingSharedFile();
         if (shared && (shared.file || shared.buffer)) {
             pendingSharedData = shared;
+            try { sessionStorage.setItem('ulmet_wa_shared', JSON.stringify({ name: shared.name, size: shared.size })); } catch(e) {}
             updatePasteBanner();
             renderFilesList();
-            showSharedFileModal(shared);
             return;
         }
     }
@@ -1208,18 +1345,23 @@ async function dismissShareAction() {
     if (modal) modal.classList.add('hidden');
     await clearPendingSharedFile();
     pendingSharedData = null;
+    try { sessionStorage.removeItem('ulmet_wa_shared'); } catch(e) {}
+    if (window.location.search.includes('shared=1')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
     updatePasteBanner();
+    renderFilesList();
     showToast("File WhatsApp dibatalkan.");
 }
 
 async function saveSharedFileToCurrentCourse() {
-    if (!pendingSharedData || !pendingSharedData.file) {
+    if (!isSharingActive()) {
         showToast("⚠️ Tidak ada file WhatsApp yang sedang menunggu.", "error");
         updatePasteBanner();
         return;
     }
     if (!currentCourse) {
-        showSharedFileModal(pendingSharedData);
+        showSharedFileModal(pendingSharedData || { name: getUrlSharedFileName() || 'Dokumen_WhatsApp.pdf' });
         showToast("ℹ️ Silakan pilih folder tujuan pada modal.");
         return;
     }
@@ -1234,14 +1376,10 @@ async function checkPendingSharedFile() {
             return;
         }
 
-        // Bersihkan parameter ?shared=1 dari URL agar rapi
-        if (window.location.search.includes('shared=1')) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
         pendingSharedData = shared;
+        try { sessionStorage.setItem('ulmet_wa_shared', JSON.stringify({ name: shared.name, size: shared.size })); } catch(e) {}
         updatePasteBanner();
-        showSharedFileModal(shared);
+        renderFilesList();
     } catch(err) {
         console.warn("Gagal cek pending shared file:", err);
     }
@@ -1423,9 +1561,13 @@ async function selectCourseAndSaveSharedFile(courseName) {
         console.error("Gagal sync files ke DB:", syncErr);
     }
 
-    // Bersihkan pending_share dari IndexedDB
+    // Bersihkan pending_share dari Cache & IndexedDB & sessionStorage
     await clearPendingSharedFile();
     pendingSharedData = null;
+    try { sessionStorage.removeItem('ulmet_wa_shared'); } catch(e) {}
+    if (window.location.search.includes('shared=1')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
     updatePasteBanner();
 
     // Refresh tampilan
@@ -1440,6 +1582,22 @@ async function dismissShareModal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Deteksi kiriman WhatsApp seketika dari URL / Session
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('shared') === '1') {
+        const fn = params.get('fn') ? decodeURIComponent(params.get('fn')) : 'Dokumen_WhatsApp.pdf';
+        const sz = parseInt(params.get('sz') || '0', 10);
+        try { sessionStorage.setItem('ulmet_wa_shared', JSON.stringify({ name: fn, size: sz })); } catch(e) {}
+        pendingSharedData = { name: fn, size: sz, isPending: true };
+    } else {
+        const savedShared = sessionStorage.getItem('ulmet_wa_shared');
+        if (savedShared) {
+            try {
+                pendingSharedData = JSON.parse(savedShared);
+            } catch(e) {}
+        }
+    }
+
     const savedCourse = localStorage.getItem(userKey("ulmet_active_course"));
     if (savedCourse && userCourses.includes(savedCourse)) {
         selectCourse(savedCourse);
@@ -1452,7 +1610,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initSupabaseData(); // Load realtime dari Supabase
 
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
+        navigator.serviceWorker.register("./sw.js").then(reg => {
+            try { reg.update(); } catch(e) {}
+        }).catch(() => {});
         navigator.serviceWorker.addEventListener('message', event => {
             if (event.data && event.data.type === 'PENDING_SHARE_READY') {
                 checkPendingSharedFile();
@@ -1460,15 +1620,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Cek apakah ada file pending yang dibagikan dari WhatsApp / Android Share Target
+    // Segarkan banner & tombol hijau seketika
+    updatePasteBanner();
+
+    // Cek file biner secara asinkron dari Cache / IndexedDB
     checkPendingSharedFile();
-    if (window.location.search.includes('shared=1')) {
+    if (isSharingActive()) {
         checkPendingSharedFileWithRetry();
-        setTimeout(checkPendingSharedFileWithRetry, 500);
-        setTimeout(checkPendingSharedFileWithRetry, 1200);
-    } else {
-        setTimeout(checkPendingSharedFile, 300);
-        setTimeout(checkPendingSharedFile, 800);
+        setTimeout(checkPendingSharedFileWithRetry, 600);
+        setTimeout(checkPendingSharedFileWithRetry, 1500);
     }
 
     // Keyboard shortcut: Escape tutup semua modal

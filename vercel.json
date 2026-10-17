@@ -1,6 +1,12 @@
 {
   "version": 2,
   "cleanUrls": false,
+  "rewrites": [
+    {
+      "source": "/share-target",
+      "destination": "/materi.html?shared=1"
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",
