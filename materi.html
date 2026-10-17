@@ -93,42 +93,42 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
-<body class="bg-slate-900 text-white flex h-screen overflow-hidden">
+<body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden selection:bg-amber-400 selection:text-slate-950">
 
-<!-- SIDEBAR NAVIGASI UTAMA -->
-<aside class="w-60 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0">
+<!-- SIDEBAR NAVIGASI UTAMA (Desktop) -->
+<aside class="w-60 bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0">
     <div>
-        <div class="h-16 flex items-center px-6 border-b border-blue-800/40">
-            <div class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center shadow-lg mr-3">U</div>
-            <span class="text-xl font-extrabold tracking-wider text-yellow-400">ULMET</span>
+        <div class="h-16 flex items-center px-6 border-b border-slate-800/80">
+            <div class="bg-amber-400 text-slate-950 font-extrabold text-base w-8 h-8 rounded-xl flex items-center justify-center shadow mr-3">U</div>
+            <span class="text-lg font-extrabold tracking-wider text-amber-400">ULMET</span>
         </div>
-        <nav class="p-3 space-y-1 mt-2">
-            <a href="dashboard.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                <span>&#128202;</span><span class="font-medium text-sm">Dashboard</span>
+        <nav class="p-3 space-y-1.5 mt-2">
+            <a href="dashboard.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>📊</span><span class="font-medium text-sm">Dashboard</span>
             </a>
-            <a href="jadwal.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                <span>&#128197;</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
+            <a href="jadwal.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>📅</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
             </a>
-            <a href="materi.html" class="flex items-center gap-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50">
-                <span>&#128218;</span><span class="font-semibold text-sm">Materi Dosen</span>
+            <a href="materi.html" class="flex items-center gap-3 bg-slate-800 text-amber-400 px-3.5 py-2.5 rounded-xl border border-slate-700/60 font-semibold text-sm">
+                <span>📚</span><span>Materi Dosen</span>
             </a>
-            <a href="ai.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI Asisten</span>
+            <a href="ai.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>🤖</span><span class="font-medium text-sm">AI Asisten</span>
             </a>
-            <a href="keuangan.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                <span>&#128184;</span><span class="font-medium text-sm">Keuangan Kos</span>
+            <a href="keuangan.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
             </a>
-            <a href="profil.html" class="flex items-center gap-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                <span>&#128100;</span><span class="font-medium text-sm">Profil Saya</span>
+            <a href="profil.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>👤</span><span class="font-medium text-sm">Profil Saya</span>
             </a>
         </nav>
     </div>
-    <div class="p-4 border-t border-blue-800/40">
-        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">A</div>
+    <div class="p-4 border-t border-slate-800/80">
+        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-slate-800/60 rounded-xl transition cursor-pointer">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">U</div>
             <div class="min-w-0">
                 <p class="text-sm font-bold text-white truncate" id="sidebar-nama">Memuat...</p>
-                <p class="text-xs text-blue-300" id="sidebar-semester">Semester -</p>
+                <p class="text-xs text-slate-400" id="sidebar-semester">Semester -</p>
             </div>
         </a>
     </div>
@@ -138,257 +138,232 @@
 <div class="flex-1 flex h-screen overflow-hidden">
 
     <!-- SIDEBAR FOLDER MATA KULIAH (Desktop only) -->
-    <div class="w-72 bg-blue-950/50 border-r border-blue-800/40 flex-col flex-shrink-0 overflow-hidden hidden md:flex">
-        <div class="px-5 py-4 border-b border-blue-800/40 flex-shrink-0">
-            <div class="flex items-center justify-between mb-1">
-                <h2 class="text-sm font-extrabold text-white tracking-wide">&#128194; Mata Kuliah</h2>
-                <div class="flex items-center gap-1.5 bg-blue-900/40 border border-blue-800/40 px-2.5 py-1.5 rounded-lg">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span class="text-[10px] font-bold text-emerald-400">Cloud</span>
-                </div>
+    <div class="w-64 bg-slate-900/60 border-r border-slate-800/80 flex-col flex-shrink-0 overflow-hidden hidden md:flex">
+        <div class="px-5 py-4 border-b border-slate-800/80 flex-shrink-0">
+            <div class="flex items-center justify-between mb-0.5">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">📁 Folder Matkul</h2>
+                <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">Cloud</span>
             </div>
-            <p class="text-[11px] text-blue-400">Pilih folder untuk melihat &amp; upload file</p>
+            <p class="text-[11px] text-slate-500">Pilih folder untuk melihat file</p>
         </div>
         <div class="flex-1 overflow-y-auto p-3 space-y-1" id="course-list-container"></div>
-        <div class="p-3 border-t border-blue-800/40 flex-shrink-0">
-            <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border-2 border-dashed border-blue-700/60 rounded-xl text-xs font-bold text-blue-400 hover:bg-blue-900/40 hover:border-blue-500 transition cursor-pointer flex items-center justify-center gap-2">
-                <span class="text-base leading-none">+</span> Tambah Folder Baru
+        <div class="p-3 border-t border-slate-800/80 flex-shrink-0">
+            <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl text-xs font-semibold text-slate-400 hover:text-amber-300 transition cursor-pointer flex items-center justify-center gap-1.5">
+                <span>+</span> Tambah Folder
             </button>
         </div>
     </div>
 
     <!-- AREA FILE -->
-    <div class="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950/10 to-slate-900">
-        <header class="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 border-b border-blue-800/40 bg-slate-900/50 backdrop-blur-sm flex-shrink-0">
-            <!-- Mobile: folder button -->
-            <button onclick="toggleMobileDrawer()" class="md:hidden mr-2 bg-blue-900/50 p-2 rounded-lg border border-blue-700/40 text-blue-300 flex-shrink-0 text-lg">
-                📂
-            </button>
-            <div class="flex items-center gap-3 min-w-0">
-                <span class="text-xl">&#128193;</span>
+    <div class="flex-1 flex flex-col overflow-hidden bg-slate-950">
+        <!-- TOP APP BAR -->
+        <header class="h-14 md:h-16 flex items-center justify-between px-3.5 md:px-6 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md flex-shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <!-- Mobile: folder drawer toggle -->
+                <button onclick="toggleMobileDrawer()" class="md:hidden p-2 rounded-xl bg-slate-800/70 hover:bg-slate-700 text-slate-300 border border-slate-700/60 flex-shrink-0 text-base" title="Daftar Folder">
+                    📁
+                </button>
                 <div class="min-w-0">
-                    <h1 class="text-lg font-extrabold text-white truncate" id="active-course-title">Materi Dosen</h1>
-                    <p class="text-[11px] text-blue-400" id="active-course-subtitle">Pilih folder di kiri untuk melihat file</p>
+                    <h1 class="text-sm md:text-base font-bold text-white truncate" id="active-course-title">Materi Dosen</h1>
+                    <p class="text-[10px] md:text-xs text-slate-400 truncate" id="active-course-subtitle">Pilih folder untuk melihat berkas</p>
                 </div>
             </div>
+            
+            <!-- SINGLE UNIFIED ACTION BUTTON -->
             <div class="flex items-center gap-2 flex-shrink-0">
-                <button type="button" id="btn-paste-header" onclick="handlePasteFromWhatsApp()" class="hidden bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 active:scale-95 text-slate-950 font-black px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition items-center gap-1.5 shadow-lg shadow-emerald-500/25 cursor-pointer">
-                    <span>📋</span> <span>Tempel File WA</span>
-                    <span id="wa-badge" class="px-1.5 py-0.2 rounded-full bg-red-600 text-white font-black text-[9px] animate-pulse">1</span>
-                </button>
-                <div class="relative inline-block overflow-hidden rounded-xl">
-                    <button type="button" class="bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-yellow-400/20 pointer-events-none" tabindex="-1">
-                        <span>📤</span> Upload File
+                <div class="relative inline-block">
+                    <button type="button" id="header-action-btn" class="bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm shadow-amber-400/20 cursor-pointer">
+                        <span id="header-action-icon">📤</span>
+                        <span id="header-action-label">Upload Berkas</span>
                     </button>
                     <input type="file" id="upload-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.gif" 
-                           onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); event.preventDefault(); return false; }"
+                           onclick="if(!currentCourse) { showToast('⚠️ Pilih folder Mata Kuliah terlebih dahulu!'); event.preventDefault(); return false; }"
                            onchange="handleFileUpload(event)" 
                            style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.01;cursor:pointer;z-index:10;">
                 </div>
             </div>
         </header>
 
-        <!-- Mobile Folder Quick Chips (Mudah pilih & ganti folder langsung di HP) -->
-        <div class="md:hidden flex items-center gap-2 overflow-x-auto px-3 py-2 bg-slate-900/90 border-b border-blue-900/40 scrollbar-hide flex-shrink-0" id="mobile-course-chips-container" style="scrollbar-width: none;">
+        <!-- Mobile Quick Chips (Pilih folder cepat di HP) -->
+        <div class="md:hidden flex items-center gap-2 overflow-x-auto px-3.5 py-2.5 bg-slate-900/60 border-b border-slate-800/70 scrollbar-hide flex-shrink-0" id="mobile-course-chips-container" style="scrollbar-width: none;">
             <!-- Diisi otomatis oleh renderMobileCourseChips() -->
         </div>
 
-        <!-- BANNER TEMPEL / TARUH FILE DARI WHATSAPP -->
-        <div id="wa-paste-banner" class="hidden mx-3 md:mx-6 mt-3 sm:mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-blue-950/90 to-emerald-950/90 border-2 border-emerald-400 shadow-xl flex-shrink-0 transition-all">
+        <!-- BANNER NOTIFIKASI TEMPEL FILE DARI WHATSAPP (Ramping & Modern) -->
+        <div id="wa-paste-banner" class="hidden mx-3.5 md:mx-6 mt-3 p-3.5 rounded-2xl bg-slate-900/90 border border-amber-400/50 shadow-xl flex-shrink-0 transition-all">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div id="wa-paste-icon" class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-2xl flex-shrink-0 shadow">
+                    <div id="wa-paste-icon" class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-xl flex-shrink-0 text-amber-400">
                         📥
                     </div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full">
-                                📥 File dari WhatsApp
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                                Berkas WhatsApp
                             </span>
-                            <span id="wa-paste-size" class="text-[11px] text-blue-300 font-medium">0 KB</span>
+                            <span id="wa-paste-size" class="text-[11px] text-slate-400 font-medium">0 KB</span>
                         </div>
-                        <p id="wa-paste-name" class="text-sm font-black text-white truncate mt-0.5">Dokumen.pdf</p>
-                        <p class="text-xs text-blue-200 mt-0.5">
-                            Tempat tujuan: <b id="wa-paste-target-course" class="text-yellow-400 font-extrabold">Pilih folder di bawah</b>
+                        <p id="wa-paste-name" class="text-sm font-bold text-white truncate mt-0.5">Dokumen.pdf</p>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Tujuan: <span id="wa-paste-target-course" class="text-amber-300 font-semibold">Pilih folder</span>
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
-                    <button id="btn-paste-to-course" onclick="saveSharedFileToCurrentCourse()" class="flex-1 sm:flex-initial bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 active:scale-95 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-yellow-500/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
-                        <span>📋</span> Taruh / Tempel File di Sini
+                    <button id="btn-paste-to-course" onclick="saveSharedFileToCurrentCourse()" class="flex-1 sm:flex-initial bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
+                        Simpan ke Folder
                     </button>
-                    <button onclick="dismissShareAction()" class="px-3 py-2.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs rounded-xl font-bold transition cursor-pointer">
+                    <button onclick="dismissShareAction()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium transition cursor-pointer">
                         Batal
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="materi-dropzone" class="mx-4 md:mx-6 mt-4 md:mt-5 border-2 border-dashed border-blue-800/60 hover:border-yellow-400/50 bg-blue-950/10 rounded-2xl p-4 md:p-5 text-center transition cursor-pointer flex-shrink-0" 
-             onclick="if(!currentCourse) { alert('⚠️ PERHATIAN: Kamu harus memilih atau membuat Folder Mata Kuliah di sebelah kiri terlebih dahulu sebelum mengupload file!'); } else { document.getElementById('upload-input').click(); }">
-            <span class="text-3xl mb-1 block">&#11015;&#65039;</span>
-            <p class="text-sm text-white font-bold">Tarik file ke sini atau klik untuk upload</p>
-            <p class="text-xs text-blue-400 mt-0.5">PDF, Word, PPT, Excel, Foto - Otomatis masuk ke folder aktif</p>
-        </div>
-
-        <div id="no-course-selected" class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
-            <div id="no-course-normal-view" class="text-center">
-                <p class="text-5xl mb-4">&#128072;</p>
-                <p class="font-bold text-lg text-blue-200">Pilih Folder Mata Kuliah</p>
-                <p class="text-sm text-blue-400 mt-2">Klik salah satu folder di sebelah kiri untuk melihat dan mengelola file di dalamnya.</p>
-            </div>
-            <div id="no-course-share-view" class="hidden w-full max-w-md mx-auto p-5 bg-gradient-to-b from-blue-950/90 via-slate-900 to-blue-950/90 border-2 border-emerald-400/80 rounded-3xl shadow-2xl text-center">
-                <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-3xl mb-3 shadow">
-                    📥
-                </div>
-                <span class="px-3 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-[11px] uppercase tracking-wide">
-                    File dari WhatsApp Siap Ditaruh
-                </span>
-                <p class="text-base font-extrabold text-white mt-2 truncate" id="no-course-share-name">
-                    Dokumen_WhatsApp.pdf
-                </p>
-                <p class="text-xs text-blue-300 mt-1">
-                    Pilih folder mata kuliah tujuan di bawah untuk langsung menaruh file:
-                </p>
-                <div class="mt-4 space-y-2 text-left max-h-60 overflow-y-auto pr-1" id="no-course-share-courses">
-                    <!-- Dynamic course buttons with Taruh di Sini -->
-                </div>
-                <div class="mt-4 pt-3 border-t border-blue-800/40 flex items-center justify-between gap-2">
-                    <button onclick="addNewCoursePrompt()" class="flex-1 py-2 px-3 border border-dashed border-yellow-400/60 rounded-xl text-xs font-bold text-yellow-400 hover:bg-yellow-400/10 transition cursor-pointer">
-                        + Folder Baru
-                    </button>
-                    <button onclick="dismissShareAction()" class="py-2 px-4 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl text-xs font-bold transition cursor-pointer">
-                        Batal
-                    </button>
-                </div>
+        <!-- DROPZONE (Desktop only, subtle) -->
+        <div id="materi-dropzone" class="hidden md:flex mx-6 mt-4 border border-dashed border-slate-800 hover:border-amber-400/60 bg-slate-900/30 rounded-2xl p-4 text-center items-center justify-center gap-3 transition cursor-pointer flex-shrink-0" 
+             onclick="if(!currentCourse) { showToast('⚠️ Pilih folder Mata Kuliah terlebih dahulu!'); } else { document.getElementById('upload-input').click(); }">
+            <span class="text-2xl text-slate-400">&#11015;&#65039;</span>
+            <div class="text-left">
+                <p class="text-xs text-slate-200 font-semibold">Tarik berkas ke sini atau klik untuk upload</p>
+                <p class="text-[11px] text-slate-500">PDF, Word, PPT, Excel, Foto — otomatis tersimpan ke folder aktif</p>
             </div>
         </div>
 
-        <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-4 md:px-6 pb-36 md:pb-6 mt-3 sm:mt-4">
+        <!-- TAMPILAN SAAT BELUM ADA FOLDER YANG TERPILIH -->
+        <div id="no-course-selected" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-3xl mb-3 text-slate-400 shadow-inner">
+                📁
+            </div>
+            <p class="font-bold text-base text-slate-200">Pilih Folder Mata Kuliah</p>
+            <p class="text-xs text-slate-400 mt-1 max-w-xs">Pilih salah satu folder di atas atau buat folder baru untuk mengelola materi kuliah.</p>
+            <button onclick="addNewCoursePrompt()" class="mt-4 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 text-xs font-semibold transition cursor-pointer">
+                + Tambah Folder
+            </button>
+        </div>
+
+        <div id="file-list-wrapper" class="hidden flex-1 overflow-y-auto px-3.5 md:px-6 pb-28 md:pb-6 mt-3">
             <div id="file-list-container" class="space-y-2"></div>
         </div>
     </div>
 </div>
 
 <!-- MODAL: FILE VIEWER -->
-<div id="modal-viewer" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex flex-col">
-    <div class="flex-shrink-0 flex items-center justify-between bg-slate-900/95 border-b border-blue-800/60 px-6 py-4">
+<div id="modal-viewer" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col">
+    <div class="flex-shrink-0 flex items-center justify-between bg-slate-900 border-b border-slate-800 px-4 md:px-6 py-3.5">
         <div class="flex items-center gap-3 min-w-0">
-            <div class="w-10 h-10 bg-blue-950 border border-blue-800 rounded-xl flex items-center justify-center text-xl flex-shrink-0" id="viewer-icon">&#128196;</div>
+            <div class="w-9 h-9 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center text-lg flex-shrink-0" id="viewer-icon">📄</div>
             <div class="min-w-0">
-                <h3 class="text-white font-bold text-base leading-tight truncate" id="viewer-title">File</h3>
-                <p class="text-[10px] text-blue-400 mt-0.5" id="viewer-meta">...</p>
+                <h3 class="text-white font-bold text-sm md:text-base leading-tight truncate" id="viewer-title">File</h3>
+                <p class="text-[10px] text-slate-400 mt-0.5" id="viewer-meta">...</p>
             </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
-            <button onclick="downloadFile(currentViewingFileId)" class="bg-blue-900/50 hover:bg-blue-800 text-blue-200 border border-blue-700/50 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">&#11015;&#65039; Unduh</button>
-            <button onclick="document.getElementById('modal-viewer').classList.add('hidden')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 font-bold p-2 px-4 rounded-xl text-sm transition">x Tutup</button>
+            <button onclick="downloadFile(currentViewingFileId)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
+                <span>⬇️</span> Unduh
+            </button>
+            <button onclick="document.getElementById('modal-viewer').classList.add('hidden')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition">
+                Tutup
+            </button>
         </div>
     </div>
-    <div class="flex-1 p-6 flex justify-center items-center overflow-auto" id="viewer-container"></div>
+    <div class="flex-1 p-4 md:p-6 flex justify-center items-center overflow-auto" id="viewer-container"></div>
 </div>
 
 <!-- MODAL: TAMBAH FOLDER BARU -->
-<div id="modal-add-folder" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-[80] flex items-center justify-center p-4" onclick="handleFolderModalBackdrop(event)">
-    <div class="modal-box bg-gradient-to-br from-slate-900 to-blue-950 border border-blue-700/60 rounded-3xl p-7 max-w-sm w-full shadow-2xl" id="modal-add-folder-box">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="w-11 h-11 bg-yellow-400/20 border border-yellow-400/40 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">&#128193;</div>
+<div id="modal-add-folder" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] flex items-center justify-center p-4" onclick="handleFolderModalBackdrop(event)">
+    <div class="modal-box bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl" id="modal-add-folder-box">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 bg-amber-400/10 border border-amber-400/30 rounded-2xl flex items-center justify-center text-xl text-amber-400 flex-shrink-0">📁</div>
             <div>
-                <h3 class="text-white font-bold text-lg leading-tight">Folder Mata Kuliah Baru</h3>
-                <p class="text-xs text-blue-400 mt-0.5">Buat folder untuk menyimpan materi</p>
+                <h3 class="text-white font-bold text-base leading-tight">Folder Mata Kuliah Baru</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Buat wadah untuk mengelompokkan materi</p>
             </div>
-            <button onclick="closeAddFolderModal()" class="ml-auto text-blue-500 hover:text-white transition text-xl leading-none flex-shrink-0">&times;</button>
+            <button onclick="closeAddFolderModal()" class="ml-auto text-slate-500 hover:text-white text-xl leading-none">&times;</button>
         </div>
-        <div class="space-y-2 mb-5">
-            <label class="text-xs font-bold text-blue-300 uppercase tracking-wider">Nama Mata Kuliah / Folder</label>
-            <div class="relative">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base">&#128193;</span>
-                <input
-                    type="text"
-                    id="new-folder-input"
-                    placeholder="Contoh: Ilmu Balaghah, Nahwu Sharaf..."
-                    maxlength="60"
-                    class="modal-input w-full bg-slate-950/70 border border-blue-700/50 focus:border-yellow-400 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-blue-600/70 outline-none transition"
-                    onkeydown="if(event.key==='Enter') confirmAddFolder()"
-                >
-            </div>
-            <p class="text-[10px] text-blue-500" id="folder-input-hint">Tekan Enter atau klik Buat Folder untuk menyimpan</p>
+        <div class="space-y-1.5 mb-4">
+            <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Nama Mata Kuliah</label>
+            <input
+                type="text"
+                id="new-folder-input"
+                placeholder="Contoh: Ilmu Balaghah, Nahwu Sharaf..."
+                maxlength="60"
+                class="w-full bg-slate-950 border border-slate-700/80 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition"
+                onkeydown="if(event.key==='Enter') confirmAddFolder()"
+            >
+            <p class="text-[10px] text-slate-500" id="folder-input-hint">Tekan Enter atau klik Buat Folder</p>
         </div>
         <div class="mb-5">
-            <p class="text-[10px] text-blue-500 mb-2 font-semibold uppercase tracking-wider">Saran Cepat:</p>
-            <div class="flex flex-wrap gap-2">
-                <button onclick="setFolderSuggestion('Nahwu &amp; Sharaf')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Nahwu &amp; Sharaf</button>
-                <button onclick="setFolderSuggestion('Ilmu Balaghah')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Ilmu Balaghah</button>
-                <button onclick="setFolderSuggestion('Tafsir Al-Quran')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Tafsir Al-Quran</button>
-                <button onclick="setFolderSuggestion('Hadits')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Hadits</button>
-                <button onclick="setFolderSuggestion('Metodologi Penelitian')" class="text-[11px] bg-blue-900/50 hover:bg-blue-800 border border-blue-700/50 hover:border-yellow-400/50 text-blue-200 hover:text-yellow-300 px-3 py-1.5 rounded-lg transition">Met. Penelitian</button>
+            <p class="text-[10px] text-slate-400 mb-1.5 font-semibold uppercase tracking-wider">Saran Cepat:</p>
+            <div class="flex flex-wrap gap-1.5">
+                <button onclick="setFolderSuggestion('Nahwu & Sharaf')" class="text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-lg transition">Nahwu & Sharaf</button>
+                <button onclick="setFolderSuggestion('Ilmu Balaghah')" class="text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-lg transition">Ilmu Balaghah</button>
+                <button onclick="setFolderSuggestion('Tafsir Al-Quran')" class="text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-lg transition">Tafsir Al-Quran</button>
+                <button onclick="setFolderSuggestion('Hadits')" class="text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-lg transition">Hadits</button>
             </div>
         </div>
-        <div class="flex gap-3">
-            <button onclick="confirmAddFolder()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-400/15">
-                &#10024; Buat Folder
+        <div class="flex gap-2.5">
+            <button onclick="confirmAddFolder()" class="flex-1 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition shadow-sm">
+                Buat Folder
             </button>
-            <button onclick="closeAddFolderModal()" class="px-5 bg-blue-950/60 hover:bg-blue-900 border border-blue-700/50 text-blue-300 font-semibold py-3 rounded-xl text-sm transition">Batal</button>
+            <button onclick="closeAddFolderModal()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-sm transition">
+                Batal
+            </button>
         </div>
     </div>
 </div>
 
 <!-- MODAL: SIMPAN BERKAS DARI SHARE TARGET (WHATSAPP/ANDROID) -->
-<div id="modal-share-destination" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[85] flex items-center justify-center p-4">
-    <div class="modal-box bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 border border-yellow-400/50 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl relative page-fade">
+<div id="modal-share-destination" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[85] flex items-center justify-center p-4">
+    <div class="modal-box bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl relative page-fade">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg">
+            <div class="w-10 h-10 bg-amber-400/10 border border-amber-400/30 rounded-2xl flex items-center justify-center text-xl text-amber-400 flex-shrink-0">
                 📥
             </div>
             <div class="min-w-0 flex-1">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30">Berbagi dari WhatsApp</span>
-                <h3 class="text-white font-extrabold text-lg leading-tight mt-0.5 truncate">Simpan ke Folder Materi</h3>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">Berkas WhatsApp</span>
+                <h3 class="text-white font-bold text-base leading-tight mt-0.5 truncate">Pilih Folder Tujuan</h3>
             </div>
-            <button onclick="closeShareModalToBrowse()" title="Tutup & pilih folder sendiri" class="text-blue-400 hover:text-white transition text-2xl leading-none flex-shrink-0 p-1">&times;</button>
+            <button onclick="closeShareModalToBrowse()" class="text-slate-500 hover:text-white text-2xl leading-none flex-shrink-0">&times;</button>
         </div>
 
         <!-- File Preview Card -->
-        <div class="bg-blue-950/80 border border-blue-700/60 rounded-2xl p-3.5 mb-4 flex items-center gap-3 shadow-inner">
-            <div id="share-file-icon" class="w-11 h-11 rounded-xl bg-blue-900/60 border border-blue-600/50 flex items-center justify-center text-xl font-bold text-yellow-400 flex-shrink-0">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 mb-4 flex items-center gap-3">
+            <div id="share-file-icon" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-lg text-amber-400 flex-shrink-0">
                 📄
             </div>
             <div class="min-w-0 flex-1">
-                <p id="share-file-name" class="text-sm font-bold text-white truncate">Dokumen.pdf</p>
-                <div class="flex items-center gap-2 mt-0.5 text-[11px] text-blue-300">
+                <p id="share-file-name" class="text-xs font-bold text-white truncate">Dokumen.pdf</p>
+                <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-400">
                     <span id="share-file-size">0 KB</span>
                     <span>•</span>
-                    <span class="text-emerald-400 font-medium">Siap disimpan</span>
+                    <span class="text-emerald-400">Siap disimpan</span>
                 </div>
             </div>
         </div>
 
-        <p class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <span>📁</span> Tekan Folder Tujuan untuk Menaruh File:
+        <p class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            Pilih folder tujuan:
         </p>
 
         <!-- Course Selection Grid -->
-        <div id="share-course-options" class="max-h-56 overflow-y-auto space-y-2 pr-1 mb-3">
-            <!-- Diisi otomatis oleh renderShareCourseOptions() -->
-        </div>
+        <div id="share-course-options" class="max-h-56 overflow-y-auto space-y-1.5 pr-1 mb-3"></div>
 
         <!-- Input inline buat folder baru cepat jika belum ada foldernya -->
-        <div class="pt-3 border-t border-blue-800/50">
+        <div class="pt-3 border-t border-slate-800">
             <div id="share-new-folder-box" class="hidden mb-3 space-y-2">
-                <input type="text" id="share-new-folder-input" placeholder="Ketik nama folder matkul baru..." class="w-full bg-slate-950 border border-yellow-400/60 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none">
+                <input type="text" id="share-new-folder-input" placeholder="Nama folder matkul baru..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none">
                 <div class="flex gap-2">
-                    <button onclick="confirmCreateCourseAndSaveShare()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold py-2 rounded-xl text-xs transition">Simpan ke Folder Baru Ini</button>
-                    <button onclick="toggleShareNewFolder(false)" class="px-3 bg-blue-950 border border-blue-800 text-blue-300 text-xs rounded-xl">Batal</button>
+                    <button onclick="confirmCreateCourseAndSaveShare()" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold py-2 rounded-xl text-xs transition">Simpan ke Folder Baru</button>
+                    <button onclick="toggleShareNewFolder(false)" class="px-3 bg-slate-800 text-slate-300 text-xs rounded-xl">Batal</button>
                 </div>
             </div>
             <div class="flex items-center justify-between gap-2">
-                <button onclick="toggleShareNewFolder(true)" id="btn-toggle-share-new" class="text-xs font-bold text-yellow-400 hover:text-yellow-300 flex items-center gap-1.5 py-1 transition cursor-pointer">
-                    <span>➕</span> Buat Folder Baru
+                <button onclick="toggleShareNewFolder(true)" id="btn-toggle-share-new" class="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 py-1 transition cursor-pointer">
+                    <span>+</span> Buat Folder Baru
                 </button>
                 <div class="flex items-center gap-3">
-                    <button onclick="closeShareModalToBrowse()" class="text-xs text-blue-300 hover:text-yellow-400 transition font-bold cursor-pointer">
-                        Buka Folder Dulu ➔
-                    </button>
-                    <button onclick="dismissShareAction()" class="text-xs text-red-400 hover:text-red-300 transition font-medium cursor-pointer">
+                    <button onclick="dismissShareAction()" class="text-xs text-slate-500 hover:text-slate-300 transition">
                         Batal
                     </button>
                 </div>
@@ -398,7 +373,7 @@
 </div>
 
 <!-- TOAST -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs"></div>
+<div id="toast" class="hidden fixed bottom-16 right-4 z-[90] font-medium px-4 py-2.5 rounded-2xl shadow-xl text-xs max-w-xs transition-all"></div>
 
 <script>
 // === RESET DUMMY DATA LAMA (wajib reset sekali untuk bersihkan dummy) ===
@@ -462,7 +437,9 @@ function triggerUpload() {
 
 function showToast(msg, type) {
     const t = document.getElementById("toast");
-    t.className = "fixed bottom-6 right-6 z-[90] font-bold px-5 py-3 rounded-2xl shadow-2xl text-sm max-w-xs " + (type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white");
+    if (!t) return;
+    t.className = "fixed bottom-16 right-4 z-[90] font-medium px-4 py-2.5 rounded-2xl shadow-2xl text-xs max-w-xs transition-all flex items-center gap-2 " + 
+        (type === "error" ? "bg-rose-950/95 text-rose-200 border border-rose-800/80" : "bg-slate-900/95 text-slate-100 border border-slate-700/80");
     t.textContent = msg;
     t.classList.remove("hidden");
     setTimeout(() => t.classList.add("hidden"), 3000);
@@ -476,7 +453,7 @@ function renderCourseFolders() {
     container.innerHTML = "";
     if (!userCourses.length) {
         var emptyP = document.createElement("p");
-        emptyP.className = "text-xs text-blue-500 text-center py-4 italic";
+        emptyP.className = "text-xs text-slate-500 text-center py-4 italic";
         emptyP.textContent = "Belum ada folder. Tambahkan di bawah.";
         container.appendChild(emptyP);
         return;
@@ -487,12 +464,12 @@ function renderCourseFolders() {
         var isActive = name === currentCourse;
 
         var div = document.createElement("div");
-        div.className = "folder-item flex items-center gap-3 p-3 rounded-xl cursor-pointer group " +
-            (isActive ? "bg-blue-900/60 border border-blue-700/50" : "hover:bg-blue-900/30 border border-transparent");
+        div.className = "folder-item flex items-center gap-3 p-2.5 rounded-xl cursor-pointer group " +
+            (isActive ? "bg-slate-800/90 border border-amber-400/40 text-amber-300" : "hover:bg-slate-800/40 border border-transparent text-slate-300");
         div.setAttribute("onclick", "if(typeof toggleMobileDrawer === 'function' && document.getElementById('mobile-folder-drawer')?.classList.contains('open')) toggleMobileDrawer(); selectCourse('" + name.replace(/'/g, "\\'") + "')");
 
         var iconSpan = document.createElement("span");
-        iconSpan.className = "text-xl flex-shrink-0";
+        iconSpan.className = "text-lg flex-shrink-0";
         iconSpan.textContent = isActive ? "📂" : "📁";
         div.appendChild(iconSpan);
 
@@ -500,19 +477,19 @@ function renderCourseFolders() {
         infoDiv.className = "min-w-0 flex-1";
 
         var nameP = document.createElement("p");
-        nameP.className = "text-sm font-bold " + (isActive ? "text-white" : "text-blue-200") + " leading-tight";
+        nameP.className = "text-xs font-semibold " + (isActive ? "text-white" : "text-slate-300") + " leading-tight truncate";
         nameP.textContent = name;
         infoDiv.appendChild(nameP);
 
         var countP = document.createElement("p");
-        countP.className = "text-[10px] " + (isActive ? "text-blue-300" : "text-blue-500");
+        countP.className = "text-[10px] " + (isActive ? "text-amber-300/80" : "text-slate-500");
         countP.textContent = count > 0 ? count + " file" : "Kosong";
         infoDiv.appendChild(countP);
 
         div.appendChild(infoDiv);
 
         var delBtn = document.createElement("button");
-        delBtn.className = "flex-shrink-0 text-red-500/40 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition opacity-0 group-hover:opacity-100";
+        delBtn.className = "flex-shrink-0 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 p-1.5 rounded-lg transition opacity-60 hover:opacity-100";
         delBtn.title = "Hapus Folder";
         delBtn.textContent = "🗑️";
         delBtn.setAttribute("onclick", "event.stopPropagation(); deleteCourseFolder('" + name.replace(/'/g, "\\'") + "')");
@@ -550,7 +527,7 @@ function deleteCourseFolder(courseName) {
         document.getElementById("no-course-selected").classList.remove("hidden");
         document.getElementById("file-list-wrapper").classList.add("hidden");
         document.getElementById("active-course-title").textContent = "Materi Dosen";
-        document.getElementById("active-course-subtitle").textContent = "Pilih folder di kiri untuk melihat file";
+        document.getElementById("active-course-subtitle").textContent = "Pilih folder untuk melihat berkas";
     }
     renderCourseFolders();
     showToast("Folder \"" + courseName + "\" dihapus");
@@ -620,77 +597,55 @@ function renderFilesList() {
     const container = document.getElementById("file-list-container");
     if (!container || !currentCourse) return;
     const files = userFiles.filter(f => f.course === currentCourse);
-    const isShare = isSharingActive();
-    const fName = (pendingSharedData && pendingSharedData.name) || getUrlSharedFileName() || 'Dokumen_WhatsApp.pdf';
-
-    let shareCardHtml = '';
-    if (isShare) {
-        shareCardHtml = `
-            <div class="mb-3 p-3.5 bg-gradient-to-r from-emerald-950/90 via-slate-900 to-emerald-950/90 border-2 border-emerald-400 rounded-2xl flex items-center justify-between gap-3 shadow-xl">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="text-2xl flex-shrink-0">📥</span>
-                    <div class="min-w-0">
-                        <span class="text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full">File WhatsApp Siap Ditaruh</span>
-                        <p class="text-xs font-bold text-white truncate mt-1">"${escapeHtml(fName)}"</p>
-                    </div>
-                </div>
-                <button onclick="handlePasteFromWhatsApp()" class="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 active:scale-95 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 flex-shrink-0 cursor-pointer transition">
-                    <span>📋</span> Tempel di Sini
-                </button>
-            </div>
-        `;
-    }
 
     if (!files.length) {
-        if (isShare) {
-            container.innerHTML = `
-                <div class="text-center py-8 px-4 bg-emerald-950/30 border border-emerald-500/40 rounded-3xl max-w-sm mx-auto my-6 shadow-xl">
-                    <p class="text-4xl mb-2">📥</p>
-                    <p class="font-extrabold text-sm text-white">Ada File dari WhatsApp Siap Ditaruh!</p>
-                    <p class="text-xs text-yellow-300 font-bold mt-1 truncate">"${escapeHtml(fName)}"</p>
-                    <button onclick="handlePasteFromWhatsApp()" class="mt-4 w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 active:scale-95 text-slate-950 font-black text-xs py-3 px-4 rounded-xl shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2 cursor-pointer transition">
-                        <span>📋</span> Taruh / Tempel File di Folder Ini
-                    </button>
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-2xl mb-2.5 text-slate-500 shadow-inner">
+                    📄
                 </div>
-            `;
-            return;
-        }
-        container.innerHTML = "<div class='text-center py-20'><p class='text-5xl mb-3'>&#128235;</p><p class='font-bold text-base text-blue-200'>Folder ini masih kosong</p><p class='text-xs text-blue-400 mt-1'>Klik Upload File atau tarik file ke area di atas</p></div>";
+                <p class="font-bold text-sm text-slate-200">Folder ini masih kosong</p>
+                <p class="text-xs text-slate-400 mt-1 max-w-xs">Tekan tombol <b>+ Upload Berkas</b> di kanan atas untuk menyimpan materi kuliah.</p>
+            </div>
+        `;
+        document.getElementById("active-course-subtitle").textContent = "0 berkas tersimpan";
         return;
     }
+
     const getTheme = ext => {
-        if (ext === "pdf") return { bg:"bg-red-950/50", border:"border-red-800/50", text:"text-red-400", badge:"PDF" };
-        if (["doc","docx"].includes(ext)) return { bg:"bg-blue-900/40", border:"border-blue-700/50", text:"text-blue-400", badge:"DOC" };
-        if (["ppt","pptx"].includes(ext)) return { bg:"bg-orange-950/40", border:"border-orange-800/50", text:"text-orange-400", badge:"PPT" };
-        if (["xls","xlsx"].includes(ext)) return { bg:"bg-green-950/40", border:"border-green-800/50", text:"text-green-400", badge:"XLS" };
-        if (["png","jpg","jpeg","webp","gif"].includes(ext)) return { bg:"bg-purple-950/40", border:"border-purple-800/50", text:"text-purple-400", badge:"&#128247;" };
-        return { bg:"bg-yellow-950/40", border:"border-yellow-800/50", text:"text-yellow-500", badge:ext.toUpperCase() };
+        if (ext === "pdf") return { bg:"bg-rose-500/10", border:"border-rose-500/20", text:"text-rose-400", badge:"PDF" };
+        if (["doc","docx"].includes(ext)) return { bg:"bg-blue-500/10", border:"border-blue-500/20", text:"text-blue-400", badge:"DOC" };
+        if (["ppt","pptx"].includes(ext)) return { bg:"bg-amber-500/10", border:"border-amber-500/20", text:"text-amber-400", badge:"PPT" };
+        if (["xls","xlsx"].includes(ext)) return { bg:"bg-emerald-500/10", border:"border-emerald-500/20", text:"text-emerald-400", badge:"XLS" };
+        if (["png","jpg","jpeg","webp","gif"].includes(ext)) return { bg:"bg-violet-500/10", border:"border-violet-500/20", text:"text-violet-400", badge:"IMG" };
+        return { bg:"bg-slate-700/30", border:"border-slate-700/50", text:"text-slate-300", badge:ext.toUpperCase() || "FILE" };
     };
+
     container.innerHTML = files.map(file => {
         const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
         const theme = getTheme(ext);
         const isCloud = !!file.storage_path;
         const safeName = file.name.replace(/"/g, "&quot;").replace(/'/g, "\\'");
-        return "<div class='file-card flex items-center justify-between p-4 bg-slate-900/60 border border-blue-800/40 hover:border-blue-600/60 rounded-2xl group cursor-pointer' draggable='true' ondragstart=\"if(window.aiHandleDragStart) aiHandleDragStart(event, '" + file.id + "')\" onclick=\"openFileViewer('" + file.id + "')\">" +
-            "<div class='flex items-center gap-4 min-w-0 flex-1'>" +
-                "<div class='w-11 h-11 " + theme.bg + " border " + theme.border + " rounded-xl flex items-center justify-center " + theme.text + " font-bold text-xs uppercase flex-shrink-0'>" + theme.badge + "</div>" +
-                "<div class='min-w-0 flex-1'>" +
-                    "<p class='text-sm font-bold text-white group-hover:text-yellow-400 transition truncate'>" + file.name + "</p>" +
-                    "<div class='flex items-center gap-2 mt-0.5'>" +
-                        "<span class='text-[10px] text-blue-400'>" + file.size + "</span>" +
-                        "<span class='w-1 h-1 rounded-full bg-blue-800'></span>" +
-                        "<span class='text-[10px] " + (isCloud ? "text-emerald-400 font-semibold" : "text-blue-400") + "'>" + (isCloud ? "☁️ Supabase Cloud" : (file.date || "Tersimpan")) + "</span>" +
-                    "</div>" +
-                "</div>" +
-            "</div>" +
-            "<div class='flex items-center gap-2 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-3'>" +
-                "<button class='bg-blue-900/60 hover:bg-blue-800 text-blue-300 p-2 rounded-lg' title='Download' onclick=\"event.stopPropagation(); downloadFile('" + file.id + "')\">&#11015;&#65039;</button>" +
-                "<button class='bg-red-950/40 hover:bg-red-900/60 border border-red-900/50 text-red-400 p-2 rounded-lg' title='Hapus' onclick=\"event.stopPropagation(); deleteFileItem('" + file.id + "', '" + safeName + "')\">&#128465;&#65039;</button>" +
-            "</div>" +
-        "</div>";
+        return `<div class='file-card flex items-center justify-between p-3.5 bg-slate-900/80 border border-slate-800/80 hover:border-slate-700 rounded-2xl group cursor-pointer transition' draggable='true' ondragstart="if(window.aiHandleDragStart) aiHandleDragStart(event, '${file.id}')" onclick="openFileViewer('${file.id}')">
+            <div class='flex items-center gap-3 min-w-0 flex-1'>
+                <div class='w-10 h-10 ${theme.bg} border ${theme.border} rounded-xl flex items-center justify-center ${theme.text} font-bold text-xs uppercase flex-shrink-0'>${theme.badge}</div>
+                <div class='min-w-0 flex-1'>
+                    <p class='text-sm font-semibold text-slate-100 group-hover:text-amber-300 transition truncate'>${file.name}</p>
+                    <div class='flex items-center gap-2 mt-0.5'>
+                        <span class='text-[10px] text-slate-400'>${file.size}</span>
+                        <span class='w-1 h-1 rounded-full bg-slate-700'></span>
+                        <span class='text-[10px] ${isCloud ? "text-emerald-400 font-medium" : "text-slate-400"}'>${isCloud ? "☁️ Cloud" : (file.date || "Tersimpan")}</span>
+                    </div>
+                </div>
+            </div>
+            <div class='flex items-center gap-1.5 flex-shrink-0 ml-2'>
+                <button class='bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl transition text-xs cursor-pointer' title='Unduh' onclick="event.stopPropagation(); downloadFile('${file.id}')">⬇️</button>
+                <button class='bg-slate-800/70 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 p-2 rounded-xl transition text-xs cursor-pointer' title='Hapus' onclick="event.stopPropagation(); deleteFileItem('${file.id}', '${safeName}')">🗑️</button>
+            </div>
+        </div>`;
     }).join("");
-    container.innerHTML = shareCardHtml + container.innerHTML;
-    document.getElementById("active-course-subtitle").textContent = files.length + " file tersimpan";
+
+    document.getElementById("active-course-subtitle").textContent = files.length + " berkas tersimpan";
 }
 
 async function handleFileUpload(fileOrEvent) {
@@ -1031,52 +986,7 @@ function getUrlSharedFileName() {
 }
 
 function updateNoCourseView(isShare, fileName) {
-    const normalView = document.getElementById('no-course-normal-view');
-    const shareView = document.getElementById('no-course-share-view');
-    const shareNameEl = document.getElementById('no-course-share-name');
-    const courseListEl = document.getElementById('no-course-share-courses');
-
-    if (!normalView || !shareView) return;
-
-    if (!isShare) {
-        normalView.classList.remove('hidden');
-        shareView.classList.add('hidden');
-        return;
-    }
-
-    normalView.classList.add('hidden');
-    shareView.classList.remove('hidden');
-    if (shareNameEl) shareNameEl.textContent = fileName || 'Dokumen_WhatsApp.pdf';
-
-    if (courseListEl) {
-        if (!userCourses || userCourses.length === 0) {
-            courseListEl.innerHTML = `
-                <div class="text-center py-3 bg-blue-950/60 rounded-xl border border-blue-800/40 text-blue-300 text-xs">
-                    Belum ada folder mata kuliah.<br>Klik "+ Folder Baru" di bawah untuk membuat folder.
-                </div>
-            `;
-        } else {
-            courseListEl.innerHTML = userCourses.map(c => {
-                const cName = typeof c === 'string' ? c : (c && c.name ? c.name : String(c));
-                const safeName = cName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                const count = userFiles.filter(f => f.course === cName).length;
-                return `
-                    <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-2.5 bg-blue-900/40 hover:bg-yellow-400/20 border border-blue-700/50 hover:border-yellow-400/70 rounded-xl transition cursor-pointer group active:scale-[0.98]">
-                        <div class="flex items-center gap-2 min-w-0 pr-2">
-                            <span class="text-lg flex-shrink-0">📁</span>
-                            <div class="min-w-0">
-                                <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${escapeHtml(cName)}</p>
-                                <p class="text-[10px] text-blue-300">${count} file</p>
-                            </div>
-                        </div>
-                        <button type="button" class="flex-shrink-0 px-2.5 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow flex items-center gap-1 cursor-pointer">
-                            <span>📋</span> Taruh
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
+    // Tampilan kosong dan banner terintegrasi rapi di layar utama
 }
 
 async function getPendingSharedFile() {
@@ -1198,8 +1108,8 @@ function renderMobileCourseChips() {
     if (!container) return;
     if (!userCourses || !userCourses.length) {
         container.innerHTML = `
-            <span class="text-xs text-blue-400/80 italic px-2 py-1">Belum ada folder</span>
-            <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-3 py-1 rounded-xl text-xs font-bold bg-blue-900/60 text-yellow-400 border border-blue-700/60 cursor-pointer">+ Buat Folder</button>
+            <span class="text-xs text-slate-500 italic px-2 py-1">Belum ada folder</span>
+            <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-amber-400 border border-slate-700/80 cursor-pointer">+ Buat Folder</button>
         `;
         return;
     }
@@ -1208,40 +1118,47 @@ function renderMobileCourseChips() {
         const isActive = name === currentCourse;
         const safe = escapeHtml(name);
         const safeAttr = name.replace(/'/g, "\\'");
-        return `<button onclick="selectCourse('${safeAttr}')" class="flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${isActive ? 'bg-yellow-400 text-slate-950 shadow-md shadow-yellow-500/20' : 'bg-slate-800/80 text-blue-200 hover:bg-slate-700 hover:text-white border border-blue-900/60'}">
+        return `<button onclick="selectCourse('${safeAttr}')" class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${isActive ? 'bg-amber-400 text-slate-950 shadow-sm font-bold' : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'}">
             <span>${isActive ? '📂' : '📁'}</span>
             <span class="max-w-[140px] truncate">${safe}</span>
         </button>`;
     }).join('');
 
     container.innerHTML = chipsHtml + `
-        <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-950/60 hover:bg-blue-900/60 text-yellow-400 border border-dashed border-blue-700/60 transition cursor-pointer flex items-center gap-1 whitespace-nowrap">
+        <button onclick="addNewCoursePrompt()" class="flex-shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/60 hover:bg-slate-900 text-slate-400 hover:text-amber-300 border border-dashed border-slate-700/80 transition cursor-pointer flex items-center gap-1 whitespace-nowrap">
             <span>+</span> Folder
         </button>
     `;
 }
 
-// Banner Tempel / Taruh File dari WhatsApp
+// Banner Notifikasi Tempel Berkas dari WhatsApp
 function updatePasteBanner() {
     const banner = document.getElementById('wa-paste-banner');
-    const headerBtn = document.getElementById('btn-paste-header');
+    const headerBtn = document.getElementById('header-action-btn');
+    const headerIcon = document.getElementById('header-action-icon');
+    const headerLabel = document.getElementById('header-action-label');
+    const uploadInput = document.getElementById('upload-input');
     const active = isSharingActive();
 
     if (!active) {
         if (banner) banner.classList.add('hidden');
-        if (headerBtn) {
-            headerBtn.classList.add('hidden');
-            headerBtn.classList.remove('flex');
-        }
-        updateNoCourseView(false);
+        if (headerIcon) headerIcon.textContent = '📤';
+        if (headerLabel) headerLabel.textContent = 'Upload Berkas';
+        if (headerBtn) headerBtn.onclick = null;
+        if (uploadInput) uploadInput.style.display = 'block';
         return;
     }
 
-    // Tampilkan tombol hijau di header
+    // Ubah tombol di header agar fokus ke simpan berkas WhatsApp
+    if (headerIcon) headerIcon.textContent = '📥';
+    if (headerLabel) headerLabel.textContent = 'Simpan WA';
     if (headerBtn) {
-        headerBtn.classList.remove('hidden');
-        headerBtn.classList.add('flex');
+        headerBtn.onclick = (e) => {
+            e.stopPropagation();
+            handlePasteFromWhatsApp();
+        };
     }
+    if (uploadInput) uploadInput.style.display = 'none';
 
     const fileName = (pendingSharedData && pendingSharedData.name) || 
                      (pendingSharedData && pendingSharedData.file && pendingSharedData.file.name) || 
@@ -1272,22 +1189,11 @@ function updatePasteBanner() {
     const pasteBtn = document.getElementById('btn-paste-to-course');
 
     if (currentCourse) {
-        if (targetCourseEl) {
-            targetCourseEl.textContent = currentCourse;
-            targetCourseEl.className = 'text-yellow-300 font-black';
-        }
-        if (pasteBtn) {
-            pasteBtn.innerHTML = `<span>📋</span> Taruh / Tempel di Folder Ini`;
-        }
+        if (targetCourseEl) targetCourseEl.textContent = currentCourse;
+        if (pasteBtn) pasteBtn.innerHTML = `<span>📥</span> Simpan ke ${escapeHtml(currentCourse)}`;
     } else {
-        if (targetCourseEl) {
-            targetCourseEl.textContent = 'Pilih folder mata kuliah di bawah';
-            targetCourseEl.className = 'text-orange-400 font-bold';
-        }
-        if (pasteBtn) {
-            pasteBtn.innerHTML = `<span>📋</span> Pilih Folder Tujuan...`;
-        }
-        updateNoCourseView(true, fileName);
+        if (targetCourseEl) targetCourseEl.textContent = 'Pilih folder di atas';
+        if (pasteBtn) pasteBtn.innerHTML = `<span>📥</span> Pilih Folder Tujuan...`;
     }
 
     if (banner) banner.classList.remove('hidden');
@@ -1419,9 +1325,9 @@ function renderShareCourseOptions() {
 
     if (!userCourses || userCourses.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-4 bg-blue-950/50 rounded-xl border border-blue-800/40">
-                <p class="text-xs text-blue-300">Belum ada folder Mata Kuliah.</p>
-                <p class="text-[11px] text-yellow-400 mt-1 font-semibold">Buat folder baru di bawah untuk menaruh file ini.</p>
+            <div class="text-center py-4 bg-slate-950 rounded-xl border border-slate-800">
+                <p class="text-xs text-slate-400">Belum ada folder Mata Kuliah.</p>
+                <p class="text-[11px] text-amber-400 mt-1 font-semibold">Buat folder baru di bawah untuk menaruh berkas ini.</p>
             </div>
         `;
         return;
@@ -1433,19 +1339,19 @@ function renderShareCourseOptions() {
         const safeName = cName.replace(/"/g, '&quot;').replace(/'/g, "\\'");
         const isCurrent = cName === currentCourse;
         return `
-            <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-3 bg-blue-900/40 hover:bg-yellow-400/20 border ${isCurrent ? 'border-yellow-400/80 bg-blue-900/70' : 'border-blue-700/50 hover:border-yellow-400/60'} rounded-xl transition cursor-pointer group active:scale-[0.98]">
+            <div onclick="selectCourseAndSaveSharedFile('${safeName}')" class="flex items-center justify-between p-2.5 bg-slate-950 hover:bg-slate-800 border ${isCurrent ? 'border-amber-400/80 bg-slate-800/60' : 'border-slate-800 hover:border-slate-700'} rounded-xl transition cursor-pointer group active:scale-[0.98]">
                 <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                    <span class="text-xl flex-shrink-0">${isCurrent ? '📂' : '📁'}</span>
+                    <span class="text-lg flex-shrink-0">${isCurrent ? '📂' : '📁'}</span>
                     <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
-                            <p class="text-xs font-bold text-white group-hover:text-yellow-300 truncate">${escapeHtml(cName)}</p>
-                            ${isCurrent ? '<span class="text-[9px] bg-yellow-400 text-slate-950 font-black px-1.5 py-0.2 rounded">Aktif</span>' : ''}
+                            <p class="text-xs font-semibold text-white group-hover:text-amber-300 truncate">${escapeHtml(cName)}</p>
+                            ${isCurrent ? '<span class="text-[9px] bg-amber-400 text-slate-950 font-bold px-1.5 py-0.2 rounded">Aktif</span>' : ''}
                         </div>
-                        <p class="text-[10px] text-blue-300">${count} file tersimpan</p>
+                        <p class="text-[10px] text-slate-400">${count} berkas</p>
                     </div>
                 </div>
-                <button type="button" class="flex-shrink-0 px-3 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow transition flex items-center gap-1 cursor-pointer">
-                    <span>📋</span> Taruh di Sini
+                <button type="button" class="flex-shrink-0 px-2.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-sm transition flex items-center gap-1 cursor-pointer">
+                    Pilih
                 </button>
             </div>
         `;
@@ -1646,17 +1552,17 @@ document.addEventListener("DOMContentLoaded", () => {
 <div id="mobile-drawer-overlay" class="hidden md:hidden fixed inset-0 bg-black/60 z-[70] backdrop-blur-sm" onclick="toggleMobileDrawer()"></div>
 
 <!-- MOBILE FOLDER DRAWER -->
-<div id="mobile-folder-drawer" class="md:hidden fixed left-0 top-0 bottom-0 w-72 bg-blue-950 border-r border-blue-800/50 flex flex-col z-[75] overflow-hidden" style="transform: translateX(-100%)">
-    <div class="px-5 py-4 border-b border-blue-800/40 flex-shrink-0 flex items-center justify-between">
+<div id="mobile-folder-drawer" class="md:hidden fixed left-0 top-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-[75] overflow-hidden" style="transform: translateX(-100%)">
+    <div class="px-5 py-4 border-b border-slate-800 flex-shrink-0 flex items-center justify-between">
         <div>
-            <h2 class="text-sm font-extrabold text-white tracking-wide">&#128194; Mata Kuliah</h2>
-            <p class="text-[11px] text-blue-400 mt-0.5">Pilih folder untuk melihat file</p>
+            <h2 class="text-sm font-bold text-white tracking-wide">📁 Folder Mata Kuliah</h2>
+            <p class="text-[11px] text-slate-400 mt-0.5">Pilih folder untuk melihat berkas</p>
         </div>
-        <button onclick="toggleMobileDrawer()" class="text-blue-400 hover:text-white text-xl p-1">&times;</button>
+        <button onclick="toggleMobileDrawer()" class="text-slate-400 hover:text-white text-xl p-1">&times;</button>
     </div>
     <div class="flex-1 overflow-y-auto p-3 space-y-1" id="mobile-course-list-container"></div>
-    <div class="p-3 border-t border-blue-800/40 flex-shrink-0">
-        <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border-2 border-dashed border-blue-700/60 rounded-xl text-xs font-bold text-blue-400 hover:bg-blue-900/40 transition cursor-pointer flex items-center justify-center gap-2">
+    <div class="p-3 border-t border-slate-800 flex-shrink-0">
+        <button onclick="addNewCoursePrompt()" class="w-full py-2.5 border border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl text-xs font-semibold text-slate-400 hover:text-amber-300 transition cursor-pointer flex items-center justify-center gap-1.5">
             <span>+</span> Tambah Folder Baru
         </button>
     </div>
