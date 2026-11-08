@@ -4,7 +4,15 @@
   "rewrites": [
     {
       "source": "/share-target",
-      "destination": "/materi.html?shared=1"
+      "destination": "/pages/materi.html?shared=1"
+    },
+    {
+      "source": "/(admin|ai|catatan|dashboard|jadwal|keuangan|login|materi|profil|widget).html",
+      "destination": "/pages/$1.html"
+    },
+    {
+      "source": "/(clear|clear-cache).html",
+      "destination": "/tools/$1.html"
     }
   ],
   "headers": [

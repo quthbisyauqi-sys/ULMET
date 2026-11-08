@@ -566,26 +566,38 @@ window.aiSelectUlmetFile = async function(fileId) {
             document.getElementById('ai-ulmet-files-modal').classList.add('hidden');
         } else if (file.storage_path) {
             try {
-                const url = typeof getFileUrl === 'function' ? getFileUrl(file.storage_path) : file.storage_path;
-                const resp = await fetch(url);
-                const blob = await resp.blob();
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    aiPendingName = file.name;
-                    aiPendingMime = blob.type || (file.ext === 'pdf' ? 'application/pdf' : 'application/octet-stream');
-                    aiPendingBase64 = reader.result.split(',')[1];
-                    document.getElementById('ai-file-name').textContent = file.name;
-                    document.getElementById('ai-file-preview').classList.remove('hidden');
-                    document.getElementById('ai-file-preview').classList.add('flex');
-                    const input = document.getElementById('ai-chat-input');
-                    input.placeholder = "File " + file.name + " siap didiskusikan...";
-                    input.focus();
-                    document.getElementById('ai-ulmet-files-modal').classList.add('hidden');
-                };
-                reader.readAsDataURL(blob);
+                let blob = null;
+                if (typeof getDeviceFileBlob === 'function') {
+                    blob = await getDeviceFileBlob(file.storage_path);
+                }
+                if (!blob && typeof getOrFetchFileUrl === 'function') {
+                    const url = await getOrFetchFileUrl(file.storage_path);
+                    if (url) {
+                        const resp = await fetch(url);
+                        if (resp.ok) blob = await resp.blob();
+                    }
+                }
+                if (blob) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        aiPendingName = file.name;
+                        aiPendingMime = blob.type || (file.ext === 'pdf' ? 'application/pdf' : 'application/octet-stream');
+                        aiPendingBase64 = reader.result.split(',')[1];
+                        document.getElementById('ai-file-name').textContent = file.name;
+                        document.getElementById('ai-file-preview').classList.remove('hidden');
+                        document.getElementById('ai-file-preview').classList.add('flex');
+                        const input = document.getElementById('ai-chat-input');
+                        input.placeholder = "File " + file.name + " siap didiskusikan...";
+                        input.focus();
+                        document.getElementById('ai-ulmet-files-modal').classList.add('hidden');
+                    };
+                    reader.readAsDataURL(blob);
+                } else {
+                    alert("Berkas tidak ditemukan di penyimpanan lokal.");
+                }
             } catch (err) {
-                console.warn('Gagal memuat file Supabase untuk AI:', err);
-                alert("Gagal memuat file dari Cloud. Silakan periksa koneksi internet Anda.");
+                console.warn('Gagal memuat file lokal untuk AI:', err);
+                alert("Gagal memuat file dari penyimpanan lokal.");
             }
         } else {
             alert("Maaf, file ini tidak memiliki isi berkas yang dapat dibaca.");

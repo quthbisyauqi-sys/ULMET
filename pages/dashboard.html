@@ -2,16 +2,14 @@
 <html lang="id">
 
 <head>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#020617">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Dashboard ULMET - Workspace</title>
-    <!-- Supabase SDK & Config -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../assets/js/local-db.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -19,7 +17,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
         /* Mascot Widget Glows & Animations */
         .glow-reward {
@@ -108,50 +106,50 @@
     </style>
 </head>
 
-<body class="bg-slate-900 text-white flex h-screen overflow-hidden selection:bg-yellow-400 selection:text-blue-950">
+<body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden selection:bg-amber-400 selection:text-slate-950">
 
     <!-- SIDEBAR (Navigasi Kiri) -->
     <aside
-        class="w-64 bg-blue-950/80 border-r border-blue-800/40 backdrop-blur-md hidden md:flex flex-col justify-between">
+        class="w-60 bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0">
         <div>
             <!-- Logo ULMET -->
-            <div class="h-20 flex items-center px-8 border-b border-blue-800/40">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800/80">
                 <div
-                    class="bg-yellow-400 text-blue-950 font-extrabold text-lg w-8 h-8 rounded-xl flex items-center justify-center shadow-lg mr-3">
+                    class="bg-amber-400 text-slate-950 font-extrabold text-base w-8 h-8 rounded-xl flex items-center justify-center shadow mr-3">
                     U</div>
-                <span class="text-xl font-extrabold tracking-wider text-yellow-400">ULMET</span>
+                <span class="text-lg font-extrabold tracking-wider text-amber-400">ULMET</span>
             </div>
 
             <!-- Menu Navigasi -->
-            <nav class="p-4 space-y-2 mt-4">
-                <a href="dashboard.html" class="flex items-center space-x-3 bg-blue-900/50 text-yellow-400 px-4 py-3 rounded-xl border border-blue-700/50">
+            <nav class="p-3 space-y-1.5 mt-2">
+                <a href="dashboard.html" class="flex items-center gap-3 bg-slate-800 text-amber-400 px-3.5 py-2.5 rounded-xl border border-slate-700/60 font-semibold text-sm">
                     <span>📊</span><span class="font-semibold text-sm">Dashboard</span>
                 </a>
-                <a href="jadwal.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <a href="jadwal.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
                     <span>📅</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
                 </a>
-                <a href="materi.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
+                <a href="materi.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
                     <span>📚</span><span class="font-medium text-sm">Materi Dosen</span>
                 </a>
-                <a href="ai.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                    <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI Asisten</span>
+                <a href="ai.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                    <span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI ULMET</span>
                 </a>
-                <a href="keuangan.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                    <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
+                <a href="keuangan.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                    <span>💸</span><span class="font-medium text-sm">Keuangan</span>
                 </a>
-                <a href="profil.html" class="flex items-center space-x-3 text-blue-200 hover:bg-blue-900/30 hover:text-white px-4 py-3 rounded-xl transition">
-                    <span>👤</span><span class="font-medium text-sm">Profil Saya</span>
+                <a href="catatan.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                    <span>📝</span><span class="font-medium text-sm">Catatan</span>
                 </a>
             </nav>
         </div>
 
         <!-- Profil User Bawah -->
-        <div class="p-4 border-t border-blue-800/40">
-            <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-blue-900/30 rounded-xl transition cursor-pointer">
-                <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-sm flex-shrink-0">A</div>
+        <div class="p-4 border-t border-slate-800/80">
+            <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-slate-800/60 rounded-xl transition cursor-pointer">
+                <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-sm flex-shrink-0">A</div>
                 <div class="min-w-0">
                     <p id="sidebar-nama" class="text-sm font-bold text-white truncate">Mahasiswa</p>
-                    <p id="sidebar-semester" class="text-xs text-blue-300 truncate">Semester -</p>
+                    <p id="sidebar-semester" class="text-xs text-slate-400 truncate">Semester -</p>
                 </div>
             </a>
         </div>
@@ -159,97 +157,36 @@
 
     <!-- KONTEN UTAMA KANAN -->
     <div
-        class="flex-1 flex flex-col h-screen overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-950/20 to-slate-900">
+        class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-950">
 
         <!-- Header Atas -->
-        <header class="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-blue-800/40 bg-slate-900/70 backdrop-blur-md sticky top-0 z-20">
+        <header class="h-14 md:h-16 flex items-center justify-between px-4 md:px-8 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-20">
             <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <a href="dashboard.html" class="md:hidden bg-yellow-400 text-blue-950 font-extrabold text-sm w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-yellow-400/20 flex-shrink-0">U</a>
+                <a href="dashboard.html" class="md:hidden bg-amber-400 text-slate-950 font-extrabold text-sm w-8 h-8 rounded-xl flex items-center justify-center shadow mr-2 flex-shrink-0">U</a>
                 <div class="min-w-0">
                     <h1 class="text-base sm:text-lg md:text-2xl font-bold text-white truncate leading-tight">Halo, <span id="welcome-name">Mahasiswa</span>! 👋</h1>
-                    <p class="text-[11px] md:text-sm text-blue-300 truncate">Pantau tugas &amp; kuliahmu</p>
+                    <p class="text-[11px] md:text-xs text-slate-400 truncate">Pantau tugas &amp; kuliahmu</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-                <button onclick="toggleAlarmModal()" class="bg-blue-900/50 hover:bg-blue-800/60 p-2 sm:p-2.5 rounded-xl border border-blue-700/50 transition relative active:scale-95" title="Notifikasi Alarm">
+                <button onclick="toggleAlarmModal()" class="bg-slate-800/80 hover:bg-slate-700 p-2 sm:p-2.5 rounded-xl border border-slate-700/60 text-slate-300 transition relative active:scale-95" title="Notifikasi Alarm">
                     🔔
                     <span id="alarm-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow">!</span>
                 </button>
-                <a href="profil.html" class="md:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-yellow-200 border-2 border-blue-900 flex items-center justify-center text-blue-950 font-bold text-xs shadow-md active:scale-95 flex-shrink-0" id="mobile-top-avatar">A</a>
+                <a href="profil.html" class="md:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-xs shadow-md active:scale-95 flex-shrink-0" id="mobile-top-avatar">A</a>
             </div>
         </header>
 
         <!-- Area Dashboard -->
         <main class="p-4 md:p-8 space-y-5 md:space-y-8 pb-36 md:pb-8">
 
-            <!-- WIDGET SI ULMET (Karakter Maskot, Reward & Pengingat Tugas/Kebiasaan) -->
-            <div id="dash-mascot-widget" class="relative overflow-hidden rounded-3xl p-4 sm:p-5 bg-gradient-to-r from-slate-900/90 via-blue-950/80 to-slate-900/90 border border-blue-800/40 shadow-xl backdrop-blur-md transition-all duration-500">
-                <!-- Mood accent glow bar at top -->
-                <div id="dash-mascot-accent" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"></div>
-
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                    <!-- Mascot Avatar with Interactive Tap -->
-                    <div class="relative flex-shrink-0 cursor-pointer group" onclick="pokeDashboardMascot()" title="Ketuk Si Ulmet!">
-                        <div id="dash-mascot-img-wrap" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-yellow-400/80 glow-reward bg-slate-900 transition-all duration-500">
-                            <img id="dash-mascot-img" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
-                        </div>
-                        <span id="dash-mascot-tag" class="absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900">
-                            🏆 REWARD
-                        </span>
-                    </div>
-
-                    <!-- Speech Bubble & Info -->
-                    <div class="flex-1 min-w-0 text-center sm:text-left">
-                        <div class="flex flex-wrap items-center justify-center sm:justify-between gap-2 mb-1.5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-black text-yellow-400 tracking-wider">🦉 SI ULMET</span>
-                                <span id="dash-mascot-subtitle" class="text-[11px] text-slate-400 font-semibold">• Pengingat Pintar</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <a href="widget.html" class="inline-flex items-center gap-1 bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs px-3 py-1 rounded-xl shadow-md transition active:scale-95">
-                                    <span>📱</span> Mode Widget Android
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Mascot Dialogue -->
-                        <div id="dash-speech-bubble" class="bg-slate-950/60 border border-slate-700/60 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-slate-200 leading-relaxed shadow-inner">
-                            <p id="dash-mascot-speech" class="font-medium">
-                                Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya! 🎓✨
-                            </p>
-                        </div>
-
-                        <!-- Quick Indicators & Test Controls -->
-                        <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-800/60 text-[11px]">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-blue-900/40 text-blue-300 border border-blue-700/40 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
-                                    📋 <span id="dash-widget-active-tasks">0</span> Tugas Kuliah
-                                </span>
-                                <span class="bg-emerald-950/40 text-emerald-300 border border-emerald-700/40 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
-                                    📿 <span id="dash-widget-habits-done">0/0</span> Kebiasaan
-                                </span>
-                            </div>
-
-                            <!-- Fast Emotion Preview Buttons for Testing -->
-                            <div class="flex items-center gap-1">
-                                <span class="text-[10px] text-slate-400 font-semibold mr-1">Tes Mood:</span>
-                                <button onclick="setDashMascotMoodPreview('happy')" title="Simulasi Reward" class="px-1.5 py-0.5 rounded-lg bg-yellow-400/20 text-yellow-300 hover:bg-yellow-400 hover:text-slate-950 font-bold text-[10px] border border-yellow-400/30 transition">🏆</button>
-                                <button onclick="setDashMascotMoodPreview('angry')" title="Simulasi Marah" class="px-1.5 py-0.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white font-bold text-[10px] border border-red-500/30 transition">😡</button>
-                                <button onclick="setDashMascotMoodPreview('worried')" title="Simulasi Panik Deadline" class="px-1.5 py-0.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white font-bold text-[10px] border border-orange-500/30 transition">⏰</button>
-                                <button onclick="setDashMascotMoodPreview('auto')" title="Kembali ke Otomatis Real-time" class="px-1.5 py-0.5 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-600 hover:text-white font-bold text-[10px] border border-blue-500/30 transition">Auto</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- QUICK INFO CHIPS (mobile: responsive horizontal scroll snap) -->
             <div class="flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0" style="scrollbar-width:none">
                 <!-- Chip: Tugas Aktif -->
-                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-blue-900/50 border border-blue-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[130px]">
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-slate-900/90 border border-slate-800/80 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-amber-400/50 transition min-w-[130px]">
                     <div class="text-2xl">📋</div>
                     <div>
-                        <p class="text-[10px] text-blue-400 font-semibold uppercase tracking-wide">Tugas Aktif</p>
+                        <p class="text-[10px] text-amber-400 font-semibold uppercase tracking-wide">Tugas Aktif</p>
                         <p class="text-xl font-extrabold text-white leading-tight" id="chip-tugas">0</p>
                     </div>
                 </div>
@@ -284,7 +221,7 @@
                 <div onclick="window.location.href='keuangan.html'" class="flex-shrink-0 snap-start bg-yellow-900/20 border border-yellow-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-yellow-400/50 transition min-w-[170px]" title="Sisa Jatah Belanja Hari Ini">
                     <div class="text-2xl">💸</div>
                     <div class="min-w-0">
-                        <p class="text-[10px] text-yellow-400 font-semibold uppercase tracking-wide truncate">Sisa Jatah Hari Ini</p>
+                        <p class="text-[10px] text-amber-400 font-semibold uppercase tracking-wide truncate">Sisa Jatah Hari Ini</p>
                         <p class="text-sm font-extrabold text-white leading-tight truncate" id="dash-balance-amount">Rp 0</p>
                     </div>
                 </div>
@@ -318,44 +255,44 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
 
                 <!-- 1. KIRI ATAS: Jadwal & Tugas Terdekat -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                <div class="bg-slate-900/80 p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-lg font-bold text-white flex items-center gap-2">
                                 <span>📝</span> Tugas Terdekat
                             </h2>
-                            <a href="jadwal.html" class="text-xs font-semibold text-yellow-400 hover:underline">Lihat Jadwal</a>
+                            <a href="jadwal.html" class="text-xs font-semibold text-amber-400 hover:underline">Lihat Jadwal</a>
                         </div>
 
                         <div class="space-y-4" id="dash-tasks-list">
                             <!-- Tasks dynamically loaded here -->
-                            <p class="text-center text-blue-400 py-4 text-sm">Memuat tugas...</p>
+                            <p class="text-center text-slate-400 py-4 text-sm">Memuat tugas...</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 2. KANAN ATAS: Kebiasaan Keseharian (Daily Habits Tracker) -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                <div class="bg-slate-900/80 p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <div class="flex items-center gap-2.5">
                                 <span class="text-2xl">📿</span>
                                 <div>
                                     <h2 class="text-lg font-bold text-white leading-tight">Kebiasaan Keseharian</h2>
-                                    <p class="text-[11px] text-blue-300" id="dash-habit-date">Hari ini</p>
+                                    <p class="text-[11px] text-slate-400" id="dash-habit-date">Hari ini</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span id="dash-habit-badge" class="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30">0/0 Selesai</span>
-                                <a href="jadwal.html?tab=kebiasaan" class="text-xs font-semibold text-yellow-400 hover:underline" title="Kelola semua kebiasaan di Jadwal">Kelola</a>
+                                <a href="jadwal.html?tab=kebiasaan" class="text-xs font-semibold text-amber-400 hover:underline" title="Kelola semua kebiasaan di Jadwal">Kelola</a>
                             </div>
                         </div>
 
                         <!-- Progress Bar Kebiasaan -->
-                        <div class="mb-4 bg-slate-900/60 p-3.5 rounded-2xl border border-blue-900/60">
+                        <div class="mb-4 bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80">
                             <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
-                                <span class="text-blue-300" id="dash-habit-progress-text">0 dari 0 kebiasaan selesai hari ini</span>
-                                <span class="text-yellow-400 font-extrabold" id="dash-habit-progress-pct">0%</span>
+                                <span class="text-slate-400" id="dash-habit-progress-text">0 dari 0 kebiasaan selesai hari ini</span>
+                                <span class="text-amber-400 font-extrabold" id="dash-habit-progress-pct">0%</span>
                             </div>
                             <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
                                 <div id="dash-habit-progress-bar" class="h-full bg-gradient-to-r from-yellow-400 via-emerald-400 to-green-500 rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -365,31 +302,31 @@
                         <!-- List Kebiasaan Interaktif -->
                         <div class="space-y-3" id="dash-habits-list">
                             <!-- Habits dynamically loaded here -->
-                            <p class="text-center text-blue-400 py-4 text-sm">Memuat kebiasaan...</p>
+                            <p class="text-center text-slate-400 py-4 text-sm">Memuat kebiasaan...</p>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-blue-800/30 flex justify-between items-center text-xs">
-                        <span class="text-blue-400 text-[11px]">Tersambung langsung dengan agenda &amp; jadwal</span>
-                        <a href="jadwal.html?tab=kebiasaan" class="text-yellow-400 hover:underline font-bold text-xs flex items-center gap-1">
+                    <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400 text-[11px]">Tersambung langsung dengan agenda &amp; jadwal</span>
+                        <a href="jadwal.html?tab=kebiasaan" class="text-amber-400 hover:underline font-bold text-xs flex items-center gap-1">
                             Buka Semua Kebiasaan &rarr;
                         </a>
                     </div>
                 </div>
 
                 <!-- 3. KIRI BAWAH: Pengeluaran Terbesar -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                <div class="bg-slate-900/80 p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
                                 <span>💸</span> Pengeluaran Terbesar per Kategori
                             </h2>
-                            <a href="keuangan.html" class="text-xs font-semibold text-yellow-400 hover:underline">Keuangan</a>
+                            <a href="keuangan.html" class="text-xs font-semibold text-amber-400 hover:underline">Keuangan</a>
                         </div>
 
                         <div class="space-y-3.5 flex-1" id="dash-expenses-list">
                             <!-- Expenses will be loaded here dynamically -->
-                            <p class="text-center text-blue-400 py-4 text-sm">Memuat pengeluaran...</p>
+                            <p class="text-center text-slate-400 py-4 text-sm">Memuat pengeluaran...</p>
                         </div>
 
                         <div class="mt-6 p-4 bg-red-900/20 border border-red-500/30 rounded-2xl flex items-start gap-3">
@@ -406,7 +343,7 @@
                 </div>
 
                 <!-- 4. KANAN BAWAH: Cuaca & Suasana Kampus 3 Locari UIN Malang -->
-                <div class="bg-blue-950/40 p-6 rounded-3xl border border-blue-800/50 flex flex-col justify-between">
+                <div class="bg-slate-900/80 p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <div class="flex items-center gap-2.5">
@@ -416,16 +353,16 @@
                                         <h2 class="text-lg font-bold text-white leading-tight">Cuaca Kampus 3 UIN</h2>
                                         <span class="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.2 rounded">BMKG LIVE</span>
                                     </div>
-                                    <p class="text-[11px] text-blue-300">Desa Tlekung, Kec. Junrejo, Kota Batu (Locari)</p>
+                                    <p class="text-[11px] text-slate-400">Desa Tlekung, Kec. Junrejo, Kota Batu (Locari)</p>
                                 </div>
                             </div>
-                            <button onclick="fetchDashboardWeather(true)" id="dash-weather-refresh-btn" class="p-2 rounded-xl bg-slate-900/70 border border-blue-800/50 text-blue-300 hover:text-yellow-400 transition active:scale-95 text-xs flex items-center gap-1.5" title="Perbarui Cuaca Locari">
+                            <button onclick="fetchDashboardWeather(true)" id="dash-weather-refresh-btn" class="p-2 rounded-xl bg-slate-900/70 border border-slate-800/80 text-slate-400 hover:text-amber-400 transition active:scale-95 text-xs flex items-center gap-1.5" title="Perbarui Cuaca Locari">
                                 <span id="dash-weather-spin">🔄</span>
                                 <span class="hidden sm:inline text-[11px] font-semibold">Segarkan</span>
                             </button>
                         </div>
 
-                        <div class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 mb-4 shadow-sm">
+                        <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 mb-4 shadow-sm">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <span class="text-4xl" id="dash-w-icon">🌤️</span>
@@ -438,8 +375,8 @@
                                     </div>
                                 </div>
                                 <div class="text-right text-xs space-y-1">
-                                    <div class="text-blue-300 font-medium">💧 Kelembaban: <span id="dash-w-humidity" class="text-white font-bold">--%</span></div>
-                                    <div class="text-blue-300 font-medium">💨 Angin: <span id="dash-w-wind" class="text-white font-bold">-- km/h</span></div>
+                                    <div class="text-slate-400 font-medium">💧 Kelembaban: <span id="dash-w-humidity" class="text-white font-bold">--%</span></div>
+                                    <div class="text-slate-400 font-medium">💨 Angin: <span id="dash-w-wind" class="text-white font-bold">-- km/h</span></div>
                                 </div>
                             </div>
                         </div>
@@ -453,9 +390,9 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-blue-800/30 flex justify-between items-center text-xs">
-                        <span class="text-blue-400 text-[11px]">Data Resmi BMKG • Auto-update setiap 15 menit</span>
-                        <a href="jadwal.html" class="text-yellow-400 hover:underline font-bold text-xs flex items-center gap-1">
+                    <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400 text-[11px]">Data Resmi BMKG • Auto-update setiap 15 menit</span>
+                        <a href="jadwal.html" class="text-amber-400 hover:underline font-bold text-xs flex items-center gap-1">
                             Buka Agenda &amp; Kalender &rarr;
                         </a>
                     </div>
@@ -467,19 +404,19 @@
 
     <!-- MODAL ALARM ULMET -->
     <div id="modal-alarm" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-        <div class="modal-box bg-slate-900 border border-blue-700/60 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
-            <button onclick="toggleAlarmModal()" class="absolute top-4 right-5 text-blue-500 hover:text-white text-2xl leading-none">&times;</button>
+        <div class="modal-box bg-slate-900 border border-slate-800/80 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl relative text-center">
+            <button onclick="toggleAlarmModal()" class="absolute top-4 right-5 text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
             <div class="w-20 h-20 bg-red-500/20 border border-red-500/50 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-pulse">
                 ⏰
             </div>
             <h3 class="text-white font-extrabold text-xl mb-1">Alarm Pengingat</h3>
-            <p class="text-xs text-blue-300 mb-6">Jangan sampai lupa tugas dan jadwal kuliahmu hari ini, pejuang!</p>
+            <p class="text-xs text-slate-400 mb-6">Jangan sampai lupa tugas dan jadwal kuliahmu hari ini, pejuang!</p>
             
-            <button onclick="playUlmetAlarm()" class="w-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-blue-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20 mb-3 flex justify-center items-center gap-2">
+            <button onclick="playUlmetAlarm()" class="w-full bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-yellow-400/20 mb-3 flex justify-center items-center gap-2">
                 ▶️ Test Suara Alarm ULMET
             </button>
             
-            <button onclick="toggleAlarmModal()" class="w-full bg-blue-900/40 hover:bg-blue-800 border border-blue-700/50 text-white font-bold py-3 rounded-xl text-sm transition">
+            <button onclick="toggleAlarmModal()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-white font-bold py-3 rounded-xl text-sm transition">
                 Tutup
             </button>
         </div>
@@ -520,12 +457,12 @@
                 if (days === 0) {
                     return { text: hours > 0 ? `${hours} jam lagi` : 'Mendesak', class: 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse' };
                 } else if (days <= 3) {
-                    return { text: `${days} hari lagi`, class: 'bg-amber-500/20 text-yellow-400 border-amber-500/30' };
+                    return { text: `${days} hari lagi`, class: 'bg-amber-500/20 text-amber-400 border-amber-500/30' };
                 } else {
-                    return { text: `${days} hari lagi`, class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+                    return { text: `${days} hari lagi`, class: 'bg-slate-800 text-slate-300 border-slate-700/60' };
                 }
             } catch (e) {
-                return { text: 'Menunggu', class: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+                return { text: 'Menunggu', class: 'bg-slate-800 text-slate-300 border-slate-700/60' };
             }
         };
 
@@ -549,9 +486,9 @@
                 tasksListContainer.innerHTML = `
                     <div class="text-center py-8">
                         <p class="text-3xl mb-2">🎉</p>
-                        <p class="text-blue-300 font-semibold text-sm">Semua tugas selesai!</p>
-                        <p class="text-xs text-blue-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
-                        <a href="jadwal.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
+                        <p class="text-slate-400 font-semibold text-sm">Semua tugas selesai!</p>
+                        <p class="text-xs text-slate-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
+                        <a href="jadwal.html" class="inline-block mt-3 text-xs bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700/60 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
                     </div>
                 `;
             } else {
@@ -566,18 +503,18 @@
                     const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
 
                     return `
-                    <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-blue-900/60 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
+                    <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
                         <div class="space-y-1">
-                            <h4 class="font-bold text-white text-sm group-hover:text-yellow-400 transition flex items-center gap-2">
+                            <h4 class="font-bold text-white text-sm group-hover:text-amber-400 transition flex items-center gap-2">
                                 <span>📌</span> ${title}
                             </h4>
-                            <div class="flex items-center gap-2 text-xs text-blue-300">
-                                <span class="bg-blue-900/50 px-2 py-0.5 rounded text-[11px] text-blue-200 border border-blue-700/40">${course}</span>
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
+                                <span class="bg-slate-800/80 px-2 py-0.5 rounded text-[11px] text-slate-300 border border-slate-700/60">${course}</span>
                             </div>
                         </div>
                         <div class="text-right flex flex-col items-end space-y-1.5">
                             <span class="${urgency.class} px-2.5 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
-                            <span class="text-xs text-blue-300/90 font-medium">📅 ${deadlineFormatted}</span>
+                            <span class="text-xs text-slate-400/90 font-medium">📅 ${deadlineFormatted}</span>
                         </div>
                     </div>
                     `;
@@ -590,7 +527,7 @@
             if (n.includes('rokok')) return { icon: '🚬', color: 'bg-red-500/20 text-red-400 border-red-500/30', barGradient: 'from-red-500 to-rose-600' };
             if (n.includes('makan') || n.includes('sarapan') || n.includes('siang') || n.includes('malam') || n.includes('nasi') || n.includes('mie') || n.includes('ayam')) return { icon: '🍜', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30', barGradient: 'from-orange-500 to-amber-400' };
             if (n.includes('kopi') || n.includes('nongkrong') || n.includes('ngopi') || n.includes('cafe') || n.includes('kafe')) return { icon: '☕', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', barGradient: 'from-amber-400 to-yellow-500' };
-            if (n.includes('bensin') || n.includes('transport') || n.includes('ojol') || n.includes('motor') || n.includes('parkir')) return { icon: '🛵', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', barGradient: 'from-blue-500 to-cyan-400' };
+            if (n.includes('bensin') || n.includes('transport') || n.includes('ojol') || n.includes('motor') || n.includes('parkir')) return { icon: '🛵', color: 'bg-blue-500/20 text-slate-400 border-blue-500/30', barGradient: 'from-blue-500 to-cyan-400' };
             if (n.includes('kos') || n.includes('galon') || n.includes('listrik') || n.includes('wifi') || n.includes('sabun') || n.includes('laundry')) return { icon: '🧻', color: 'bg-teal-500/20 text-teal-400 border-teal-500/30', barGradient: 'from-teal-400 to-emerald-500' };
             if (n.includes('kuliah') || n.includes('print') || n.includes('tugas') || n.includes('fotokopi') || n.includes('buku')) return { icon: '📚', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', barGradient: 'from-purple-500 to-indigo-400' };
             if (n.includes('snack') || n.includes('jajan') || n.includes('cemilan')) return { icon: '🍰', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30', barGradient: 'from-pink-500 to-rose-400' };
@@ -646,16 +583,16 @@
             }
 
             const expensesListContainer = document.getElementById('dash-expenses-list');
+            const warnDesc = document.getElementById('dash-expense-warning-desc');
             if (exps.length === 0) {
                 expensesListContainer.innerHTML = `
                     <div class="text-center py-8">
                         <p class="text-3xl mb-2">💸</p>
-                        <p class="text-blue-300 font-semibold text-sm">Belum ada catatan pengeluaran.</p>
-                        <p class="text-xs text-blue-400/80 mt-1">Catat pengeluaran harianmu agar keuangan terkontrol.</p>
-                        <a href="keuangan.html" class="inline-block mt-3 text-xs bg-blue-800/40 hover:bg-blue-800 text-yellow-400 border border-blue-700/50 px-3 py-1.5 rounded-lg transition font-medium">Catat Pengeluaran</a>
+                        <p class="text-slate-400 font-semibold text-sm">Belum ada catatan pengeluaran.</p>
+                        <p class="text-xs text-slate-400/80 mt-1">Catat pengeluaran harianmu agar keuangan terkontrol.</p>
+                        <a href="keuangan.html" class="inline-block mt-3 text-xs bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700/60 px-3 py-1.5 rounded-lg transition font-medium">Catat Pengeluaran</a>
                     </div>
                 `;
-                const warnDesc = document.getElementById('dash-expense-warning-desc');
                 if (warnDesc) warnDesc.textContent = "Belum ada catatan pengeluaran untuk dievaluasi.";
             } else {
                 // KELOMPOKKAN SEMUA PENGELUARAN BERDASARKAN KATEGORI (SATU POIN PER KATEGORI/BARANG)
@@ -686,7 +623,7 @@
 
                 if (grouped.length === 0) {
                     expensesListContainer.innerHTML = `
-                        <div class="text-center py-6 text-xs text-blue-400">Belum ada nominal pengeluaran.</div>
+                        <div class="text-center py-6 text-xs text-slate-400">Belum ada nominal pengeluaran.</div>
                     `;
                     return;
                 }
@@ -700,17 +637,17 @@
                     const pctOfGrand = grandTotal > 0 ? Math.round((item.totalAmount / grandTotal) * 100) : 0;
 
                     return `
-                    <div onclick="window.location.href='keuangan.html'" class="space-y-1.5 group cursor-pointer p-2.5 rounded-2xl hover:bg-slate-900/60 transition border border-transparent hover:border-blue-700/40">
+                    <div onclick="window.location.href='keuangan.html'" class="space-y-1.5 group cursor-pointer p-2.5 rounded-2xl hover:bg-slate-900/60 transition border border-transparent hover:border-slate-700/60">
                         <div class="flex justify-between items-center text-xs">
                             <div class="flex items-center gap-2 overflow-hidden pr-2">
                                 <span class="w-7 h-7 rounded-xl flex items-center justify-center text-sm border ${meta.color} flex-shrink-0">${meta.icon}</span>
                                 <div class="min-w-0">
-                                    <span class="text-white font-bold truncate group-hover:text-yellow-400 transition">${escapeHtml(item.category)}</span>
+                                    <span class="text-white font-bold truncate group-hover:text-amber-400 transition">${escapeHtml(item.category)}</span>
                                     <span class="text-[10px] text-slate-400 font-semibold ml-1">(${item.count}x beli)</span>
                                 </div>
                             </div>
                             <div class="text-right flex-shrink-0 flex items-center gap-1.5">
-                                <span class="text-yellow-400 font-black">${formatRupiah(item.totalAmount)}</span>
+                                <span class="text-amber-400 font-black">${formatRupiah(item.totalAmount)}</span>
                                 <span class="text-[10px] text-slate-400 font-bold bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-700/40">${pctOfGrand}%</span>
                             </div>
                         </div>
@@ -723,7 +660,6 @@
 
                 // Evaluasi pengeluaran akumulasi terbesar
                 const topOne = topCategories[0];
-                const warnDesc = document.getElementById('dash-expense-warning-desc');
                 if (warnDesc && topOne) {
                     const topMeta = getCategoryMeta(topOne.category);
                     let advice = "Evaluasi pos ini agar tidak menguras sisa jatah harianmu.";
@@ -732,7 +668,7 @@
                     else if (lowerName.includes('makan')) advice = "Makan mendominasi total belanjamu. Coba variasikan dengan masak di kos agar sisa jatah harian semakin banyak.";
                     else if (lowerName.includes('kopi') || lowerName.includes('nongkrong')) advice = "Nongkrong & ngopi cukup sering. Batasi jajan kafe agar dompet tetap aman.";
                     
-                    warnDesc.innerHTML = `Akumulasi terbesar: <b class="text-white">${topMeta.icon} ${escapeHtml(topOne.category)}</b> total <b class="text-yellow-400">${formatRupiah(topOne.totalAmount)}</b> (${topOne.count}x beli). ${advice}`;
+                    warnDesc.innerHTML = `Akumulasi terbesar: <b class="text-white">${topMeta.icon} ${escapeHtml(topOne.category)}</b> total <b class="text-amber-400">${formatRupiah(topOne.totalAmount)}</b> (${topOne.count}x beli). ${advice}`;
                 }
             }
         }
@@ -813,7 +749,7 @@
                     <div class="text-center py-6 text-slate-400">
                         <p class="text-2xl mb-1">📿</p>
                         <p class="text-xs">Belum ada daftar kebiasaan.</p>
-                        <a href="jadwal.html?tab=kebiasaan" class="inline-block mt-2 text-xs text-yellow-400 hover:underline font-bold">Tambah Kebiasaan</a>
+                        <a href="jadwal.html?tab=kebiasaan" class="inline-block mt-2 text-xs text-amber-400 hover:underline font-bold">Tambah Kebiasaan</a>
                     </div>
                 `;
                 return;
@@ -822,19 +758,19 @@
             listEl.innerHTML = habits.map(h => {
                 const done = h.lastChecked === today;
                 return `
-                    <div class="p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${done ? 'bg-emerald-950/25 border-emerald-500/40' : 'bg-slate-900/60 border-blue-900/50 hover:border-yellow-400/40'}">
+                    <div class="p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${done ? 'bg-emerald-950/25 border-emerald-500/40' : 'bg-slate-900/60 border-slate-800/80 hover:border-amber-400/40'}">
                         <div class="flex items-center gap-3 min-w-0">
                             <button onclick="toggleDashHabit(${h.id})" title="${done ? 'Batal centang' : 'Tandai selesai'}"
                                 class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition-all active:scale-90
-                                ${done ? 'bg-emerald-500 border-emerald-400 text-white shadow-md shadow-emerald-500/30' : 'border-dashed border-blue-600/50 hover:border-emerald-400 hover:bg-emerald-900/20 text-blue-400'}">
+                                ${done ? 'bg-emerald-500 border-emerald-400 text-white shadow-md shadow-emerald-500/30' : 'border-dashed border-slate-700 hover:border-emerald-400 hover:bg-emerald-900/20 text-slate-400'}">
                                 ${done ? '<span class="text-lg font-bold">✓</span>' : `<span class="text-base">${h.icon || '📌'}</span>`}
                             </button>
                             <div class="min-w-0">
                                 <p class="font-bold text-xs sm:text-sm ${done ? 'line-through text-emerald-300/70' : 'text-white'} truncate">${escapeHtml(h.nama)}</p>
-                                <div class="flex items-center gap-2 text-[10px] sm:text-[11px] text-blue-300/80 mt-0.5">
+                                <div class="flex items-center gap-2 text-[10px] sm:text-[11px] text-slate-400/80 mt-0.5">
                                     <span class="text-orange-400 font-bold">🔥 ${h.streak || 0} hari</span>
                                     <span>•</span>
-                                    <span class="text-blue-400">⏰ ${h.reminderJam || '07:00'}</span>
+                                    <span class="text-slate-400">⏰ ${h.reminderJam || '07:00'}</span>
                                 </div>
                             </div>
                         </div>
@@ -859,13 +795,18 @@
             if (h.lastChecked === today) {
                 h.lastChecked = null;
                 h.streak = Math.max(0, (Number(h.streak) || 0) - 1);
+                if (typeof triggerHaptic === 'function') triggerHaptic('delete');
             } else {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yStr = yesterday.toISOString().slice(0, 10);
                 h.streak = (h.lastChecked === yStr) ? ((Number(h.streak) || 0) + 1) : 1;
                 h.lastChecked = today;
-                playDashHabitSound();
+                if (typeof feedbackAction === 'function') {
+                    feedbackAction('streak');
+                } else {
+                    playDashHabitSound();
+                }
                 showDashToast(`🎉 ${h.nama} selesai! Streak ${h.streak} hari 🔥`);
             }
 
@@ -932,133 +873,12 @@
         }
 
         function updateDashboardMascotWidget(tasksInput) {
-            const tasks = tasksInput || JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
-            const habits = getHabitsList();
-            const today = todayStr();
-            const now = new Date();
-
-            const activeTasks = tasks.filter(t => t.status !== 'selesai' && t.status !== 'completed');
-            const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now);
-            const urgentTasks = activeTasks.filter(t => {
-                if (!t.deadline) return false;
-                const diffH = (new Date(t.deadline) - now) / 3600000;
-                return diffH > 0 && diffH <= 24;
-            });
-
-            const doneHabitsCount = habits.filter(h => h.lastChecked === today).length;
-            const totalHabits = habits.length;
-
-            // Update stats in widget
-            const actTasksEl = document.getElementById('dash-widget-active-tasks');
-            if (actTasksEl) actTasksEl.textContent = activeTasks.length;
-            const habDoneEl = document.getElementById('dash-widget-habits-done');
-            if (habDoneEl) habDoneEl.textContent = `${doneHabitsCount}/${totalHabits}`;
-
-            // Check manual test mood
-            const testOverride = localStorage.getItem('ulmet_widget_preview_mood') || 'auto';
-            let mood = 'happy';
-
-            if (testOverride && testOverride !== 'auto') {
-                mood = testOverride;
-            } else {
-                const lastActive = localStorage.getItem(userKey('ulmet_last_active_date'));
-                let daysInactive = 0;
-                if (lastActive) {
-                    const d1 = new Date(lastActive);
-                    const d2 = new Date(today);
-                    daysInactive = Math.max(0, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
-                }
-
-                if (overdueTasks.length > 0 || daysInactive >= 2) {
-                    mood = 'angry';
-                } else if (urgentTasks.length > 0) {
-                    mood = 'worried';
-                } else {
-                    mood = 'happy';
-                }
-            }
-
-            dashCurrentMascotMood = mood;
-            const imgEl = document.getElementById('dash-mascot-img');
-            const wrapEl = document.getElementById('dash-mascot-img-wrap');
-            const tagEl = document.getElementById('dash-mascot-tag');
-            const speechEl = document.getElementById('dash-mascot-speech');
-            const bubbleEl = document.getElementById('dash-speech-bubble');
-            const subtitleEl = document.getElementById('dash-mascot-subtitle');
-            const accentEl = document.getElementById('dash-mascot-accent');
-
-            if (!imgEl || !wrapEl) return;
-
-            wrapEl.className = 'w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 bg-slate-900 transition-all duration-500';
-
-            if (mood === 'happy') {
-                imgEl.src = 'mascot-happy.jpg';
-                wrapEl.classList.add('glow-reward');
-                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500';
-                if (tagEl) {
-                    tagEl.textContent = '🏆 REWARD';
-                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900';
-                }
-                if (subtitleEl) subtitleEl.textContent = '• Bangga Padamu!';
-                if (speechEl) speechEl.innerHTML = 'Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya, calon sarjana sukses! 🎓✨';
-                if (bubbleEl) bubbleEl.className = 'bg-slate-950/60 border border-yellow-500/40 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-slate-200 leading-relaxed shadow-inner';
-            } else if (mood === 'angry') {
-                imgEl.src = 'mascot-angry.jpg';
-                wrapEl.classList.add('glow-angry');
-                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-red-500 transition-all duration-500';
-                if (tagEl) {
-                    tagEl.textContent = '😡 MARAH!';
-                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900 animate-pulse';
-                }
-                if (subtitleEl) subtitleEl.textContent = '• Sedang Marah!';
-                if (speechEl) speechEl.innerHTML = '<b>HEI KAMU! 💢</b> Kemana aja kok jarang buka ULMET?! Ada tugas numpuk yang kamu abaikan! Buka dan selesaikan <b>SEKARANG JUGA!</b>';
-                if (bubbleEl) bubbleEl.className = 'bg-red-950/30 border border-red-500/50 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-red-200 leading-relaxed shadow-inner';
-            } else if (mood === 'worried') {
-                imgEl.src = 'mascot-worried.jpg';
-                wrapEl.classList.add('glow-worried');
-                if (accentEl) accentEl.className = 'absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500 transition-all duration-500';
-                if (tagEl) {
-                    tagEl.textContent = '⏰ PANIK!';
-                    tagEl.className = 'absolute -bottom-2 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:-right-1 bg-orange-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md whitespace-nowrap border border-slate-900';
-                }
-                if (subtitleEl) subtitleEl.textContent = '• Deadline Mepet!';
-                if (speechEl) speechEl.innerHTML = '<b>GAWAT! ⏰</b> Deadline tugas tinggal hitungan jam lagi! Matikan sosmed, fokus selesaikan sekarang sebelum telat!';
-                if (bubbleEl) bubbleEl.className = 'bg-amber-950/30 border border-orange-500/50 p-2.5 sm:p-3 rounded-2xl text-xs sm:text-sm text-amber-200 leading-relaxed shadow-inner';
-            }
+            // Widget maskot telah ditiadakan dari dashboard utama untuk tampilan minimalis, bersih, dan lapang
+            return;
         }
 
-        function setDashMascotMoodPreview(mood) {
-            localStorage.setItem('ulmet_widget_preview_mood', mood);
-            updateDashboardMascotWidget();
-            if (mood === 'happy') {
-                pokeDashboardMascot();
-            } else if (mood === 'angry') {
-                pokeDashboardMascot();
-            } else if (mood === 'worried') {
-                pokeDashboardMascot();
-            }
-        }
-
-        function pokeDashboardMascot() {
-            const wrapEl = document.getElementById('dash-mascot-img-wrap');
-            if (dashCurrentMascotMood === 'happy') {
-                if (wrapEl) {
-                    wrapEl.classList.remove('bounce-animation');
-                    void wrapEl.offsetWidth;
-                    wrapEl.classList.add('bounce-animation');
-                }
-                playDashMascotRewardSound();
-            } else if (dashCurrentMascotMood === 'angry') {
-                if (wrapEl) {
-                    wrapEl.classList.remove('shake-animation');
-                    void wrapEl.offsetWidth;
-                    wrapEl.classList.add('shake-animation');
-                }
-                playDashMascotAngrySound();
-            } else {
-                playDashMascotWorriedSound();
-            }
-        }
+        function setDashMascotMoodPreview(mood) {}
+        function pokeDashboardMascot() {}
 
         function playDashMascotRewardSound() {
             try {
@@ -1298,16 +1118,16 @@
             // 2. Fallback: Open-Meteo
             try {
                 const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LOCARI_LAT}&longitude=${LOCARI_LON}&current=temperature_2m,relative_humidity_2m,weather_code,is_day,wind_speed_10m&timezone=Asia%2FJakarta`;
-                const res = await fetch(weatherUrl);
-                if (!res.ok) throw new Error('Weather API error');
-                const data = await res.json();
-                const curr = data.current || {};
+                const omRes = await fetch(weatherUrl);
+                if (!omRes.ok) throw new Error('Weather API error');
+                const omData = await omRes.json();
+                const curr = omData.current || {};
                 const roundedTemp = Math.round(curr.temperature_2m || 24);
                 const wCode = curr.weather_code ?? 1;
                 const isDay = curr.is_day ?? 1;
                 const wmo = getWmoInfo(wCode, isDay);
                 const humidity = curr.relative_humidity_2m ?? 70;
-                const wind = curr.wind_speed_10m ?? 5;
+                const omWind = curr.wind_speed_10m ?? 5;
 
                 dashWeather = {
                     temp: roundedTemp,
@@ -1316,7 +1136,7 @@
                     city: LOCARI_CITY,
                     source: 'BMKG Ref',
                     humidity: humidity,
-                    wind: wind,
+                    wind: omWind,
                     tip: getWeatherStudyTip(roundedTemp, wmo.text),
                     loading: false,
                     lastUpdated: Date.now()
@@ -1332,58 +1152,99 @@
             }
         }
 
-        async function initDashboard() {
-            // 1. Verifikasi auth dan set user scope
-            const session = await requireAuth();
-            if (!session || !session.user) return;
-            const uid = session.user.id;
-            setCurrentUserId(uid);
-
-            // 2. Load Profile User
+        function renderInitialLocalDashboard() {
+            // 1. Profil Mahasiswa dari Local Storage (Instan 0ms)
             try {
-                const sb = getSupabase();
                 let profile = null;
+                const cachedProf = localStorage.getItem(userKey('ulmet_profile')) || localStorage.getItem('ulmet_profile');
+                if (cachedProf) {
+                    profile = JSON.parse(cachedProf);
+                } else {
+                    const accStr = localStorage.getItem(userKey('ulmet_account')) || localStorage.getItem('ulmet_account');
+                    if (accStr) profile = JSON.parse(accStr);
+                }
+                if (profile) {
+                    const namaPanggilan = profile.panggilan || (profile.nama ? profile.nama.split(' ')[0] : (profile.username || 'Mahasiswa'));
+                    const welcomeEl = document.getElementById('welcome-name');
+                    if (welcomeEl) welcomeEl.innerText = namaPanggilan;
+                    if (profile.nama && document.getElementById('sidebar-nama')) document.getElementById('sidebar-nama').innerText = profile.nama;
+                    if (profile.semester && document.getElementById('sidebar-semester')) document.getElementById('sidebar-semester').innerText = 'Semester ' + profile.semester;
+                    if (profile.avatar && document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').innerText = profile.avatar;
+                }
+            } catch (e) {
+                console.warn('Gagal render profil lokal:', e);
+            }
+
+            // 2. Cuaca Real-Time dari Cache
+            try {
+                const cachedW = localStorage.getItem('ulmet_live_weather');
+                if (cachedW) {
+                    dashWeather = Object.assign(dashWeather, JSON.parse(cachedW));
+                }
+                renderDashboardWeatherUI();
+            } catch(e) {}
+
+            // 3. Kebiasaan Keseharian (Habits)
+            try {
+                renderDashboardHabits();
+            } catch(e) {
+                console.warn('Gagal render habits lokal:', e);
+            }
+
+            // 4. Tugas Kuliah Terdekat
+            try {
+                let localTasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || 'null');
+                if (!Array.isArray(localTasks) || localTasks.length === 0) {
+                    localTasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
+                }
+                renderDashboardTasks(localTasks);
+            } catch(e) {
+                console.warn('Gagal render tasks lokal:', e);
+            }
+
+            // 5. Berkas Tersimpan
+            try {
+                const localFiles = JSON.parse(localStorage.getItem(userKey('ulmet_files')) || localStorage.getItem('ulmet_files') || '[]');
+                const filesCountEl = document.getElementById('dash-files-count');
+                if (filesCountEl) filesCountEl.innerText = localFiles.length;
+            } catch(e) {}
+
+            // 6. Anggaran & Pengeluaran Keuangan
+            try {
+                const localBudget = parseInt(localStorage.getItem(userKey('ulmet_keuangan_budget')) || localStorage.getItem('ulmet_keuangan_budget') || '0');
+                const localExpenses = JSON.parse(localStorage.getItem(userKey('ulmet_keuangan_expenses')) || localStorage.getItem('ulmet_keuangan_expenses') || '[]');
+                renderDashboardExpenses(localExpenses, localBudget);
+            } catch(e) {
+                console.warn('Gagal render expenses lokal:', e);
+            }
+
+            // 7. Track Aktivitas & Streak
+            try {
+                trackDashboardActivity();
+            } catch(e) {}
+        }
+
+        async function syncDashboardCloud() {
+            try {
+                const session = await getSession();
+                if (!session || !session.user) return;
+                const uid = session.user.id;
+                setCurrentUserId(uid);
+
+                const sb = getSupabase();
                 if (sb) {
                     const { data } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
                     if (data) {
-                        profile = data;
-                        localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(profile));
+                        localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(data));
+                        const namaPanggilan = data.panggilan || (data.nama ? data.nama.split(' ')[0] : 'Mahasiswa');
+                        const welcomeEl = document.getElementById('welcome-name');
+                        if (welcomeEl) welcomeEl.innerText = namaPanggilan;
+                        if (data.nama && document.getElementById('sidebar-nama')) document.getElementById('sidebar-nama').innerText = data.nama;
+                        if (data.semester && document.getElementById('sidebar-semester')) document.getElementById('sidebar-semester').innerText = 'Semester ' + data.semester;
+                        if (data.avatar && document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').innerText = data.avatar;
                     }
                 }
-                if (!profile) {
-                    const cachedProf = localStorage.getItem(userKey('ulmet_profile'));
-                    if (cachedProf) profile = JSON.parse(cachedProf);
-                }
-                if (profile) {
-                    const namaPanggilan = profile.panggilan || (profile.nama ? profile.nama.split(' ')[0] : 'Mahasiswa');
-                    const welcomeEl = document.getElementById('welcome-name');
-                    if (welcomeEl) welcomeEl.innerText = namaPanggilan;
-                    if (profile.nama) document.getElementById('sidebar-nama').innerText = profile.nama;
-                    if (profile.semester) document.getElementById('sidebar-semester').innerText = 'Semester ' + profile.semester;
-                    if (profile.avatar) document.getElementById('sidebar-avatar').innerText = profile.avatar;
-                }
-            } catch (e) {
-                console.warn('Gagal memuat profil:', e);
-            }
 
-            // 3. Render awal dari user-scoped cache lokal (Instan & Responsif)
-            try {
-                trackDashboardActivity();
-                renderDashboardHabits();
-                fetchDashboardWeather();
-                const localTasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || '[]');
-                renderDashboardTasks(localTasks);
-                const localFiles = JSON.parse(localStorage.getItem(userKey('ulmet_files')) || '[]');
-                document.getElementById('dash-files-count').innerText = localFiles.length;
-                const localBudget = parseInt(localStorage.getItem(userKey('ulmet_keuangan_budget')) || '0');
-                const localExpenses = JSON.parse(localStorage.getItem(userKey('ulmet_keuangan_expenses')) || '[]');
-                renderDashboardExpenses(localExpenses, localBudget);
-            } catch(e) {
-                console.warn('Gagal render cache lokal:', e);
-            }
-
-            // 4. Background Sync dari Supabase (Otoritatif per user)
-            try {
                 const [sbTasks, sbFiles, sbExpenses, sbBudget] = await Promise.all([
                     loadTasks(),
                     loadFiles(),
@@ -1391,13 +1252,21 @@
                     loadBudgetConfig()
                 ]);
 
-                renderDashboardTasks(sbTasks || []);
-                document.getElementById('dash-files-count').innerText = (sbFiles || []).length;
+                if (Array.isArray(sbTasks)) renderDashboardTasks(sbTasks);
+                if (Array.isArray(sbFiles) && document.getElementById('dash-files-count')) {
+                    document.getElementById('dash-files-count').innerText = sbFiles.length;
+                }
                 const b = (sbBudget && typeof sbBudget.budget === 'number') ? sbBudget.budget : 0;
-                renderDashboardExpenses(sbExpenses || [], b);
+                if (Array.isArray(sbExpenses)) renderDashboardExpenses(sbExpenses, b);
             } catch(e) {
-                console.warn('Sync background dashboard warning:', e);
+                console.warn('[ULMET] Cloud sync background info:', e);
             }
+        }
+
+        async function initDashboard() {
+            renderInitialLocalDashboard();
+            fetchDashboardWeather();
+            await syncDashboardCloud();
 
             // Auto-refresh cuaca tiap 15 menit & sinkron kebiasaan saat window aktif kembali
             setInterval(() => fetchDashboardWeather(), 15 * 60 * 1000);
@@ -1467,7 +1336,7 @@
     </script>
 
     <!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
-    <nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
+    <nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
         <a href="dashboard.html" class="bnav-item active">
             <span class="bnav-icon">📊</span>
             <span class="bnav-label">Dashboard</span>
@@ -1488,9 +1357,9 @@
             <span class="bnav-icon">💸</span>
             <span class="bnav-label">Keuangan</span>
         </a>
-        <a href="profil.html" class="bnav-item">
-            <span class="bnav-icon">👤</span>
-            <span class="bnav-label">Profil</span>
+        <a href="catatan.html" class="bnav-item">
+            <span class="bnav-icon">📝</span>
+            <span class="bnav-label">Catatan</span>
         </a>
     </nav>
 
@@ -1515,7 +1384,7 @@
     }, {passive: true});
     </script>
     <script>
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("../sw.js").catch(() => {});
     let deferredDashPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();

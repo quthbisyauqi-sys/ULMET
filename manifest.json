@@ -1,37 +1,37 @@
 {
   "name": "ULMET — Manajemen Waktu Mahasiswa",
   "short_name": "ULMET",
-  "description": "Aplikasi manajemen jadwal, tugas, catatan, dan keuangan kos mahasiswa",
-  "id": "./dashboard.html",
-  "start_url": "./dashboard.html",
+  "description": "Aplikasi manajemen jadwal, tugas, catatan, portofolio SKPI, dan keuangan mahasiswa",
+  "id": "./pages/dashboard.html",
+  "start_url": "./pages/dashboard.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#facc15",
+  "background_color": "#020617",
+  "theme_color": "#020617",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "lang": "id",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-192.png",
+      "src": "assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -66,8 +66,17 @@
             ".xlsx",
             "text/plain",
             ".txt",
+            "text/csv",
+            ".csv",
+            "application/zip",
+            ".zip",
+            "application/x-rar-compressed",
+            ".rar",
             "image/*",
-            "*/*"
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp"
           ]
         }
       ]
@@ -77,32 +86,44 @@
     {
       "name": "Buka Dashboard",
       "short_name": "Dashboard",
-      "url": "./dashboard.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "url": "./pages/dashboard.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Jadwal & Tugas",
       "short_name": "Jadwal",
-      "url": "./jadwal.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "url": "./pages/jadwal.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Materi Kuliah",
       "short_name": "Materi",
-      "url": "./materi.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "url": "./pages/materi.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Tanya AI",
       "short_name": "AI",
-      "url": "./ai.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "url": "./pages/ai.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Keuangan Mahasiswa",
+      "short_name": "Keuangan",
+      "url": "./pages/keuangan.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Catatan Kuliah",
+      "short_name": "Catatan",
+      "url": "./pages/catatan.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Widget Si Ulmet",
       "short_name": "Widget",
-      "url": "./widget.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "url": "./pages/widget.html",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#020617">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <title>Materi Dosen - ULMET</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     </script>
+    <!-- Mammoth.js untuk render pratinjau dokumen Word (.docx) langsung di dalam peramban -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: "Plus Jakarta Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -29,6 +31,13 @@
         .file-card:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.15); }
         /* Modal input focus glow */
         .modal-input:focus { box-shadow: 0 0 0 3px rgba(250,204,21,0.25); }
+        /* Word Docx Rendered Styles */
+        .docx-article p { margin-bottom: 1.1rem; line-height: 1.8; }
+        .docx-article h1, .docx-article h2, .docx-article h3 { font-weight: 800; color: #facc15; margin-top: 1.6rem; margin-bottom: 0.8rem; line-height: 1.3; }
+        .docx-article ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .docx-article ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .docx-article table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .docx-article th, .docx-article td { border: 1px solid rgba(59,130,246,0.3); padding: 8px 12px; }
         /* Drive step indicator */
         .drive-step { counter-increment: drive-step; }
         .drive-step::before { content: counter(drive-step); @apply flex-shrink-0; }
@@ -89,9 +98,7 @@
         #mobile-folder-drawer { transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1); }
         #mobile-folder-drawer.open { transform: translateX(0) !important; }
     </style>
-    <!-- Supabase SDK & Config -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../assets/js/local-db.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden selection:bg-amber-400 selection:text-slate-950">
 
@@ -113,13 +120,13 @@
                 <span>📚</span><span>Materi Dosen</span>
             </a>
             <a href="ai.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
-                <span>🤖</span><span class="font-medium text-sm">AI Asisten</span>
+                <span>🤖</span><span class="font-medium text-sm">AI ULMET</span>
             </a>
             <a href="keuangan.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
-                <span>💸</span><span class="font-medium text-sm">Keuangan Kos</span>
+                <span>💸</span><span class="font-medium text-sm">Keuangan</span>
             </a>
-            <a href="profil.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
-                <span>👤</span><span class="font-medium text-sm">Profil Saya</span>
+            <a href="catatan.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition">
+                <span>📝</span><span class="font-medium text-sm">Catatan</span>
             </a>
         </nav>
     </div>
@@ -168,20 +175,6 @@
                     <p class="text-[10px] md:text-xs text-slate-400 truncate" id="active-course-subtitle">Pilih folder untuk melihat berkas</p>
                 </div>
             </div>
-            
-            <!-- SINGLE UNIFIED ACTION BUTTON -->
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <div class="relative inline-block">
-                    <button type="button" id="header-action-btn" class="bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm shadow-amber-400/20 cursor-pointer">
-                        <span id="header-action-icon">📤</span>
-                        <span id="header-action-label">Upload Berkas</span>
-                    </button>
-                    <input type="file" id="upload-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.gif" 
-                           onclick="if(!currentCourse) { showToast('⚠️ Pilih folder Mata Kuliah terlebih dahulu!'); event.preventDefault(); return false; }"
-                           onchange="handleFileUpload(event)" 
-                           style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.01;cursor:pointer;z-index:10;">
-                </div>
-            </div>
         </header>
 
         <!-- Mobile Quick Chips (Pilih folder cepat di HP) -->
@@ -220,14 +213,30 @@
             </div>
         </div>
 
-        <!-- DROPZONE (Desktop only, subtle) -->
-        <div id="materi-dropzone" class="hidden md:flex mx-6 mt-4 border border-dashed border-slate-800 hover:border-amber-400/60 bg-slate-900/30 rounded-2xl p-4 text-center items-center justify-center gap-3 transition cursor-pointer flex-shrink-0" 
+        <!-- DROPZONE (Tampil responsif di Mobile & Desktop) -->
+        <div id="materi-dropzone" class="flex mx-3.5 md:mx-6 mt-3.5 md:mt-4 border border-dashed border-slate-800 hover:border-amber-400/60 bg-slate-900/40 hover:bg-slate-900/70 rounded-2xl p-4 text-center items-center justify-center gap-3 transition cursor-pointer flex-shrink-0" 
              onclick="if(!currentCourse) { showToast('⚠️ Pilih folder Mata Kuliah terlebih dahulu!'); } else { document.getElementById('upload-input').click(); }">
             <span class="text-2xl text-slate-400">&#11015;&#65039;</span>
             <div class="text-left">
                 <p class="text-xs text-slate-200 font-semibold">Tarik berkas ke sini atau klik untuk upload</p>
                 <p class="text-[11px] text-slate-500">PDF, Word, PPT, Excel, Foto — otomatis tersimpan ke folder aktif</p>
             </div>
+        </div>
+
+        <!-- Hidden file input triggered exclusively via dropzone / programmatic trigger -->
+        <input type="file" id="upload-input" class="hidden" style="display:none!important;" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.gif" 
+               onclick="if(!currentCourse) { showToast('⚠️ Pilih folder Mata Kuliah terlebih dahulu!'); event.preventDefault(); return false; }"
+               onchange="handleFileUpload(event)">
+
+        <!-- Quick WA Share Guide Trigger -->
+        <div class="flex items-center justify-between mx-3.5 md:mx-6 mt-2.5 px-3.5 py-2 rounded-2xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400 flex-shrink-0">
+            <span class="flex items-center gap-2 truncate">
+                <span class="text-base text-emerald-400">📲</span>
+                <span class="truncate text-slate-300">Kirim berkas materi langsung dari <b>WhatsApp</b> ke ULMET</span>
+            </span>
+            <button onclick="showWaShareGuideModal()" class="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 flex-shrink-0 ml-2 cursor-pointer bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1 rounded-xl transition">
+                <span>Cara Pakai</span> ➔
+            </button>
         </div>
 
         <!-- TAMPILAN SAAT BELUM ADA FOLDER YANG TERPILIH -->
@@ -259,15 +268,178 @@
             </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
-            <button onclick="downloadFile(currentViewingFileId)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
-                <span>⬇️</span> Unduh
+            <button onclick="openInExternalEditor(currentViewingFileId)" class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-blue-600/30 cursor-pointer" title="Buka di Google Docs atau Aplikasi Luar">
+                <span>✏️</span> <span class="hidden sm:inline">Buka di</span> Editor / Docs
             </button>
-            <button onclick="document.getElementById('modal-viewer').classList.add('hidden')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition">
+            <button onclick="downloadFile(currentViewingFileId)" class="bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 cursor-pointer">
+                <span>⬇️</span> <span class="hidden sm:inline">Unduh</span>
+            </button>
+            <button onclick="document.getElementById('modal-viewer').classList.add('hidden')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition cursor-pointer">
                 Tutup
             </button>
         </div>
     </div>
     <div class="flex-1 p-4 md:p-6 flex justify-center items-center overflow-auto" id="viewer-container"></div>
+</div>
+
+<!-- MODAL: BUKA DI EDITOR / GOOGLE DOCS -->
+<div id="modal-open-editor" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[85] flex items-center justify-center p-4" onclick="handleEditorModalBackdrop(event)">
+    <div class="modal-box bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl relative page-fade">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-xl text-amber-400 flex-shrink-0">
+                ✏️
+            </div>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">Edit Dokumen</span>
+                <h3 class="text-white font-bold text-base leading-tight mt-0.5 truncate">Pilih Cara Mengedit</h3>
+            </div>
+            <button onclick="closeEditorModal()" class="text-slate-500 hover:text-white text-2xl leading-none flex-shrink-0 cursor-pointer">&times;</button>
+        </div>
+
+        <!-- File Target Info -->
+        <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-3.5 mb-4 flex items-center gap-3">
+            <div id="editor-file-badge" class="w-10 h-10 rounded-xl bg-blue-900/40 border border-blue-800/60 flex items-center justify-center text-xs font-black text-blue-300 flex-shrink-0 uppercase">
+                DOC
+            </div>
+            <div class="min-w-0 flex-1">
+                <p id="editor-file-name" class="text-xs font-bold text-white truncate">Dokumen.docx</p>
+                <p id="editor-file-meta" class="text-[11px] text-slate-400 mt-0.5">Sastra Arab • 34 KB</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-300 font-semibold mb-2.5">Pilih editor yang ingin digunakan:</p>
+
+        <!-- Options List -->
+        <div class="space-y-2.5 mb-4">
+            <!-- Option 1: Edit Langsung di ULMET (In-App) -->
+            <button type="button" onclick="launchInAppEditor()" class="w-full text-left p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 to-transparent hover:bg-amber-500/15 border border-amber-400/40 hover:border-amber-400/80 transition cursor-pointer group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-lg text-amber-400 group-hover:scale-105 transition flex-shrink-0">
+                    ✍️
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition">Edit Langsung di ULMET</span>
+                        <span class="text-[9px] font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-1.5 py-0.2 rounded">Paling Praktis</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                        Ketik dan edit langsung teks dokumen di sini tanpa download & tanpa buka tab lain.
+                    </p>
+                </div>
+                <span class="text-amber-400 group-hover:text-white transition text-sm mt-1">➔</span>
+            </button>
+
+            <!-- Option 2: Google Docs Web (Auto Copy to Clipboard, ZERO DOWNLOAD) -->
+            <button type="button" onclick="launchInGoogleDocsWeb()" class="w-full text-left p-3.5 rounded-2xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-blue-500/50 transition cursor-pointer group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center text-lg text-blue-400 group-hover:scale-105 transition flex-shrink-0">
+                    🌐
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-white group-hover:text-blue-300 transition">Buka di Google Docs (Web)</span>
+                        <span class="text-[9px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.2 rounded">Google Docs</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                        Buka Google Docs baru & otomatis salin teks isi dokumen ke clipboard (tinggal Ctrl+V).
+                    </p>
+                </div>
+                <span class="text-slate-500 group-hover:text-white transition text-sm mt-1">➔</span>
+            </button>
+        </div>
+
+        <!-- Google Docs Instruction Box (hidden by default, shown when launched) -->
+        <div id="gdocs-guide-box" class="hidden mb-4 p-4 bg-blue-950/60 border border-blue-500/50 rounded-2xl text-xs text-slate-200 space-y-2.5">
+            <div class="flex items-center gap-2 text-amber-300 font-bold">
+                <span>📄</span> Buka Dokumen di Google Docs
+            </div>
+            <p class="leading-relaxed text-slate-300">
+                Google Docs membuka lembar baru kosong karena Google belum memuat file lokal Anda. Ada 2 cara mudah memunculkan isinya:
+            </p>
+            <div class="space-y-2">
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                    <span class="font-bold text-emerald-400">Cara 1 (Paling Cepat - Tempel):</span>
+                    <p class="text-slate-300 mt-0.5">Teks dan format dokumen ini sudah otomatis disalin ke clipboard. Di Google Docs yang baru terbuka, cukup tekan <b class="text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 font-mono">Ctrl + V</b> (Paste). Seluruh isi dokumen langsung muncul rapi!</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                    <span class="font-bold text-blue-400">Cara 2 (Buka Berkas Word .docx):</span>
+                    <p class="text-slate-300 mt-0.5">Di tab Google Docs, tekan <b class="text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 font-mono">Ctrl + O</b> (atau menu <b>File ➔ Buka</b>) ➔ pilih tab <b>Upload</b> ➔ pilih berkas Word Anda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Cancel -->
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+            <span class="text-[11px] text-slate-500">Tanpa download ulang</span>
+            <button onclick="closeEditorModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PANDUAN BERBAGI FILE LANGSUNG DARI WHATSAPP -->
+<div id="modal-wa-guide" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[85] flex items-center justify-center p-4" onclick="if(event.target.id==='modal-wa-guide') closeWaShareGuideModal()">
+    <div class="modal-box bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl relative page-fade">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-400 flex-shrink-0">
+                📲
+            </div>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20">Fitur Web Share Target</span>
+                <h3 class="text-white font-bold text-base leading-tight mt-0.5 truncate">Kirim File dari WhatsApp ke ULMET</h3>
+            </div>
+            <button onclick="closeWaShareGuideModal()" class="text-slate-500 hover:text-white text-2xl leading-none flex-shrink-0 cursor-pointer">&times;</button>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+            Dosen sering mengirim materi perkuliahan (PDF, Word, PPT) di grup WhatsApp? Anda bisa langsung mengirimnya ke ULMET tanpa perlu download lalu upload manual:
+        </p>
+
+        <!-- Step List -->
+        <div class="space-y-2.5 mb-5">
+            <div class="flex items-start gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800/80">
+                <div class="w-7 h-7 rounded-lg bg-emerald-400/10 border border-emerald-400/30 text-emerald-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                    1
+                </div>
+                <div class="text-xs text-slate-300">
+                    <b class="text-white">Install ULMET di HP:</b> Pastikan aplikasi ULMET sudah ditambahkan ke layar utama (*Add to Home Screen*) dari Chrome Android/iOS.
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800/80">
+                <div class="w-7 h-7 rounded-lg bg-emerald-400/10 border border-emerald-400/30 text-emerald-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                    2
+                </div>
+                <div class="text-xs text-slate-300">
+                    <b class="text-white">Buka File di WhatsApp:</b> Ketuk berkas dokumen di WhatsApp, lalu tekan tombol <b class="text-emerald-400">Bagikan / Share</b> (ikon tiga titik/tanda panah).
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800/80">
+                <div class="w-7 h-7 rounded-lg bg-emerald-400/10 border border-emerald-400/30 text-emerald-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                    3
+                </div>
+                <div class="text-xs text-slate-300">
+                    <b class="text-white">Pilih Aplikasi ULMET:</b> Dari daftar aplikasi share di HP Anda, pilih <b class="text-amber-400">ULMET</b>.
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3 rounded-2xl bg-slate-950 border border-slate-800/80">
+                <div class="w-7 h-7 rounded-lg bg-emerald-400/10 border border-emerald-400/30 text-emerald-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                    4
+                </div>
+                <div class="text-xs text-slate-300">
+                    <b class="text-white">Simpan ke Folder Matkul:</b> ULMET otomatis terbuka dan Anda tinggal memilih folder mata kuliah tujuan. Berkas langsung tersimpan rapi!
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="closeWaShareGuideModal()" class="flex-1 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer">
+                Mengerti & Siap Pakai
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- MODAL: TAMBAH FOLDER BARU -->
@@ -605,7 +777,7 @@ function renderFilesList() {
                     📄
                 </div>
                 <p class="font-bold text-sm text-slate-200">Folder ini masih kosong</p>
-                <p class="text-xs text-slate-400 mt-1 max-w-xs">Tekan tombol <b>+ Upload Berkas</b> di kanan atas untuk menyimpan materi kuliah.</p>
+                <p class="text-xs text-slate-400 mt-1 max-w-xs">Tarik berkas atau klik area upload di atas untuk menyimpan materi kuliah.</p>
             </div>
         `;
         document.getElementById("active-course-subtitle").textContent = "0 berkas tersimpan";
@@ -639,6 +811,7 @@ function renderFilesList() {
                 </div>
             </div>
             <div class='flex items-center gap-1.5 flex-shrink-0 ml-2'>
+                <button class='bg-slate-800 hover:bg-blue-900/60 hover:text-blue-300 hover:border-blue-700/60 border border-slate-700/40 text-slate-300 p-2 rounded-xl transition text-xs cursor-pointer' title='Buka / Edit di Google Docs atau Aplikasi' onclick="event.stopPropagation(); openInExternalEditor('${file.id}')">✏️</button>
                 <button class='bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl transition text-xs cursor-pointer' title='Unduh' onclick="event.stopPropagation(); downloadFile('${file.id}')">⬇️</button>
                 <button class='bg-slate-800/70 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 p-2 rounded-xl transition text-xs cursor-pointer' title='Hapus' onclick="event.stopPropagation(); deleteFileItem('${file.id}', '${safeName}')">🗑️</button>
             </div>
@@ -660,7 +833,7 @@ async function handleFileUpload(fileOrEvent) {
     }
     const ext = file.name.split(".").pop().toLowerCase();
     const size = file.size > 1048576 ? (file.size/1048576).toFixed(1) + " MB" : Math.max(1, Math.round(file.size/1024)) + " KB";
-    showToast("⏳ Mengunggah \"" + file.name + "\" ke Supabase...");
+    showToast("⏳ Menyimpan \"" + file.name + "\" ke database lokal...");
 
     const obj = {
         id: "file-" + Date.now(),
@@ -672,23 +845,22 @@ async function handleFileUpload(fileOrEvent) {
         storage_path: null
     };
 
-    let uploadedToCloud = false;
-    // Upload ke Supabase Storage (bucket "materi")
+    let savedLocally = false;
+    // Simpan ke IndexedDB Engine Perangkat
     try {
         const folderPath = (currentCourse || 'Umum').replace(/[^a-zA-Z0-9_\-\s]/g, '').replace(/\s+/g, '_');
         const uploadRes = await uploadFile(file, folderPath);
         if (uploadRes && (uploadRes.fullPath || uploadRes.path)) {
             obj.storage_path = uploadRes.fullPath || uploadRes.path;
-            uploadedToCloud = true;
-            showToast("☁️ Berkas berhasil diunggah ke Supabase Cloud!");
+            savedLocally = true;
+            showToast("💾 Berkas tersimpan aman di Database Lokal!");
         }
     } catch(err) {
-        console.warn("Upload ke Supabase Storage gagal:", err);
-        showToast("⚠️ Upload cloud gagal: " + (err.message || 'Error'));
+        console.warn("Penyimpanan IndexedDB gagal:", err);
     }
 
-    // Jika cloud gagal DAN ukuran file kecil (<2MB), simpan dataUrl sebagai fallback offline
-    if (!uploadedToCloud && file.size < 2 * 1024 * 1024) {
+    // Fallback dataUrl jika file kecil (<2MB)
+    if (!savedLocally && file.size < 2 * 1024 * 1024) {
         try {
             const dataUrl = await new Promise((resolve) => {
                 const r = new FileReader();
@@ -712,37 +884,33 @@ async function handleFileUpload(fileOrEvent) {
         console.warn("LocalStorage warning:", e);
     }
 
-    // Sinkronisasi metadata ke tabel files Supabase
+    // Sinkronisasi metadata ke penyimpanan lokal
     try {
         await syncFiles(userFiles);
     } catch (syncErr) {
-        console.error("Gagal sync files ke DB:", syncErr);
+        console.error("Gagal sync files:", syncErr);
     }
 
     renderCourseFolders();
     renderFilesList();
+    if (typeof feedbackAction === 'function') feedbackAction('success');
 
     const input = document.getElementById("upload-input");
     if (input) input.value = "";
 }
 
-function downloadFile(fileId) {
+async function downloadFile(fileId) {
     const file = userFiles.find(f => f.id === fileId);
     if (!file) return;
+    let url = file.dataUrl || "";
     if (file.storage_path) {
-        const url = getFileUrl(file.storage_path);
+        url = await getOrFetchFileUrl(file.storage_path);
+    }
+    if (url) {
         const a = document.createElement("a");
         a.href = url;
         a.download = file.name;
         a.target = "_blank";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast("Mengunduh " + file.name);
-    } else if (file.dataUrl) {
-        const a = document.createElement("a");
-        a.href = file.dataUrl;
-        a.download = file.name;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -754,6 +922,7 @@ function downloadFile(fileId) {
 
 async function deleteFileItem(fileId, fileName) {
     if (!confirm("Hapus berkas \"" + fileName + "\" dari ULMET?")) return;
+    if (typeof triggerHaptic === 'function') triggerHaptic('delete');
     const file = userFiles.find(f => f.id === fileId);
     if (file && file.storage_path) {
         try { await deleteStorageFile(file.storage_path); } catch(e) {}
@@ -766,22 +935,53 @@ async function deleteFileItem(fileId, fileName) {
     showToast("File dihapus");
 }
 
-function openFileViewer(fileId) {
+async function openFileViewer(fileId) {
     const file = userFiles.find(f => f.id === fileId);
     if (!file) return;
     currentViewingFileId = fileId;
     const ext = (file.ext || file.name.split(".").pop() || "").toLowerCase();
     document.getElementById("viewer-title").textContent = file.name;
-    document.getElementById("viewer-meta").textContent = file.course + " - " + file.size + (file.storage_path ? " - Supabase Cloud" : "");
-    const icon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["png","jpg","jpeg","webp","gif"].includes(ext) ? "&#128247;" : "&#128196;";
+    document.getElementById("viewer-meta").textContent = file.course + " • " + file.size + " • Database Lokal";
+    const icon = ext === "pdf" ? "📕" : ["doc","docx"].includes(ext) ? "📝" : ["png","jpg","jpeg","webp","gif","svg"].includes(ext) ? "🖼️" : "📄";
     document.getElementById("viewer-icon").innerHTML = icon;
     const container = document.getElementById("viewer-container");
-    const fileUrl = file.storage_path ? getFileUrl(file.storage_path) : (file.dataUrl || "");
+    
+    let fileUrl = file.dataUrl || "";
+    let arrayBuffer = null;
 
+    // 1. Ambil data biner Blob langsung dari IndexedDB perangkat
+    if (file.storage_path && typeof getDeviceFileBlob === 'function') {
+        try {
+            const blob = await getDeviceFileBlob(file.storage_path);
+            if (blob) {
+                arrayBuffer = await blob.arrayBuffer();
+                fileUrl = URL.createObjectURL(blob);
+            }
+        } catch(e) {
+            console.warn("Ambil blob dari IndexedDB:", e);
+        }
+    }
+
+    // 2. Fallback via getOrFetchFileUrl
+    if (!fileUrl && file.storage_path && typeof getOrFetchFileUrl === 'function') {
+        fileUrl = await getOrFetchFileUrl(file.storage_path);
+    }
+    if (!arrayBuffer && fileUrl) {
+        try {
+            const res = await fetch(fileUrl);
+            if (res.ok) arrayBuffer = await res.arrayBuffer();
+        } catch(e) {}
+    }
+
+    // Buka modal viewer
+    document.getElementById("modal-viewer").classList.remove("hidden");
+
+    // 3. Render sesuai format berkas
     if (["png","jpg","jpeg","webp","gif","svg"].includes(ext)) {
+        // Pratinjau Gambar Langsung
         container.innerHTML = "<div class='flex flex-col items-center justify-center max-w-5xl w-full p-2'><img src='" + fileUrl + "' alt='" + file.name + "' class='max-w-full max-h-[78vh] object-contain rounded-2xl shadow-2xl border border-blue-800/40'><p class='text-xs text-blue-300 mt-3'>Pratinjau Gambar (" + file.size + ")</p></div>";
     } else if (ext === "pdf" && fileUrl) {
-        // Native PDF rendering using PDF.js
+        // Pratinjau PDF Langsung via PDF.js
         container.innerHTML = `
             <div class='w-full max-w-4xl h-[85vh] flex flex-col bg-slate-900 border border-blue-800/40 rounded-3xl overflow-hidden shadow-2xl relative'>
                 <div class='flex-1 overflow-y-auto bg-slate-800/80 flex flex-col items-center gap-6 p-4 md:p-8' id='pdf-render-container'>
@@ -792,9 +992,107 @@ function openFileViewer(fileId) {
                 </div>
             </div>`;
         renderLocalPDF(fileUrl);
+    } else if (["doc", "docx"].includes(ext) && arrayBuffer) {
+        // Pratinjau Dokumen Word Langsung via Mammoth.js
+        container.innerHTML = `
+            <div class='w-full max-w-4xl h-[85vh] flex flex-col bg-slate-900 border border-blue-800/40 rounded-3xl overflow-hidden shadow-2xl relative'>
+                <div class='flex-shrink-0 bg-slate-900/90 border-b border-blue-900/40 px-4 sm:px-6 py-3 flex items-center justify-between text-xs flex-wrap gap-2'>
+                    <span class='font-bold text-amber-400 flex items-center gap-1.5'>
+                        <span>📝</span> Pembaca Dokumen Word In-App ULMET
+                    </span>
+                    <div class='flex items-center gap-2'>
+                        <button onclick="enableInAppEditing()" class='bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 shadow-sm cursor-pointer'>
+                            <span>✍️</span> Edit di Sini
+                        </button>
+                        <button onclick="launchInGoogleDocsWeb()" class='bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1 shadow-sm cursor-pointer'>
+                            <span>🌐</span> Buka di Google Docs
+                        </button>
+                    </div>
+                </div>
+                <div class='flex-1 overflow-y-auto bg-[#070d1a] p-4 sm:p-10 flex justify-center' id='docx-scroll-view'>
+                    <div class='max-w-3xl w-full bg-slate-900/95 text-slate-100 p-6 sm:p-12 rounded-2xl border border-blue-900/50 shadow-2xl docx-article' id='docx-content-area'>
+                        <div class='py-12 text-center text-sm text-yellow-400 animate-pulse'>
+                            <div class='w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-3'></div>
+                            Membuka dan membaca dokumen Word langsung di ULMET...
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        try {
+            let renderedHtml = "";
+            if (typeof mammoth !== 'undefined') {
+                const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                if (result && result.value && result.value.trim()) {
+                    renderedHtml = result.value;
+                }
+            }
+
+            if (!renderedHtml) {
+                // Fallback XML extraction
+                const dec = new TextDecoder('utf-8', { fatal: false });
+                const raw = dec.decode(arrayBuffer);
+                const matches = raw.match(/<w:t[^>]*>(.*?)<\/w:t>/g);
+                if (matches && matches.length) {
+                    const text = matches.map(m => m.replace(/<[^>]+>/g, '')).join(' ').trim();
+                    renderedHtml = text.split('\n').map(p => `<p>${p}</p>`).join('');
+                }
+            }
+
+            const contentArea = document.getElementById('docx-content-area');
+            if (contentArea) {
+                if (renderedHtml || file.editedHtml) {
+                    contentArea.innerHTML = `
+                        <div class='border-b border-blue-800/40 pb-4 mb-6 flex items-start justify-between gap-4'>
+                            <div>
+                                <h2 class='text-xl sm:text-2xl font-black text-white leading-tight'>${file.name}</h2>
+                                <p class='text-xs text-blue-300 mt-1 font-medium'>${file.course} • ${file.size} ${file.editedHtml ? '<span class="text-amber-400 font-semibold">• Telah Diedit</span>' : ''}</p>
+                            </div>
+                            <button onclick="enableInAppEditing()" class='hidden sm:flex bg-slate-800 hover:bg-amber-400/20 hover:text-amber-300 text-slate-300 border border-slate-700 font-semibold px-3 py-1.5 rounded-xl text-xs items-center gap-1 transition cursor-pointer'>
+                                <span>✏️</span> Ubah Teks
+                            </button>
+                        </div>
+                        <div class='text-sm sm:text-base text-slate-200 leading-relaxed space-y-4 font-sans focus:outline-none transition' id='docx-body-text'>
+                            ${file.editedHtml || renderedHtml}
+                        </div>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <div class='py-12 text-center text-slate-400 space-y-3'>
+                            <div class='text-4xl'>📄</div>
+                            <p class='text-sm font-bold text-white'>Pratinjau Tidak Memuat Teks</p>
+                            <p class='text-xs text-slate-500'>Dokumen tidak memiliki teks terbaca langsung. Anda dapat mengunduhnya dengan tombol di kanan atas.</p>
+                        </div>
+                    `;
+                }
+            }
+        } catch(err) {
+            console.error("Gagal render docx:", err);
+            const contentArea = document.getElementById('docx-content-area');
+            if (contentArea) {
+                contentArea.innerHTML = `<div class='p-6 text-center text-red-400 text-xs'>Gagal memproses pratinjau Word: ${err.message}</div>`;
+            }
+        }
+
+    } else if (ext === "txt" && arrayBuffer) {
+        // Pratinjau Berkas Teks Langsung
+        const dec = new TextDecoder('utf-8');
+        const textContent = dec.decode(arrayBuffer);
+        const escapeHTML = (s) => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));
+        container.innerHTML = `
+            <div class='w-full max-w-4xl h-[85vh] flex flex-col bg-slate-900 border border-blue-800/40 rounded-3xl overflow-hidden shadow-2xl relative'>
+                <div class='flex-shrink-0 bg-slate-900/90 border-b border-blue-900/40 px-5 py-3 flex items-center justify-between text-xs'>
+                    <span class='font-bold text-yellow-400'>📄 Berkas Teks (${file.name})</span>
+                    <span class='text-blue-300/80'>${file.course}</span>
+                </div>
+                <div class='flex-1 overflow-y-auto bg-[#070d1a] p-6 sm:p-10'>
+                    <pre class='max-w-3xl mx-auto bg-slate-900 p-6 rounded-2xl border border-blue-900/40 text-xs sm:text-sm text-slate-200 font-mono whitespace-pre-wrap leading-relaxed'>${escapeHTML(textContent)}</pre>
+                </div>
+            </div>`;
     } else {
-        const docIcon = ext === "pdf" ? "&#128213;" : ["doc","docx"].includes(ext) ? "&#128216;" : ["ppt","pptx"].includes(ext) ? "&#128217;" : ["xls","xlsx"].includes(ext) ? "&#128215;" : "&#128196;";
-        const descText = file.storage_path ? "Tersimpan aman di Supabase Cloud." : "Berkas lokal tersimpan di memori perangkat.";
+        // Format lain yang memang binary non-preview (zip, dll)
+        const docIcon = ext === "pdf" ? "📕" : ["doc","docx"].includes(ext) ? "📝" : ["ppt","pptx"].includes(ext) ? "📊" : ["xls","xlsx"].includes(ext) ? "📈" : "📦";
+        const descText = "Tersimpan aman di Database Lokal Perangkat (IndexedDB).";
         container.innerHTML = `
         <div class='bg-slate-900/90 border border-blue-800/60 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center space-y-6'>
             <div class='w-24 h-24 bg-blue-950/80 border border-blue-800/50 rounded-3xl flex items-center justify-center text-5xl mx-auto shadow-inner'>
@@ -805,12 +1103,16 @@ function openFileViewer(fileId) {
                 <p class='text-xs text-blue-400 mt-2 font-medium'>${file.course} • ${file.size}</p>
             </div>
             <p class='text-[11px] text-slate-300 bg-blue-950/40 p-3 rounded-xl border border-blue-800/30'>${descText}</p>
-            <button onclick="downloadFile('${file.id}')" class='w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 active:scale-95 text-blue-950 font-extrabold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2'>
-                &#128194; Buka / Unduh Berkas
-            </button>
+            <div class='flex flex-col gap-2 w-full'>
+                <button onclick="openInExternalEditor('${file.id}')" class='w-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer'>
+                    <span>✏️</span> Buka di Google Docs / Aplikasi Edit
+                </button>
+                <button onclick="downloadFile('${file.id}')" class='w-full bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer'>
+                    <span>⬇️</span> Unduh Berkas ke Perangkat
+                </button>
+            </div>
         </div>`;
     }
-    document.getElementById("modal-viewer").classList.remove("hidden");
 }
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.getElementById("modal-viewer")?.classList.add("hidden"); });
 
@@ -957,6 +1259,381 @@ async function initSupabaseData() {
     } catch(e) {
         console.warn('Gagal memuat data Supabase di materi:', e);
     }
+}
+
+// =============================================
+// INTEGRASI BUKA & EDIT FILE DI GOOGLE DOCS / APLIKASI
+// =============================================
+let currentEditorFile = null;
+let currentEditorFileObj = null;
+
+async function openInExternalEditor(fileId) {
+    const file = userFiles.find(f => f.id === fileId);
+    if (!file) {
+        showToast("⚠️ Berkas tidak ditemukan", "error");
+        return;
+    }
+    currentEditorFile = file;
+
+    // Ambil blob file dari IndexedDB perangkat
+    let blob = null;
+    if (file.storage_path && typeof getDeviceFileBlob === 'function') {
+        try { blob = await getDeviceFileBlob(file.storage_path); } catch(e) {}
+    }
+    if (!blob && file.dataUrl) {
+        try {
+            const res = await fetch(file.dataUrl);
+            blob = await res.blob();
+        } catch(e) {}
+    }
+
+    const ext = (file.ext || file.name.split('.').pop() || '').toLowerCase();
+    let mimeType = 'application/octet-stream';
+    if (ext === 'docx') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    else if (ext === 'doc') mimeType = 'application/msword';
+    else if (ext === 'pdf') mimeType = 'application/pdf';
+    else if (ext === 'pptx') mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    else if (ext === 'ppt') mimeType = 'application/vnd.ms-powerpoint';
+    else if (ext === 'xlsx') mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    else if (ext === 'xls') mimeType = 'application/vnd.ms-excel';
+    else if (ext === 'txt') mimeType = 'text/plain';
+
+    if (blob) {
+        try {
+            currentEditorFileObj = new File([blob], file.name, { type: mimeType });
+        } catch(e) {
+            currentEditorFileObj = blob;
+            currentEditorFileObj.name = file.name;
+        }
+    } else {
+        currentEditorFileObj = null;
+    }
+
+    // Update elemen modal
+    const nameEl = document.getElementById('editor-file-name');
+    if (nameEl) nameEl.textContent = file.name;
+    const metaEl = document.getElementById('editor-file-meta');
+    if (metaEl) metaEl.textContent = `${file.course} • ${file.size}`;
+    const badgeEl = document.getElementById('editor-file-badge');
+    if (badgeEl) badgeEl.textContent = ext.toUpperCase().slice(0, 4) || 'DOC';
+
+    const guideBox = document.getElementById('gdocs-guide-box');
+    if (guideBox) guideBox.classList.add('hidden');
+
+    const modal = document.getElementById('modal-open-editor');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeEditorModal() {
+    const modal = document.getElementById('modal-open-editor');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleEditorModalBackdrop(event) {
+    if (event.target && event.target.id === 'modal-open-editor') {
+        closeEditorModal();
+    }
+}
+
+// 1. EDIT LANGSUNG DI ULMET (IN-APP) — TANPA DOWNLOAD SAMA SEKALI
+async function launchInAppEditor() {
+    if (!currentEditorFile) return;
+    const targetId = currentEditorFile.id;
+    closeEditorModal();
+    await openFileViewer(targetId);
+    setTimeout(() => {
+        enableInAppEditing();
+    }, 250);
+}
+
+function enableInAppEditing() {
+    const body = document.getElementById('docx-body-text') || document.getElementById('docx-content-area');
+    if (!body) {
+        showToast("ℹ️ Pratinjau dokumen belum selesai memuat.");
+        return;
+    }
+
+    body.contentEditable = "true";
+    body.focus();
+
+    let banner = document.getElementById('inapp-edit-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'inapp-edit-banner';
+        banner.className = 'sticky top-0 z-30 mb-4 p-3.5 rounded-2xl bg-slate-900/98 border border-amber-400/80 shadow-2xl backdrop-blur-md flex flex-col gap-2.5';
+        banner.innerHTML = `
+            <!-- Baris 1: Judul, Status Kata, Tombol Simpan & Cetak -->
+            <div class="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="text-xl">✍️</span>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-amber-300">Editor Dokumen ULMET</p>
+                        <p class="text-[10px] text-slate-400" id="editor-word-count">Menghitung kata...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="saveInAppEdits()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition">
+                        <span>💾</span> Simpan
+                    </button>
+                    <button onclick="printOrExportDoc()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 cursor-pointer transition" title="Cetak atau Simpan PDF">
+                        <span>🖨️</span> Cetak / PDF
+                    </button>
+                    <button onclick="cancelInAppEdits()" class="px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-rose-950/60 hover:text-rose-300 text-slate-400 text-xs cursor-pointer transition">
+                        ✕ Tutup Editor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Baris 2: Toolbar Format Mirip Google Docs -->
+            <div class="flex items-center gap-1.5 flex-wrap text-xs text-slate-200">
+                <!-- Undo / Redo -->
+                <button type="button" onclick="execEditorCommand('undo')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition" title="Undo (Ctrl+Z)">↩️</button>
+                <button type="button" onclick="execEditorCommand('redo')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition" title="Redo (Ctrl+Y)">↪️</button>
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Gaya Heading -->
+                <select onchange="execEditorCommand('formatBlock', this.value); this.value='';" class="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2 py-1 text-xs outline-none cursor-pointer">
+                    <option value="">Gaya Teks</option>
+                    <option value="p">Teks Normal</option>
+                    <option value="h1">Judul 1 (H1)</option>
+                    <option value="h2">Judul 2 (H2)</option>
+                    <option value="h3">Judul 3 (H3)</option>
+                </select>
+
+                <!-- Jenis Font -->
+                <select onchange="execEditorCommand('fontName', this.value); this.value='';" class="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2 py-1 text-xs outline-none cursor-pointer">
+                    <option value="">Font</option>
+                    <option value="Plus Jakarta Sans, sans-serif">Plus Jakarta Sans</option>
+                    <option value="Times New Roman, serif">Times New Roman</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Courier New, monospace">Courier New</option>
+                </select>
+
+                <!-- Ukuran Font -->
+                <select onchange="execEditorCommand('fontSize', this.value); this.value='';" class="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2 py-1 text-xs outline-none cursor-pointer">
+                    <option value="">Ukuran</option>
+                    <option value="2">10 pt</option>
+                    <option value="3">12 pt (Normal)</option>
+                    <option value="4">14 pt (Besar)</option>
+                    <option value="5">18 pt (Judul)</option>
+                    <option value="6">24 pt (Ekstra)</option>
+                </select>
+
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Tebal, Miring, Garis Bawah, Coret -->
+                <button type="button" onclick="execEditorCommand('bold')" class="font-bold px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white transition" title="Tebal (Ctrl+B)">B</button>
+                <button type="button" onclick="execEditorCommand('italic')" class="italic px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white font-serif transition" title="Miring (Ctrl+I)">I</button>
+                <button type="button" onclick="execEditorCommand('underline')" class="underline px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white transition" title="Garis Bawah (Ctrl+U)">U</button>
+                <button type="button" onclick="execEditorCommand('strikeThrough')" class="line-through px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 transition" title="Coret">S</button>
+
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Warna Teks & Sorot Stabilo -->
+                <label class="flex items-center gap-1 bg-slate-950 border border-slate-800 px-2 py-1 rounded-lg cursor-pointer hover:border-slate-700 transition" title="Warna Teks">
+                    <span class="font-bold text-amber-400">A</span>
+                    <input type="color" onchange="execEditorCommand('foreColor', this.value)" class="w-4 h-4 bg-transparent border-0 cursor-pointer p-0">
+                </label>
+                <label class="flex items-center gap-1 bg-slate-950 border border-slate-800 px-2 py-1 rounded-lg cursor-pointer hover:border-slate-700 transition" title="Warna Sorot / Stabilo">
+                    <span>🖍️</span>
+                    <input type="color" value="#facc15" onchange="execEditorCommand('hiliteColor', this.value)" class="w-4 h-4 bg-transparent border-0 cursor-pointer p-0">
+                </label>
+
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Alignment Rata Kiri, Tengah, Kanan, Justify -->
+                <button type="button" onclick="execEditorCommand('justifyLeft')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Rata Kiri">⇤</button>
+                <button type="button" onclick="execEditorCommand('justifyCenter')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Rata Tengah">⇥⇤</button>
+                <button type="button" onclick="execEditorCommand('justifyRight')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Rata Kanan">⇥</button>
+                <button type="button" onclick="execEditorCommand('justifyFull')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Rata Kanan-Kiri">≣</button>
+
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Lists -->
+                <button type="button" onclick="execEditorCommand('insertUnorderedList')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Daftar Poin (Bullets)">•≡</button>
+                <button type="button" onclick="execEditorCommand('insertOrderedList')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 transition" title="Daftar Angka (Numbering)">1≡</button>
+
+                <div class="w-px h-5 bg-slate-800 my-auto mx-0.5"></div>
+
+                <!-- Hapus Format -->
+                <button type="button" onclick="execEditorCommand('removeFormat')" class="p-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 transition" title="Hapus Format">🧹</button>
+            </div>
+        `;
+        body.parentElement.insertBefore(banner, body);
+    }
+
+    body.classList.add('ring-2', 'ring-amber-400/40', 'rounded-2xl', 'p-4', 'bg-slate-950/60');
+    body.addEventListener('input', updateEditorWordCount);
+    updateEditorWordCount();
+    showToast("✍️ Mode Edit Google Docs Aktif! Silakan ubah teks langsung.");
+}
+
+function execEditorCommand(command, value = null) {
+    document.execCommand(command, false, value);
+    updateEditorWordCount();
+}
+
+function updateEditorWordCount() {
+    const body = document.getElementById('docx-body-text') || document.getElementById('docx-content-area');
+    const countEl = document.getElementById('editor-word-count');
+    if (!body || !countEl) return;
+    const text = body.innerText.trim();
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    const chars = text.length;
+    countEl.textContent = `📝 ${words} kata • ${chars} karakter`;
+}
+
+function printOrExportDoc() {
+    window.print();
+}
+
+function saveInAppEdits() {
+    const body = document.getElementById('docx-body-text') || document.getElementById('docx-content-area');
+    if (!body || !currentViewingFileId) return;
+    const updatedHtml = body.innerHTML;
+
+    const file = userFiles.find(f => f.id === currentViewingFileId);
+    if (file) {
+        file.editedHtml = updatedHtml;
+        file.lastEdited = new Date().toISOString();
+        localStorage.setItem(userKey("ulmet_files"), JSON.stringify(userFiles));
+        showToast("💾 Perubahan dokumen berhasil disimpan di ULMET!");
+    }
+
+    cancelInAppEdits();
+}
+
+function cancelInAppEdits() {
+    const body = document.getElementById('docx-body-text') || document.getElementById('docx-content-area');
+    if (body) {
+        body.contentEditable = "false";
+        body.classList.remove('ring-2', 'ring-amber-400/40', 'bg-slate-950/60');
+        body.removeEventListener('input', updateEditorWordCount);
+    }
+    const banner = document.getElementById('inapp-edit-banner');
+    if (banner) banner.remove();
+}
+
+// 2. BUKA DI GOOGLE DOCS (WEB) — SALIN SELURUH ISI DOKUMEN & BUKA TAB BARU
+async function launchInGoogleDocsWeb() {
+    if (!currentEditorFile) {
+        if (currentViewingFileId) currentEditorFile = userFiles.find(f => f.id === currentViewingFileId);
+    }
+    if (!currentEditorFile) return;
+
+    showToast("⏳ Menyiapkan teks dokumen untuk Google Docs...");
+
+    // Ekstraksi teks & HTML dokumen yang sebenarnya
+    let textToCopy = '';
+    let htmlToCopy = '';
+
+    // A. Cek dari DOM jika dokumen sedang terbuka di viewer
+    const bodyEl = document.getElementById('docx-body-text') || document.getElementById('docx-content-area');
+    if (bodyEl && bodyEl.innerText && bodyEl.innerText.trim()) {
+        htmlToCopy = bodyEl.innerHTML;
+        textToCopy = bodyEl.innerText.trim();
+    }
+
+    // B. Jika belum ada dari DOM (misal diklik dari kartu file luar), ambil Blob dari IndexedDB dan ekstrak via Mammoth
+    if (!textToCopy) {
+        let arrayBuffer = null;
+        if (currentEditorFileObj && typeof currentEditorFileObj.arrayBuffer === 'function') {
+            try { arrayBuffer = await currentEditorFileObj.arrayBuffer(); } catch(e) {}
+        }
+        if (!arrayBuffer && currentEditorFile.storage_path && typeof getDeviceFileBlob === 'function') {
+            try {
+                const blob = await getDeviceFileBlob(currentEditorFile.storage_path);
+                if (blob) arrayBuffer = await blob.arrayBuffer();
+            } catch(e) {}
+        }
+        if (!arrayBuffer && currentEditorFile.dataUrl) {
+            try {
+                const res = await fetch(currentEditorFile.dataUrl);
+                if (res.ok) arrayBuffer = await res.arrayBuffer();
+            } catch(e) {}
+        }
+
+        const ext = (currentEditorFile.ext || currentEditorFile.name.split('.').pop() || '').toLowerCase();
+        if (['doc', 'docx'].includes(ext) && arrayBuffer && typeof mammoth !== 'undefined') {
+            try {
+                const htmlRes = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                if (htmlRes && htmlRes.value && htmlRes.value.trim()) {
+                    htmlToCopy = htmlRes.value.trim();
+                }
+                const textRes = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                if (textRes && textRes.value && textRes.value.trim()) {
+                    textToCopy = textRes.value.trim();
+                }
+            } catch(e) {
+                console.warn("Mammoth extraction failed in launchInGoogleDocsWeb:", e);
+            }
+        } else if (arrayBuffer && ext === 'txt') {
+            try {
+                const dec = new TextDecoder('utf-8');
+                textToCopy = dec.decode(arrayBuffer);
+                htmlToCopy = textToCopy.split('\n').map(p => `<p>${p}</p>`).join('');
+            } catch(e) {}
+        }
+    }
+
+    // Fallback terakhir jika tetap kosong
+    if (!textToCopy) {
+        textToCopy = currentEditorFile.name;
+        htmlToCopy = `<p>${currentEditorFile.name}</p>`;
+    }
+
+    // Salin otomatis format HTML (Rich Text) ke clipboard pengguna
+    let copied = false;
+    try {
+        if (navigator.clipboard && window.ClipboardItem) {
+            const blobHtml = new Blob([htmlToCopy], { type: 'text/html' });
+            const blobText = new Blob([textToCopy], { type: 'text/plain' });
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    'text/html': blobHtml,
+                    'text/plain': blobText
+                })
+            ]);
+            copied = true;
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(textToCopy);
+            copied = true;
+        }
+    } catch(e) {
+        console.warn('Clipboard write error:', e);
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            copied = true;
+        } catch(e2) {}
+    }
+
+    // Buka tab Google Docs baru langsung
+    const ext = (currentEditorFile.ext || currentEditorFile.name.split('.').pop() || '').toLowerCase();
+    let targetUrl = 'https://docs.google.com/document/create';
+    if (['xls', 'xlsx', 'csv'].includes(ext)) {
+        targetUrl = 'https://docs.google.com/spreadsheets/create';
+    } else if (['ppt', 'pptx'].includes(ext)) {
+        targetUrl = 'https://docs.google.com/presentation/create';
+    }
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+
+    const guideBox = document.getElementById('gdocs-guide-box');
+    if (guideBox) {
+        guideBox.classList.remove('hidden');
+    }
+
+    showToast("✨ Seluruh teks esai telah disalin! Tekan Ctrl+V di Google Docs.");
+}
+
+function showWaShareGuideModal() {
+    const modal = document.getElementById('modal-wa-guide');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeWaShareGuideModal() {
+    const modal = document.getElementById('modal-wa-guide');
+    if (modal) modal.classList.add('hidden');
 }
 
 // =============================================
@@ -1134,31 +1811,12 @@ function renderMobileCourseChips() {
 // Banner Notifikasi Tempel Berkas dari WhatsApp
 function updatePasteBanner() {
     const banner = document.getElementById('wa-paste-banner');
-    const headerBtn = document.getElementById('header-action-btn');
-    const headerIcon = document.getElementById('header-action-icon');
-    const headerLabel = document.getElementById('header-action-label');
-    const uploadInput = document.getElementById('upload-input');
     const active = isSharingActive();
 
     if (!active) {
         if (banner) banner.classList.add('hidden');
-        if (headerIcon) headerIcon.textContent = '📤';
-        if (headerLabel) headerLabel.textContent = 'Upload Berkas';
-        if (headerBtn) headerBtn.onclick = null;
-        if (uploadInput) uploadInput.style.display = 'block';
         return;
     }
-
-    // Ubah tombol di header agar fokus ke simpan berkas WhatsApp
-    if (headerIcon) headerIcon.textContent = '📥';
-    if (headerLabel) headerLabel.textContent = 'Simpan WA';
-    if (headerBtn) {
-        headerBtn.onclick = (e) => {
-            e.stopPropagation();
-            handlePasteFromWhatsApp();
-        };
-    }
-    if (uploadInput) uploadInput.style.display = 'none';
 
     const fileName = (pendingSharedData && pendingSharedData.name) || 
                      (pendingSharedData && pendingSharedData.file && pendingSharedData.file.name) || 
@@ -1434,7 +2092,7 @@ async function selectCourseAndSaveSharedFile(courseName) {
         if (uploadRes && (uploadRes.fullPath || uploadRes.path)) {
             obj.storage_path = uploadRes.fullPath || uploadRes.path;
             uploadedToCloud = true;
-            showToast("☁️ Berkas berhasil diunggah ke Cloud Supabase!");
+            showToast("💾 Berkas tersimpan aman di Database Lokal!");
         }
     } catch(err) {
         console.warn("Upload file share ke Cloud gagal:", err);
@@ -1516,7 +2174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSupabaseData(); // Load realtime dari Supabase
 
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").then(reg => {
+        navigator.serviceWorker.register("../sw.js").then(reg => {
             try { reg.update(); } catch(e) {}
         }).catch(() => {});
         navigator.serviceWorker.addEventListener('message', event => {
@@ -1543,6 +2201,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("modal-viewer")?.classList.add("hidden");
             closeAddFolderModal();
             closeShareModalToBrowse();
+            closeEditorModal();
+            closeWaShareGuideModal();
         }
     });
 });
@@ -1569,7 +2229,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 
 <!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 flex items-center justify-around h-12 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
     <a href="dashboard.html" class="bnav-item">
         <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
@@ -1590,9 +2250,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="bnav-icon">💸</span>
         <span class="bnav-label">Keuangan</span>
     </a>
-    <a href="profil.html" class="bnav-item">
-        <span class="bnav-icon">👤</span>
-        <span class="bnav-label">Profil</span>
+    <a href="catatan.html" class="bnav-item">
+        <span class="bnav-icon">📝</span>
+        <span class="bnav-label">Catatan</span>
     </a>
 </nav>
 

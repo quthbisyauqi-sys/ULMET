@@ -1,6 +1,6 @@
 -- =============================================
--- ULMET — Supabase SQL Schema (Clean & Safe)
--- Jalankan di Supabase SQL Editor
+-- ULMET — Relational SQL Schema (Clean & Safe)
+-- PostgreSQL DDL with Multi-Tenant Row Level Security
 -- =============================================
 
 -- Bersihkan tabel lama jika sebelumnya dibuat tanpa kolom user_id

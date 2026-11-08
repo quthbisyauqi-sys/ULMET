@@ -1,27 +1,29 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v60';
+const CACHE_NAME = 'ulmet-v86';
 const SHARED_CACHE_NAME = 'ulmet-shared-cache';
 const ASSETS = [
     './',
-    './jadwal.html',
-    './dashboard.html',
-    './widget.html',
-    './materi.html',
-    './keuangan.html',
-    './ai.html',
-    './profil.html',
-    './login.html',
-    './admin.html',
+    './index.html',
+    './pages/jadwal.html',
+    './pages/dashboard.html',
+    './pages/catatan.html',
+    './pages/widget.html',
+    './pages/materi.html',
+    './pages/keuangan.html',
+    './pages/ai.html',
+    './pages/profil.html',
+    './pages/login.html',
+    './pages/admin.html',
     './manifest.json',
-    './icon-192.png',
-    './icon-512.png',
-    './mascot-happy.jpg',
-    './mascot-angry.jpg',
-    './mascot-worried.jpg',
-    './supabase-config.js',
-    './ai-widget.js'
+    './assets/icons/icon-192.png',
+    './assets/icons/icon-512.png',
+    './assets/img/mascot-happy.jpg',
+    './assets/img/mascot-angry.jpg',
+    './assets/img/mascot-worried.jpg',
+    './assets/js/local-db.js',
+    './assets/js/ai-widget.js'
 ];
 
 // ===== INSTALL: cache semua asset =====
@@ -61,7 +63,7 @@ const saveSharedFile = async (fileObj, customName) => {
             try {
                 arrayBuffer = await fileObj.arrayBuffer();
                 size = arrayBuffer.byteLength || size;
-            } catch(e) {
+            } catch (e) {
                 console.warn("ArrayBuffer extraction failed:", e);
             }
         }
@@ -80,7 +82,7 @@ const saveSharedFile = async (fileObj, customName) => {
             });
             const fileResponse = new Response(binaryBody, { headers });
             await cache.put('/pending-shared-file', fileResponse);
-        } catch(err) {
+        } catch (err) {
             console.warn("Gagal simpan shared file ke Cache Storage:", err);
         }
 
@@ -98,13 +100,13 @@ const saveSharedFile = async (fileObj, customName) => {
                     const db = e.target.result;
                     const tx = db.transaction('shared_files', 'readwrite');
                     const store = tx.objectStore('shared_files');
-                    const dataObj = { 
-                        id: 'pending_share', 
+                    const dataObj = {
+                        id: 'pending_share',
                         name: name,
                         type: type,
                         size: size,
                         buffer: arrayBuffer,
-                        timestamp: Date.now() 
+                        timestamp: Date.now()
                     };
                     store.put(dataObj);
                     tx.oncomplete = () => resolve();
@@ -112,7 +114,7 @@ const saveSharedFile = async (fileObj, customName) => {
                 };
                 req.onerror = () => reject(req.error);
             });
-        } catch(err) {
+        } catch (err) {
             console.warn("Gagal simpan shared file ke IndexedDB:", err);
         }
 
@@ -122,8 +124,8 @@ const saveSharedFile = async (fileObj, customName) => {
             for (const client of clients) {
                 client.postMessage({ type: 'PENDING_SHARE_READY', name: name, size: size, mimeType: type });
             }
-        } catch(e) {}
-    } catch(fatalErr) {
+        } catch (e) { }
+    } catch (fatalErr) {
         console.error("Fatal error in saveSharedFile:", fatalErr);
     }
 };
@@ -163,7 +165,7 @@ self.addEventListener('fetch', event => {
             } catch (err) {
                 console.error("Error processing share target in SW:", err);
             }
-            const redirectUrl = new URL('./materi.html?shared=1&fn=' + encodeURIComponent(sharedFileName) + '&sz=' + sharedFileSize, self.location.href).href;
+            const redirectUrl = new URL('./pages/materi.html?shared=1&fn=' + encodeURIComponent(sharedFileName) + '&sz=' + sharedFileSize, self.location.href).href;
             return Response.redirect(redirectUrl, 303);
         })());
         return;
@@ -197,12 +199,12 @@ self.addEventListener('message', event => {
                 urgency === 'urgent' ? '🚨 DEADLINE HARI INI!' : '⚠️ Deadline Mendekat!',
                 {
                     body: `"${taskName}"${matkul ? ` (${matkul})` : ''} — ${urgency === 'urgent' ? 'Kurang dari 24 jam!' : 'Deadline dalam beberapa hari!'}`,
-                    icon: './icon-192.png',
-                    badge: './icon-192.png',
+                    icon: './assets/icons/icon-192.png',
+                    badge: './assets/icons/icon-192.png',
                     tag: 'deadline-' + taskId,
                     requireInteraction: urgency === 'urgent',
                     vibrate: urgency === 'urgent' ? [200, 100, 200, 100, 400] : [200, 100, 200],
-                    data: { url: './jadwal.html', taskId },
+                    data: { url: './pages/jadwal.html', taskId },
                     actions: [
                         { action: 'open', title: '📋 Buka Tugas' },
                         { action: 'dismiss', title: 'Nanti Saja' }
@@ -218,11 +220,11 @@ self.addEventListener('message', event => {
         setTimeout(() => {
             self.registration.showNotification('📿 Pengingat Kebiasaan Harian', {
                 body: `${icon} ${habitName} — Jangan lupa selesaikan hari ini!`,
-                icon: './icon-192.png',
-                badge: './icon-192.png',
+                icon: './assets/icons/icon-192.png',
+                badge: './assets/icons/icon-192.png',
                 tag: 'habit-' + habitName,
                 vibrate: [100, 50, 100],
-                data: { url: './jadwal.html#kebiasaan' },
+                data: { url: './pages/jadwal.html#kebiasaan' },
             });
         }, msUntil);
     }
@@ -231,7 +233,7 @@ self.addEventListener('message', event => {
 // ===== Klik notifikasi → buka halaman =====
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    const url = (event.notification.data && event.notification.data.url) || './jadwal.html';
+    const url = (event.notification.data && event.notification.data.url) || './pages/jadwal.html';
     if (event.action === 'dismiss') return;
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {

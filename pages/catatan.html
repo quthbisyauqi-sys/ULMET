@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="../manifest.json">
+    <title>Catatan Mahasiswa - ULMET</title>
+    <script src="../assets/js/local-db.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Plus Jakarta Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        @keyframes pageFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .page-fade { animation: pageFade 0.25s ease forwards; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-box { animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Full screen editor transition */
+        #editor-view {
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+        }
+        #editor-view.hidden-view {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #editor-view.active-view {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Note card styling */
+        .note-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            break-inside: avoid;
+        }
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .note-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex h-screen overflow-hidden selection:bg-amber-400 selection:text-slate-950">
+
+<!-- SIDEBAR NAVIGASI UTAMA (DESKTOP) -->
+<aside class="w-60 bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-md hidden md:flex flex-col justify-between flex-shrink-0 z-20">
+    <div>
+        <div class="h-16 flex items-center px-6 border-b border-slate-800/80">
+            <div class="bg-amber-400 text-slate-950 font-extrabold text-base w-8 h-8 rounded-xl flex items-center justify-center shadow mr-3">U</div>
+            <span class="text-lg font-extrabold tracking-wider text-amber-400">ULMET</span>
+        </div>
+        <nav class="p-3 space-y-1.5 mt-2">
+            <a href="dashboard.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                <span>📊</span><span>Dashboard</span>
+            </a>
+            <a href="jadwal.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                <span>📅</span><span>Jadwal &amp; Tugas</span>
+            </a>
+            <a href="materi.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                <span>📚</span><span>Materi Dosen</span>
+            </a>
+            <a href="ai.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                <span>🤖</span><span>AI ULMET</span>
+            </a>
+            <a href="keuangan.html" class="flex items-center gap-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
+                <span>💸</span><span>Keuangan</span>
+            </a>
+            <a href="catatan.html" class="flex items-center gap-3 bg-slate-800 text-amber-400 px-3.5 py-2.5 rounded-xl border border-slate-700/60 font-semibold text-sm">
+                <span>📝</span><span>Catatan</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Profil User Bawah (Akses Utama ke Profil Tanpa Membuang Ruang) -->
+    <div class="p-4 border-t border-slate-800/80">
+        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-slate-800/60 rounded-xl transition cursor-pointer" title="Buka Profil Saya">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">U</div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate" id="sidebar-nama">Memuat...</p>
+                <p class="text-xs text-slate-400" id="sidebar-semester">Semester -</p>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN CONTAINER -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950 relative">
+
+    <!-- HEADER ATAS -->
+    <header class="h-14 md:h-16 flex items-center justify-between px-4 md:px-8 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md flex-shrink-0 z-10">
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <!-- Mobile: Avatar Profil Langsung ke profil.html -->
+            <a href="profil.html" class="md:hidden bg-amber-400 text-slate-950 font-extrabold text-sm w-8 h-8 rounded-xl flex items-center justify-center shadow flex-shrink-0" title="Buka Profil">
+                <span id="mobile-top-avatar">U</span>
+            </a>
+            <div class="min-w-0">
+                <h1 class="text-base md:text-lg font-bold text-white truncate leading-tight flex items-center gap-2">
+                    <span>📝</span>
+                    <span>Catatan Mahasiswa</span>
+                </h1>
+                <p class="text-[10px] md:text-xs text-slate-400 truncate" id="notes-count-subtitle">Memuat catatan...</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <!-- Search bar -->
+            <div class="relative hidden sm:block w-48 md:w-64">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none text-xs">🔍</span>
+                <input type="text" id="inp-search-desktop" oninput="handleSearch(this.value)" placeholder="Cari isi catatan..."
+                    class="w-full bg-slate-950/70 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/60 transition">
+            </div>
+
+            <!-- View Layout Toggle (Grid / List) -->
+            <button onclick="toggleViewMode()" id="btn-toggle-view" class="p-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700/60 text-slate-300 rounded-xl text-xs transition" title="Ganti Tampilan Grid / List">
+                <span id="view-mode-icon">🔲</span>
+            </button>
+
+            <!-- Tambah Catatan Button (Desktop) -->
+            <button onclick="openNoteEditor()" class="hidden sm:flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm active:scale-95 cursor-pointer">
+                <span>+</span>
+                <span>Catatan Baru</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MOBILE SEARCH INPUT (Tampil di layar HP) -->
+    <div class="sm:hidden px-4 pt-2.5 pb-1 bg-slate-950 flex-shrink-0">
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none text-xs">🔍</span>
+            <input type="text" id="inp-search-mobile" oninput="handleSearch(this.value)" placeholder="Cari judul atau isi catatan..."
+                class="w-full bg-slate-900/90 border border-slate-800/80 rounded-xl pl-8 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/60 transition">
+            <button onclick="clearSearch()" id="btn-clear-search" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
+    </div>
+
+    <!-- HORIZONTAL FOLDER / CATEGORY CHIPS (Persis Seperti Screenshot Pengguna) -->
+    <div class="flex items-center gap-2 overflow-x-auto px-4 md:px-8 py-2.5 bg-slate-950 border-b border-slate-800/80 scrollbar-hide flex-shrink-0" style="scrollbar-width: none;" id="folder-chips-container">
+        <!-- Diisi otomatis oleh renderFolderChips() -->
+    </div>
+
+    <!-- AREA GRID CATATAN (2-KOLOM MOBILE ALA XIAOMI / MIUI NOTES) -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-5 md:p-8 pb-32 md:pb-8">
+        <!-- Container Grid / List -->
+        <div id="notes-container" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 items-start">
+            <!-- Diisi otomatis oleh renderNotes() -->
+        </div>
+
+        <!-- Tampilan Kosong (Empty State) -->
+        <div id="notes-empty" class="hidden flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-3xl mb-3 shadow-inner">📝</div>
+            <p class="font-bold text-base text-slate-200">Belum Ada Catatan</p>
+            <p class="text-xs text-slate-400 mt-1 max-w-xs" id="notes-empty-desc">Ketuk tombol kuning di bawah untuk mulai menulis catatan kuliah atau ide barumu.</p>
+            <button onclick="openNoteEditor()" class="mt-4 px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition active:scale-95 shadow">
+                + Buat Catatan Pertama
+            </button>
+        </div>
+    </main>
+
+    <!-- FLOATING ACTION BUTTON (FAB) KUNING BESAR (Persis seperti screenshot di pojok kanan bawah) -->
+    <button onclick="openNoteEditor()" title="Tulis Catatan Baru" class="fixed bottom-16 right-5 md:bottom-8 md:right-8 w-14 h-14 bg-amber-400 hover:bg-amber-300 active:scale-90 text-slate-950 rounded-full shadow-[0_10px_30px_rgba(251,191,36,0.4)] flex items-center justify-center text-3xl font-black z-40 transition-all cursor-pointer">
+        <span>+</span>
+    </button>
+
+    <!-- ======================================================== -->
+    <!-- FULL NOTE EDITOR VIEW (Persis Seperti Screenshot ke-2) -->
+    <!-- ======================================================== -->
+    <div id="editor-view" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col hidden-view">
+        
+        <!-- Editor Top App Bar -->
+        <header class="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <!-- Tombol Kembali (Auto-save) -->
+                <button onclick="closeNoteEditor()" class="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition active:scale-90 text-lg flex items-center gap-1 cursor-pointer" title="Kembali & Simpan">
+                    <span>←</span>
+                </button>
+                
+                <!-- Category / Folder Selector Chip -->
+                <div class="relative">
+                    <select id="editor-folder-select" onchange="handleEditorFolderChange(this.value)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 text-amber-400 text-xs font-bold rounded-xl px-2.5 py-1.5 pr-6 outline-none appearance-none cursor-pointer transition">
+                        <!-- Diisi otomatis -->
+                    </select>
+                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[9px]">▼</span>
+                </div>
+            </div>
+
+            <!-- Action Controls (Pin, Copy/Share, Delete) -->
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <!-- Pin Button -->
+                <button onclick="togglePinCurrentNote()" id="btn-pin-note" class="p-2 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition text-base" title="Sematkan ke Atas (Pin)">
+                    📌
+                </button>
+
+                <!-- Copy / Share Button -->
+                <button onclick="copyCurrentNoteText()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition text-base" title="Salin Seluruh Teks">
+                    📋
+                </button>
+
+                <!-- Delete Button -->
+                <button onclick="deleteCurrentNote()" class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition text-base" title="Hapus Catatan">
+                    🗑️
+                </button>
+
+                <!-- Done / Save Checkmark -->
+                <button onclick="closeNoteEditor()" class="ml-1 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl transition shadow active:scale-95 cursor-pointer">
+                    Selesai
+                </button>
+            </div>
+        </header>
+
+        <!-- Editor Content Body -->
+        <div class="flex-1 overflow-y-auto px-4 md:px-8 py-5 max-w-4xl w-full mx-auto flex flex-col">
+            
+            <!-- Note Title Input -->
+            <input type="text" id="editor-title" placeholder="Judul catatan..." oninput="autoSaveCurrentNote()"
+                class="w-full bg-transparent text-xl sm:text-2xl font-black text-white placeholder-slate-600 outline-none mb-1.5 tracking-tight">
+
+            <!-- Metadata Line (Tanggal & Karakter persis di bawah judul seperti screenshot) -->
+            <div class="flex items-center gap-2 text-xs text-slate-400 mb-4 pb-2 border-b border-slate-800/60 font-medium">
+                <span id="editor-date-text">Hari ini</span>
+                <span>•</span>
+                <span id="editor-char-count">0 karakter</span>
+            </div>
+
+            <!-- Content Area (Scrollable Clean Typing Surface) -->
+            <textarea id="editor-content" placeholder="Mulai ketik isi catatan kuliah, riset, atau daftar perlengkapan di sini..."
+                oninput="autoSaveCurrentNote()"
+                class="flex-1 w-full bg-transparent text-slate-100 placeholder-slate-600 text-sm sm:text-base leading-relaxed outline-none resize-none pb-24 font-normal"></textarea>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH FOLDER BARU -->
+    <div id="modal-folder" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[110] flex items-center justify-center p-4">
+        <div class="modal-box bg-slate-900 border border-slate-800/80 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
+            <h3 class="text-white font-extrabold text-base mb-1 flex items-center gap-2">
+                <span>📁</span> Tambah Kategori Baru
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Buat folder kategori untuk memisahkan catatan tugas, matkul, atau organisasi.</p>
+            
+            <form onsubmit="saveNewFolder(event)" class="space-y-4">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">Nama Folder</label>
+                    <input type="text" id="inp-folder-name" required placeholder="cth: LKP2M, Hutang, atau Skripsi"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-600 focus:border-amber-400 outline-none">
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="closeFolderModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
+    <a href="dashboard.html" class="bnav-item">
+        <span class="bnav-icon">📊</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">📅</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item">
+        <span class="bnav-icon">📚</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item">
+        <span class="bnav-icon">🤖</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">💸</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+    <a href="catatan.html" class="bnav-item active">
+        <span class="bnav-icon">📝</span>
+        <span class="bnav-label">Catatan</span>
+    </a>
+</nav>
+
+<!-- TOAST NOTIFICATION -->
+<div id="catatan-toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[120] bg-slate-900/95 border border-amber-400/60 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-2xl pointer-events-none transition-all duration-300 opacity-0 transform translate-y-2"></div>
+
+<script>
+    // State Aplikasi
+    let currentFolderFilter = 'Semua';
+    let searchQuery = '';
+    let isListView = false;
+    let editingNoteId = null;
+    let autoSaveTimer = null;
+
+    // Default Folder & Notes
+    const DEFAULT_FOLDERS = ['Hutang', 'LKP2M', 'Matkul', 'Pribadi'];
+    const DEFAULT_NOTES = [
+        {
+            id: 'note_1',
+            title: 'Mini riset KKI',
+            content: `Mini riset KKI\n\nMembuat mini riset di sekitaran daerah KKI nanti subjek dan objeknya seperti umkm, petani" dll\n\nDan untuk metode penelitiannya itu di sarankan menggunakan kualitatif\n\n1. Latar belakang\n2. Kajian teori\n3. Teorinya siapa\n4. Metodologi penelitiannya\n5. Hasil dan pembahasan.\n\nNanti di lampiran di tulis yang mengerjakan latar belakang siapa dan yang mengerjakan kajian teori dll agar kelihatan yang mengerjakan siapa.`,
+            folder: 'LKP2M',
+            pinned: true,
+            updatedAt: Date.now() - 3600000 * 2,
+            createdAt: Date.now() - 86400000
+        },
+        {
+            id: 'note_2',
+            title: 'You may delay',
+            content: `but time will not\nI can because i think can`,
+            folder: 'Pribadi',
+            pinned: false,
+            updatedAt: Date.now() - 3600000 * 5,
+            createdAt: Date.now() - 86400000 * 2
+        },
+        {
+            id: 'note_3',
+            title: 'Jaket, alat sholat,',
+            content: `Jaket, alat sholat, buku tulis, charger, botol minum`,
+            folder: 'Pribadi',
+            pinned: false,
+            updatedAt: Date.now() - 3600000 * 20,
+            createdAt: Date.now() - 86400000 * 3
+        },
+        {
+            id: 'note_4',
+            title: 'Matkul Sastra Arab - Balaghah',
+            content: `Konsep dasar majaz mursal dan alaqah-nya:\n1. Sababiyyah & Musabbabiyyah\n2. Juz'iyyah & Kulliyyah\n3. Haliyyah & Mahaliyyah\n\nPersiapan ujian bab 3.`,
+            folder: 'Matkul',
+            pinned: false,
+            updatedAt: Date.now() - 86400000,
+            createdAt: Date.now() - 86400000 * 4
+        }
+    ];
+
+    function getNotesList() {
+        const stored = localStorage.getItem(userKey('ulmet_notes'));
+        if (!stored) {
+            localStorage.setItem(userKey('ulmet_notes'), JSON.stringify(DEFAULT_NOTES));
+            return DEFAULT_NOTES;
+        }
+        try {
+            return JSON.parse(stored) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveNotesList(notes) {
+        localStorage.setItem(userKey('ulmet_notes'), JSON.stringify(notes));
+        if (typeof syncNotes === 'function') {
+            syncNotes(notes).catch(() => {});
+        }
+    }
+
+    function getFoldersList() {
+        const stored = localStorage.getItem(userKey('ulmet_note_folders'));
+        if (!stored) {
+            localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify(DEFAULT_FOLDERS));
+            return DEFAULT_FOLDERS;
+        }
+        try {
+            return JSON.parse(stored) || DEFAULT_FOLDERS;
+        } catch (e) {
+            return DEFAULT_FOLDERS;
+        }
+    }
+
+    function saveFoldersList(folders) {
+        localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify(folders));
+        if (typeof syncNoteFolders === 'function') {
+            syncNoteFolders(folders).catch(() => {});
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('catatan-toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove('opacity-0', 'translate-y-2');
+        t.classList.add('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+            t.classList.remove('opacity-100', 'translate-y-0');
+            t.classList.add('opacity-0', 'translate-y-2');
+        }, 2500);
+    }
+
+    // Format Tanggal ala Catatan Mobile (Kemarin 17:44 / 5 Nov 20:16)
+    function formatNoteDate(ts) {
+        if (!ts) return 'Baru saja';
+        const d = new Date(ts);
+        const now = new Date();
+        const isToday = d.toDateString() === now.toDateString();
+        
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+        const isYesterday = d.toDateString() === yesterday.toDateString();
+
+        const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+        if (isToday) return `Hari ini ${timeStr}`;
+        if (isYesterday) return `Kemarin ${timeStr}`;
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + timeStr;
+    }
+
+    // Render Folder Chips Bar (Atas)
+    function renderFolderChips() {
+        const folders = getFoldersList();
+        const container = document.getElementById('folder-chips-container');
+        if (!container) return;
+
+        const allChips = ['Semua', ...folders];
+
+        container.innerHTML = `
+            ${allChips.map(f => {
+                const isActive = (currentFolderFilter === f);
+                return `
+                    <button onclick="setFolderFilter('${f.replace(/'/g, "\\'")}')"
+                        class="px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap transition cursor-pointer flex-shrink-0 flex items-center gap-1.5
+                        ${isActive 
+                            ? 'bg-slate-800 text-amber-400 font-bold border border-slate-700/80 shadow-inner' 
+                            : 'bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800/80 font-medium'}">
+                        <span>${isActive ? '🟡' : '📁'}</span>
+                        <span>${escapeHtml(f)}</span>
+                    </button>
+                `;
+            }).join('')}
+
+            <!-- Tombol Tambah Folder -->
+            <button onclick="openFolderModal()" class="px-2.5 py-1.5 rounded-xl text-xs bg-slate-900/80 hover:bg-slate-800 border border-dashed border-slate-700 text-slate-400 hover:text-amber-300 transition flex items-center gap-1 flex-shrink-0 cursor-pointer" title="Tambah Kategori / Folder Baru">
+                <span class="text-amber-400 font-bold">+</span> Folder
+            </button>
+        `;
+    }
+
+    function setFolderFilter(f) {
+        currentFolderFilter = f;
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+        renderFolderChips();
+        renderNotes();
+    }
+
+    // Render Grid / List Catatan
+    function renderNotes() {
+        const allNotes = getNotesList();
+        const container = document.getElementById('notes-container');
+        const emptyState = document.getElementById('notes-empty');
+        const countSubtitle = document.getElementById('notes-count-subtitle');
+
+        let filtered = allNotes.filter(n => {
+            const matchFolder = (currentFolderFilter === 'Semua') || (n.folder === currentFolderFilter);
+            const query = searchQuery.toLowerCase().trim();
+            const matchSearch = !query || 
+                (n.title && n.title.toLowerCase().includes(query)) || 
+                (n.content && n.content.toLowerCase().includes(query));
+            return matchFolder && matchSearch;
+        });
+
+        // Urutkan: Pinned di paling atas, lalu tanggal terbaru
+        filtered.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0);
+        });
+
+        if (countSubtitle) {
+            countSubtitle.textContent = `${filtered.length} catatan ${currentFolderFilter !== 'Semua' ? 'di ' + currentFolderFilter : 'tersimpan'}`;
+        }
+
+        if (filtered.length === 0) {
+            container.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            emptyState.classList.add('flex');
+            const emptyDesc = document.getElementById('notes-empty-desc');
+            if (emptyDesc) {
+                if (searchQuery) {
+                    emptyDesc.textContent = `Tidak ditemukan catatan yang cocok dengan "${searchQuery}".`;
+                } else if (currentFolderFilter !== 'Semua') {
+                    emptyDesc.textContent = `Folder "${currentFolderFilter}" masih kosong. Ketuk + untuk menambahkan.`;
+                } else {
+                    emptyDesc.textContent = `Ketuk tombol kuning di bawah untuk mulai menulis catatan kuliah atau ide barumu.`;
+                }
+            }
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+
+        container.className = isListView 
+            ? 'flex flex-col gap-3 max-w-2xl mx-auto w-full' 
+            : 'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 items-start';
+
+        container.innerHTML = filtered.map(n => {
+            const dateStr = formatNoteDate(n.updatedAt || n.createdAt);
+            const snippet = (n.content || 'Tidak ada teks').trim();
+
+            return `
+                <div onclick="openNoteEditor('${n.id}')" class="note-card bg-slate-900/80 hover:bg-slate-900 border border-slate-800/80 hover:border-amber-400/50 rounded-2xl p-3.5 sm:p-4.5 cursor-pointer relative group flex flex-col justify-between">
+                    
+                    ${n.pinned ? `
+                        <span class="absolute top-3 right-3 text-xs" title="Catatan Disematkan">📌</span>
+                    ` : ''}
+
+                    <div>
+                        <h3 class="font-bold text-white text-xs sm:text-sm leading-snug line-clamp-2 pr-5 group-hover:text-amber-300 transition mb-1.5">
+                            ${escapeHtml(n.title || 'Catatan Tanpa Judul')}
+                        </h3>
+                        
+                        <p class="text-[11px] sm:text-xs text-slate-400 line-clamp-4 leading-relaxed whitespace-pre-line mb-3">
+                            ${escapeHtml(snippet)}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 pt-2 border-t border-slate-800/60 mt-auto">
+                        <span class="truncate">${dateStr}</span>
+                        <span class="px-1.5 py-0.5 rounded-md bg-slate-950 text-slate-400 font-medium border border-slate-800 truncate max-w-[80px]">
+                            ${escapeHtml(n.folder || 'Umum')}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Toggle View Mode (Grid vs List)
+    function toggleViewMode() {
+        isListView = !isListView;
+        const icon = document.getElementById('view-mode-icon');
+        if (icon) icon.textContent = isListView ? '📋' : '🔲';
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+        renderNotes();
+    }
+
+    // Pencarian
+    function handleSearch(val) {
+        searchQuery = val;
+        const clearBtn = document.getElementById('btn-clear-search');
+        if (clearBtn) {
+            if (val.trim()) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+        }
+        renderNotes();
+    }
+
+    function clearSearch() {
+        searchQuery = '';
+        const in1 = document.getElementById('inp-search-desktop');
+        const in2 = document.getElementById('inp-search-mobile');
+        if (in1) in1.value = '';
+        if (in2) in2.value = '';
+        handleSearch('');
+    }
+
+    // ========================================================
+    // NOTE EDITOR LOGIC (PERSIS SEPERTI SCREENSHOT KE-2)
+    // ========================================================
+    function openNoteEditor(noteId = null) {
+        editingNoteId = noteId;
+        const editorView = document.getElementById('editor-view');
+        const titleInp = document.getElementById('editor-title');
+        const contentInp = document.getElementById('editor-content');
+        const dateText = document.getElementById('editor-date-text');
+        const charCount = document.getElementById('editor-char-count');
+        const folderSel = document.getElementById('editor-folder-select');
+        const pinBtn = document.getElementById('btn-pin-note');
+
+        // Isi dropdown folder di editor
+        const folders = getFoldersList();
+        folderSel.innerHTML = folders.map(f => `
+            <option value="${f}" ${currentFolderFilter === f ? 'selected' : ''}>${f}</option>
+        `).join('');
+
+        if (noteId) {
+            const allNotes = getNotesList();
+            const n = allNotes.find(x => x.id === noteId);
+            if (n) {
+                titleInp.value = n.title || '';
+                contentInp.value = n.content || '';
+                dateText.textContent = formatNoteDate(n.updatedAt || n.createdAt);
+                charCount.textContent = (n.content ? n.content.length : 0) + ' karakter';
+                folderSel.value = n.folder || folders[0];
+                pinBtn.textContent = n.pinned ? '📌' : '📍';
+                pinBtn.className = n.pinned 
+                    ? 'p-2 rounded-xl text-amber-400 bg-amber-400/10 border border-amber-400/30 transition text-base' 
+                    : 'p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition text-base';
+            }
+        } else {
+            // Catatan Baru Kosong
+            const activeFolder = (currentFolderFilter !== 'Semua') ? currentFolderFilter : folders[0];
+            titleInp.value = '';
+            contentInp.value = '';
+            dateText.textContent = 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            charCount.textContent = '0 karakter';
+            folderSel.value = activeFolder;
+            pinBtn.textContent = '📍';
+            pinBtn.className = 'p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition text-base';
+        }
+
+        editorView.classList.remove('hidden-view');
+        editorView.classList.add('active-view');
+
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+
+        // Auto focus ke title jika baru, atau content jika sudah ada title
+        setTimeout(() => {
+            if (!noteId || !titleInp.value.trim()) {
+                titleInp.focus();
+            } else {
+                contentInp.focus();
+            }
+        }, 150);
+    }
+
+    function closeNoteEditor() {
+        autoSaveCurrentNote(true);
+        const editorView = document.getElementById('editor-view');
+        editorView.classList.remove('active-view');
+        editorView.classList.add('hidden-view');
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+        renderNotes();
+    }
+
+    function autoSaveCurrentNote(immediate = false) {
+        const titleVal = document.getElementById('editor-title').value.trim();
+        const contentVal = document.getElementById('editor-content').value;
+        const charCount = document.getElementById('editor-char-count');
+        const folderVal = document.getElementById('editor-folder-select').value;
+        
+        if (charCount) {
+            charCount.textContent = (contentVal ? contentVal.length : 0) + ' karakter';
+        }
+
+        // Jangan simpan jika keduanya kosong
+        if (!titleVal && !contentVal.trim()) return;
+
+        const performSave = () => {
+            let notes = getNotesList();
+            
+            // Auto generate title jika judul kosong
+            let effectiveTitle = titleVal;
+            if (!effectiveTitle && contentVal.trim()) {
+                effectiveTitle = contentVal.trim().split('\n')[0].slice(0, 40);
+            }
+
+            if (editingNoteId) {
+                const idx = notes.findIndex(x => x.id === editingNoteId);
+                if (idx !== -1) {
+                    notes[idx].title = effectiveTitle;
+                    notes[idx].content = contentVal;
+                    notes[idx].folder = folderVal;
+                    notes[idx].updatedAt = Date.now();
+                }
+            } else {
+                // Catatan Baru
+                const newNote = {
+                    id: 'note_' + Date.now(),
+                    title: effectiveTitle || 'Catatan Baru',
+                    content: contentVal,
+                    folder: folderVal,
+                    pinned: false,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                notes.unshift(newNote);
+                editingNoteId = newNote.id;
+            }
+
+            saveNotesList(notes);
+        };
+
+        if (immediate) {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            performSave();
+        } else {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(performSave, 400);
+        }
+    }
+
+    function handleEditorFolderChange(newFolder) {
+        autoSaveCurrentNote(true);
+        showToast(`Pindah ke folder: ${newFolder}`);
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+    }
+
+    function togglePinCurrentNote() {
+        if (!editingNoteId) {
+            autoSaveCurrentNote(true);
+        }
+        if (!editingNoteId) return;
+
+        let notes = getNotesList();
+        const n = notes.find(x => x.id === editingNoteId);
+        if (!n) return;
+
+        n.pinned = !n.pinned;
+        saveNotesList(notes);
+
+        const pinBtn = document.getElementById('btn-pin-note');
+        if (pinBtn) {
+            pinBtn.textContent = n.pinned ? '📌' : '📍';
+            pinBtn.className = n.pinned 
+                ? 'p-2 rounded-xl text-amber-400 bg-amber-400/10 border border-amber-400/30 transition text-base' 
+                : 'p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition text-base';
+        }
+
+        if (typeof triggerHaptic === 'function') triggerHaptic('success');
+        showToast(n.pinned ? '📌 Disematkan ke paling atas' : 'Lepas sematan');
+    }
+
+    function copyCurrentNoteText() {
+        const title = document.getElementById('editor-title').value.trim();
+        const content = document.getElementById('editor-content').value;
+        const fullText = (title ? title + '\n\n' : '') + content;
+        
+        if (!fullText.trim()) {
+            showToast('Catatan masih kosong');
+            return;
+        }
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(fullText).then(() => {
+                if (typeof triggerHaptic === 'function') triggerHaptic('success');
+                showToast('📋 Seluruh isi catatan disalin ke papan klip!');
+            });
+        }
+    }
+
+    function deleteCurrentNote() {
+        if (!editingNoteId) {
+            closeNoteEditor();
+            return;
+        }
+
+        if (!confirm('Hapus catatan ini secara permanen?')) return;
+
+        let notes = getNotesList();
+        notes = notes.filter(x => x.id !== editingNoteId);
+        saveNotesList(notes);
+
+        if (typeof triggerHaptic === 'function') triggerHaptic('delete');
+        showToast('🗑️ Catatan berhasil dihapus');
+
+        const editorView = document.getElementById('editor-view');
+        editorView.classList.remove('active-view');
+        editorView.classList.add('hidden-view');
+        renderNotes();
+    }
+
+    // Modal Folder Logic
+    function openFolderModal() {
+        const modal = document.getElementById('modal-folder');
+        const inp = document.getElementById('inp-folder-name');
+        if (inp) inp.value = '';
+        if (modal) modal.classList.remove('hidden');
+        if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+        setTimeout(() => { if (inp) inp.focus(); }, 100);
+    }
+
+    function closeFolderModal() {
+        const modal = document.getElementById('modal-folder');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function saveNewFolder(e) {
+        e.preventDefault();
+        const inp = document.getElementById('inp-folder-name');
+        const name = (inp ? inp.value.trim() : '');
+        if (!name) return;
+
+        let folders = getFoldersList();
+        if (folders.includes(name)) {
+            alert('Folder dengan nama tersebut sudah ada!');
+            return;
+        }
+
+        folders.push(name);
+        saveFoldersList(folders);
+
+        closeFolderModal();
+        currentFolderFilter = name;
+        renderFolderChips();
+        renderNotes();
+
+        if (typeof feedbackAction === 'function') feedbackAction('success');
+        showToast(`Folder "${name}" berhasil dibuat!`);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag]));
+    }
+
+    // Muat Profil Pengguna di Sidebar
+    async function loadUserProfileHeader() {
+        try {
+            const profile = JSON.parse(localStorage.getItem(userKey('ulmet_profile')) || 'null');
+            const namaEl = document.getElementById('sidebar-nama');
+            const semEl = document.getElementById('sidebar-semester');
+            const avEl = document.getElementById('sidebar-avatar');
+            const mobAv = document.getElementById('mobile-top-avatar');
+
+            if (profile) {
+                if (namaEl) namaEl.textContent = profile.nama || profile.panggilan || 'Mahasiswa';
+                if (semEl) semEl.textContent = 'Semester ' + (profile.semester || '1');
+                const initial = (profile.panggilan || profile.nama || 'U').charAt(0).toUpperCase();
+                if (avEl) avEl.textContent = initial;
+                if (mobAv) mobAv.textContent = initial;
+            }
+        } catch(e) {}
+    }
+
+    // Inisialisasi saat Halaman Dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUserProfileHeader();
+        renderFolderChips();
+        renderNotes();
+    });
+</script>
+</body>
+</html>
+

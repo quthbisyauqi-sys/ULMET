@@ -2,19 +2,19 @@
 <html lang="id">
 
 <head>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="../manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0a101f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Widget ULMET — Pengingat Tugas & Karakter Si Ulmet</title>
 
-    <!-- Supabase SDK & Config -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
+    <script src="../assets/js/local-db.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
@@ -40,36 +40,70 @@
             box-shadow: 0 0 35px -5px rgba(250, 204, 21, 0.45), 0 0 15px rgba(234, 179, 8, 0.3);
             border-color: rgba(250, 204, 21, 0.7);
         }
+
         .glow-angry {
             box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.55), 0 0 15px rgba(220, 38, 38, 0.4);
             border-color: rgba(239, 68, 68, 0.8);
             animation: pulse-angry 1.5s infinite;
         }
+
         .glow-worried {
             box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.45);
             border-color: rgba(249, 115, 22, 0.7);
         }
 
         @keyframes pulse-angry {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
         }
 
         @keyframes shake-angry {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-4px) rotate(-1deg); }
-            40% { transform: translateX(4px) rotate(1deg); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(3px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-4px) rotate(-1deg);
+            }
+
+            40% {
+                transform: translateX(4px) rotate(1deg);
+            }
+
+            60% {
+                transform: translateX(-3px);
+            }
+
+            80% {
+                transform: translateX(3px);
+            }
         }
+
         .shake-animation {
             animation: shake-angry 0.5s ease-in-out;
         }
 
         @keyframes bounce-reward {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px) scale(1.03); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px) scale(1.03);
+            }
         }
+
         .bounce-animation {
             animation: bounce-reward 0.7s ease-in-out;
         }
@@ -78,6 +112,7 @@
         .widget-scroll::-webkit-scrollbar {
             width: 4px;
         }
+
         .widget-scroll::-webkit-scrollbar-thumb {
             background: rgba(148, 163, 184, 0.25);
             border-radius: 9999px;
@@ -101,15 +136,22 @@
 
     <!-- Background ambient lighting -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div id="ambient-orb-1" class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl transition-all duration-700"></div>
-        <div id="ambient-orb-2" class="absolute top-1/3 -right-32 w-96 h-96 bg-yellow-500/15 rounded-full blur-3xl transition-all duration-700"></div>
-        <div id="ambient-orb-3" class="absolute -bottom-32 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl transition-all duration-700"></div>
+        <div id="ambient-orb-1"
+            class="absolute -top-32 -left-32 w-96 h-96 bg-slate-800/20 rounded-full blur-3xl transition-all duration-700">
+        </div>
+        <div id="ambient-orb-2"
+            class="absolute top-1/3 -right-32 w-96 h-96 bg-yellow-500/15 rounded-full blur-3xl transition-all duration-700">
+        </div>
+        <div id="ambient-orb-3"
+            class="absolute -bottom-32 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl transition-all duration-700">
+        </div>
     </div>
 
     <!-- TOP HEADER / CONTROL BAR -->
     <header class="w-full max-w-lg flex items-center justify-between py-2 mb-3">
         <div class="flex items-center gap-2">
-            <a href="dashboard.html" class="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center justify-center text-slate-200 transition text-sm shadow">
+            <a href="dashboard.html"
+                class="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center justify-center text-slate-200 transition text-sm shadow">
                 ←
             </a>
             <div>
@@ -121,25 +163,30 @@
         </div>
 
         <div class="flex items-center gap-1.5">
-            <button onclick="triggerNativeInstall()" class="flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-xl shadow-lg shadow-yellow-500/20 active:scale-95 transition">
+            <button onclick="triggerNativeInstall()"
+                class="flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-extrabold text-xs px-3 py-1.5 rounded-xl shadow-lg shadow-yellow-500/20 active:scale-95 transition">
                 <span>➕</span> Pasang di HP
             </button>
         </div>
     </header>
 
     <!-- WIDGET SIZE TOGGLES (Mimicking Android 1x1, 4x2, 4x4) -->
-    <div class="w-full max-w-lg flex items-center justify-between bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800/80 mb-4 backdrop-blur-md">
+    <div
+        class="w-full max-w-lg flex items-center justify-between bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800/80 mb-4 backdrop-blur-md">
         <span class="text-[11px] text-slate-400 font-bold px-2 flex items-center gap-1">
             <span>📐</span> Ukuran Widget:
         </span>
         <div class="flex items-center gap-1">
-            <button onclick="setWidgetSize('4x2')" id="btn-size-4x2" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
+            <button onclick="setWidgetSize('4x2')" id="btn-size-4x2"
+                class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
                 4 x 2 (Banner)
             </button>
-            <button onclick="setWidgetSize('4x4')" id="btn-size-4x4" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-yellow-400 text-slate-950 shadow-md">
+            <button onclick="setWidgetSize('4x4')" id="btn-size-4x4"
+                class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-yellow-400 text-slate-950 shadow-md">
                 4 x 4 (Lengkap)
             </button>
-            <button onclick="setWidgetSize('2x2')" id="btn-size-2x2" class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
+            <button onclick="setWidgetSize('2x2')" id="btn-size-2x2"
+                class="size-btn px-3 py-1 text-xs font-bold rounded-xl transition bg-slate-800 text-slate-300 hover:text-white">
                 2 x 2 (Karakter)
             </button>
         </div>
@@ -151,19 +198,27 @@
         <!-- ====================================================
              1. WIDGET 4 x 4 (Comprehensive Full Interactive Widget)
              ==================================================== -->
-        <div id="widget-view-4x4" class="widget-glass rounded-3xl p-5 border border-white/10 relative overflow-hidden transition-all duration-500">
+        <div id="widget-view-4x4"
+            class="widget-glass rounded-3xl p-5 border border-white/10 relative overflow-hidden transition-all duration-500">
             <!-- Mood Accent Glow Strip -->
-            <div id="mood-glow-bar-4x4" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"></div>
+            <div id="mood-glow-bar-4x4"
+                class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500">
+            </div>
 
             <!-- Top Header: Mascot Avatar + Speech Bubble + Live Badge -->
             <div class="flex items-start gap-4 mb-4">
                 <!-- Mascot Image with Dynamic Mood Glow -->
                 <div class="relative flex-shrink-0 cursor-pointer" onclick="pokeMascot()" title="Sentuh Si Ulmet!">
-                    <div id="mascot-img-wrapper-4x4" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900 relative">
-                        <img id="mascot-avatar-img-4x4" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
-                        <span id="mascot-touch-hint" class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm text-[9px] px-1 rounded text-white font-bold">👆 Sentuh</span>
+                    <div id="mascot-img-wrapper-4x4"
+                        class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900 relative">
+                        <img id="mascot-avatar-img-4x4" src="../assets/img/mascot-happy.jpg" alt="Si Ulmet Mascot"
+                            class="w-full h-full object-cover">
+                        <span id="mascot-touch-hint"
+                            class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm text-[9px] px-1 rounded text-white font-bold">👆
+                            Sentuh</span>
                     </div>
-                    <div id="mascot-mood-tag-4x4" class="absolute -bottom-2 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1">
+                    <div id="mascot-mood-tag-4x4"
+                        class="absolute -bottom-2 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1">
                         🏆 REWARD
                     </div>
                 </div>
@@ -171,16 +226,19 @@
                 <!-- Mascot Speech & Status -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-1 mb-1">
-                        <span id="mascot-name-badge-4x4" class="text-xs font-black text-yellow-400 tracking-wider flex items-center gap-1">
+                        <span id="mascot-name-badge-4x4"
+                            class="text-xs font-black text-yellow-400 tracking-wider flex items-center gap-1">
                             <span>🦉</span> SI ULMET
                         </span>
-                        <span id="live-time-pill" class="text-[10px] bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full font-semibold border border-slate-700/60">
+                        <span id="live-time-pill"
+                            class="text-[10px] bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full font-semibold border border-slate-700/60">
                             12:00
                         </span>
                     </div>
 
                     <!-- Speech Bubble -->
-                    <div id="speech-bubble-4x4" class="bg-slate-900/90 border border-slate-700/70 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-200 transition-all duration-300 relative shadow-inner">
+                    <div id="speech-bubble-4x4"
+                        class="bg-slate-900/90 border border-slate-700/70 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-200 transition-all duration-300 relative shadow-inner">
                         <p id="mascot-speech-text-4x4" class="font-medium">
                             Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya! 🎓✨
                         </p>
@@ -188,10 +246,12 @@
 
                     <!-- Activity Streak & Quick Stats -->
                     <div class="flex items-center gap-2 mt-2 text-[11px]">
-                        <span id="streak-pill-4x4" class="bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+                        <span id="streak-pill-4x4"
+                            class="bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
                             🔥 <span id="streak-count-4x4">1</span> Hari Aktif
                         </span>
-                        <span id="today-score-pill-4x4" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-lg font-bold">
+                        <span id="today-score-pill-4x4"
+                            class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-lg font-bold">
                             ✅ <span id="done-ratio-4x4">0/0</span> Selesai
                         </span>
                     </div>
@@ -200,11 +260,15 @@
 
             <!-- TAB SWITCHER: TUGAS KULIAH vs KEBIASAAN HARIAN -->
             <div class="flex border-b border-slate-800/80 mb-3 text-xs font-bold">
-                <button onclick="setWidgetTab('tasks')" id="tab-tasks-btn" class="flex-1 py-2 text-center text-yellow-400 border-b-2 border-yellow-400 flex items-center justify-center gap-1.5 transition">
-                    <span>📚</span> Tugas Kuliah <span id="badge-count-tasks" class="bg-blue-900 text-blue-200 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
+                <button onclick="setWidgetTab('tasks')" id="tab-tasks-btn"
+                    class="flex-1 py-2 text-center text-yellow-400 border-b-2 border-yellow-400 flex items-center justify-center gap-1.5 transition">
+                    <span>📚</span> Tugas Kuliah <span id="badge-count-tasks"
+                        class="bg-slate-800 text-amber-400 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
                 </button>
-                <button onclick="setWidgetTab('habits')" id="tab-habits-btn" class="flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
-                    <span>📿</span> Kebiasaan Sehari-hari <span id="badge-count-habits" class="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
+                <button onclick="setWidgetTab('habits')" id="tab-habits-btn"
+                    class="flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
+                    <span>📿</span> Kebiasaan Sehari-hari <span id="badge-count-habits"
+                        class="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-1">0</span>
                 </button>
             </div>
 
@@ -216,10 +280,12 @@
 
             <!-- FOOTER SHORTCUTS (DASHBOARD & JADWAL) -->
             <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <a href="dashboard.html" class="flex items-center gap-1.5 text-slate-400 hover:text-white font-bold transition">
+                <a href="dashboard.html"
+                    class="flex items-center gap-1.5 text-slate-400 hover:text-white font-bold transition">
                     <span>🏠</span> Buka ULMET
                 </a>
-                <a href="jadwal.html" class="flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-extrabold transition">
+                <a href="jadwal.html"
+                    class="flex items-center gap-1 text-yellow-400 hover:text-yellow-300 font-extrabold transition">
                     <span>+</span> Tambah Tugas <span class="text-slate-500 font-normal">→</span>
                 </a>
             </div>
@@ -229,17 +295,23 @@
         <!-- ====================================================
              2. WIDGET 4 x 2 (Horizontal Banner Layout)
              ==================================================== -->
-        <div id="widget-view-4x2" class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden transition-all duration-500">
+        <div id="widget-view-4x2"
+            class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden transition-all duration-500">
             <!-- Mood Accent Glow Strip -->
-            <div id="mood-glow-bar-4x2" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500"></div>
+            <div id="mood-glow-bar-4x2"
+                class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500">
+            </div>
 
             <div class="flex items-center gap-3.5">
                 <!-- Mascot Thumbnail -->
                 <div class="relative flex-shrink-0 cursor-pointer" onclick="pokeMascot()">
-                    <div id="mascot-img-wrapper-4x2" class="w-16 h-16 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
-                        <img id="mascot-avatar-img-4x2" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                    <div id="mascot-img-wrapper-4x2"
+                        class="w-16 h-16 rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
+                        <img id="mascot-avatar-img-4x2" src="../assets/img/mascot-happy.jpg" alt="Si Ulmet Mascot"
+                            class="w-full h-full object-cover">
                     </div>
-                    <span id="mascot-mood-tag-4x2" class="absolute -bottom-1.5 -right-1 bg-yellow-400 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow">
+                    <span id="mascot-mood-tag-4x2"
+                        class="absolute -bottom-1.5 -right-1 bg-yellow-400 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded-full shadow">
                         🏆
                     </span>
                 </div>
@@ -247,8 +319,10 @@
                 <!-- Info Banner -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                        <h3 id="banner-title-4x2" class="text-xs font-black text-yellow-400 truncate">Si Ulmet Bangga! 🏆</h3>
-                        <span id="banner-urgent-badge-4x2" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
+                        <h3 id="banner-title-4x2" class="text-xs font-black text-yellow-400 truncate">Si Ulmet Bangga!
+                            🏆</h3>
+                        <span id="banner-urgent-badge-4x2"
+                            class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
                             Tugas Terkendali
                         </span>
                     </div>
@@ -256,10 +330,12 @@
                         Tugas aktif beres, kebiasaan terjaga rapi hari ini!
                     </p>
                     <div class="flex items-center gap-2 mt-2">
-                        <a href="jadwal.html" class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg transition active:scale-95 shadow">
+                        <a href="jadwal.html"
+                            class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg transition active:scale-95 shadow">
                             📝 Cek Tugas (<span id="banner-active-task-count">0</span>)
                         </a>
-                        <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[10px] px-2.5 py-1 rounded-lg transition border border-slate-700">
+                        <a href="dashboard.html"
+                            class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[10px] px-2.5 py-1 rounded-lg transition border border-slate-700">
                             Buka ULMET
                         </a>
                     </div>
@@ -271,22 +347,29 @@
         <!-- ====================================================
              3. WIDGET 2 x 2 (Square Compact Mascot Focus)
              ==================================================== -->
-        <div id="widget-view-2x2" class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden text-center max-w-[280px] mx-auto transition-all duration-500">
-            <div id="mood-glow-bar-2x2" class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 to-amber-500"></div>
+        <div id="widget-view-2x2"
+            class="hidden widget-glass rounded-3xl p-4 border border-white/10 relative overflow-hidden text-center max-w-[280px] mx-auto transition-all duration-500">
+            <div id="mood-glow-bar-2x2"
+                class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 to-amber-500"></div>
 
             <div class="relative w-24 h-24 mx-auto mb-2 cursor-pointer" onclick="pokeMascot()">
-                <div id="mascot-img-wrapper-2x2" class="w-full h-full rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
-                    <img id="mascot-avatar-img-2x2" src="mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-full h-full object-cover">
+                <div id="mascot-img-wrapper-2x2"
+                    class="w-full h-full rounded-2xl overflow-hidden border-2 glow-reward transition-all duration-500 bg-slate-900">
+                    <img id="mascot-avatar-img-2x2" src="../assets/img/mascot-happy.jpg" alt="Si Ulmet Mascot"
+                        class="w-full h-full object-cover">
                 </div>
-                <div id="mascot-mood-tag-2x2" class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow">
+                <div id="mascot-mood-tag-2x2"
+                    class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full whitespace-nowrap shadow">
                     🏆 BANGGA
                 </div>
             </div>
 
             <h4 id="compact-title-2x2" class="text-xs font-black text-white mt-3">Rajin Buka ULMET!</h4>
-            <p id="compact-sub-2x2" class="text-[10px] text-slate-400 mt-0.5"><span id="compact-task-count">0</span> tugas tersisa</p>
+            <p id="compact-sub-2x2" class="text-[10px] text-slate-400 mt-0.5"><span id="compact-task-count">0</span>
+                tugas tersisa</p>
 
-            <a href="dashboard.html" class="mt-3 block w-full bg-slate-800/80 hover:bg-slate-700 text-yellow-400 text-[11px] font-extrabold py-1.5 rounded-xl border border-slate-700 transition">
+            <a href="dashboard.html"
+                class="mt-3 block w-full bg-slate-800/80 hover:bg-slate-700 text-yellow-400 text-[11px] font-extrabold py-1.5 rounded-xl border border-slate-700 transition">
                 Masuk ULMET →
             </a>
         </div>
@@ -302,34 +385,44 @@
             <span id="current-mode-label" class="text-[10px] text-yellow-400 font-extrabold">Auto (Real-time)</span>
         </div>
         <div class="grid grid-cols-4 gap-1.5 text-center">
-            <button onclick="setTestMood('happy')" id="btn-mood-happy" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 hover:bg-yellow-400 hover:text-slate-950 transition active:scale-95">
+            <button onclick="setTestMood('happy')" id="btn-mood-happy"
+                class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 hover:bg-yellow-400 hover:text-slate-950 transition active:scale-95">
                 🏆 Reward
             </button>
-            <button onclick="setTestMood('angry')" id="btn-mood-angry" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500 hover:text-white transition active:scale-95">
+            <button onclick="setTestMood('angry')" id="btn-mood-angry"
+                class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500 hover:text-white transition active:scale-95">
                 😡 Marah
             </button>
-            <button onclick="setTestMood('worried')" id="btn-mood-worried" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-orange-500/20 text-orange-400 border border-orange-500/40 hover:bg-orange-500 hover:text-white transition active:scale-95">
+            <button onclick="setTestMood('worried')" id="btn-mood-worried"
+                class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-orange-500/20 text-orange-400 border border-orange-500/40 hover:bg-orange-500 hover:text-white transition active:scale-95">
                 ⏰ Panik
             </button>
-            <button onclick="setTestMood('auto')" id="btn-mood-auto" class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-600 hover:text-white transition active:scale-95">
+            <button onclick="setTestMood('auto')" id="btn-mood-auto"
+                class="px-2 py-1.5 rounded-xl text-[11px] font-black bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white transition active:scale-95">
                 🤖 Auto
             </button>
         </div>
         <p class="text-[10px] text-slate-400 mt-2 text-center">
-            *Mode <b>Marah</b> otomatis aktif jika ada tugas yang overdue atau tidak membuka ULMET > 1 hari. Mode <b>Reward</b> aktif jika kamu rajin buka ULMET dan mengerjakan tugas!
+            *Mode <b>Marah</b> otomatis aktif jika ada tugas yang overdue atau tidak membuka ULMET > 1 hari. Mode
+            <b>Reward</b> aktif jika kamu rajin buka ULMET dan mengerjakan tugas!
         </p>
     </div>
 
     <!-- HOW TO INSTALL MODAL (Cara Pasang di HP Android) -->
-    <div id="install-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-sm w-full p-6 text-slate-200 shadow-2xl relative">
-            <button onclick="closeInstallModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold">
+    <div id="install-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-sm w-full p-6 text-slate-200 shadow-2xl relative">
+            <button onclick="closeInstallModal()"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center font-bold">
                 ✕
             </button>
 
             <div class="text-center mb-4">
-                <div class="w-16 h-16 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-yellow-400 to-amber-500 p-0.5 shadow-lg shadow-yellow-500/30">
-                    <img src="mascot-happy.jpg" alt="ULMET Icon" class="w-full h-full object-cover rounded-2xl">
+                <div
+                    class="w-16 h-16 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-yellow-400 to-amber-500 p-0.5 shadow-lg shadow-yellow-500/30">
+                    <img src="../assets/img/mascot-happy.jpg" alt="ULMET Icon"
+                        class="w-full h-full object-cover rounded-2xl">
                 </div>
                 <h3 class="text-lg font-black text-white">Pasang Widget di Layar HP</h3>
                 <p class="text-xs text-slate-400">Jadikan ULMET widget di Home Screen Android-mu!</p>
@@ -337,24 +430,30 @@
 
             <div class="space-y-3 text-xs">
                 <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">1</span>
+                    <span
+                        class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">1</span>
                     <p><b class="text-white">Buka di Google Chrome</b> pada HP Android kamu.</p>
                 </div>
                 <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">2</span>
+                    <span
+                        class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">2</span>
                     <p>Ketuk tombol <b>Titik Tiga (⋮)</b> di pojok kanan atas browser Chrome.</p>
                 </div>
                 <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">3</span>
+                    <span
+                        class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">3</span>
                     <p>Pilih menu <b>"Tambahkan ke Layar Utama" (Add to Home screen)</b> atau <b>"Install App"</b>.</p>
                 </div>
                 <div class="flex items-start gap-3 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-                    <span class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">4</span>
-                    <p>Selesai! Widget Si Ulmet langsung berada di layar utama untuk mengingatkan tugasmu setiap hari! 🎉</p>
+                    <span
+                        class="w-6 h-6 rounded-full bg-yellow-400 text-slate-950 font-black flex items-center justify-center flex-shrink-0 text-xs">4</span>
+                    <p>Selesai! Widget Si Ulmet langsung berada di layar utama untuk mengingatkan tugasmu setiap hari!
+                        🎉</p>
                 </div>
             </div>
 
-            <button onclick="closeInstallModal()" class="mt-5 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black py-2.5 rounded-xl transition shadow-lg shadow-yellow-500/20 active:scale-95 text-xs">
+            <button onclick="closeInstallModal()"
+                class="mt-5 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black py-2.5 rounded-xl transition shadow-lg shadow-yellow-500/20 active:scale-95 text-xs">
                 Mengerti, Siap Pasang!
             </button>
         </div>
@@ -388,7 +487,7 @@
                     osc.start(now + idx * 0.1);
                     osc.stop(now + idx * 0.1 + 0.35);
                 });
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function playAngryBuzz() {
@@ -407,7 +506,7 @@
                 osc.start(now);
                 osc.stop(now + 0.35);
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function playWorriedBeep() {
@@ -424,7 +523,7 @@
                 gain.connect(ctx.destination);
                 osc.start(now);
                 osc.stop(now + 0.2);
-            } catch(e) {}
+            } catch (e) { }
         }
 
         // Lightweight Canvas Confetti Engine
@@ -603,9 +702,9 @@
         // Apply Mascot Visuals according to Mood
         function applyMascotMood(mood) {
             currentMood = mood;
-            const mascotHappyImg = 'mascot-happy.jpg';
-            const mascotAngryImg = 'mascot-angry.jpg';
-            const mascotWorriedImg = 'mascot-worried.jpg';
+            const mascotHappyImg = '../assets/img/mascot-happy.jpg';
+            const mascotAngryImg = '../assets/img/mascot-angry.jpg';
+            const mascotWorriedImg = '../assets/img/mascot-worried.jpg';
 
             const moodGlowBars = [
                 document.getElementById('mood-glow-bar-4x4'),
@@ -645,7 +744,7 @@
                 avatars.forEach(a => { if (a) a.src = mascotHappyImg; });
                 wrappers.forEach(w => { if (w) w.classList.add('glow-reward'); });
                 moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 transition-all duration-500"; });
-                
+
                 if (moodTag4x4) {
                     moodTag4x4.innerHTML = "🏆 REWARD";
                     moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1";
@@ -655,7 +754,7 @@
                 if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-amber-300 font-bold">• Bangga Padamu!</span>';
                 if (speechText) speechText.innerHTML = "Keren banget! Kamu rajin buka ULMET dan tugasmu beres! Pertahankan streak belajarmu ya, calon sarjana sukses! 🎓✨";
                 if (bubbleEl) bubbleEl.className = "bg-slate-900/90 border border-yellow-500/40 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-200 transition-all duration-300 relative shadow-inner";
-                
+
                 if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Bangga! 🏆";
                 if (bannerSub) bannerSub.textContent = "Kamu rajin dan disiplin mengurus tugas kuliahmu!";
                 if (bannerBadge) {
@@ -668,7 +767,7 @@
                 avatars.forEach(a => { if (a) a.src = mascotAngryImg; });
                 wrappers.forEach(w => { if (w) w.classList.add('glow-angry'); });
                 moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-red-500 transition-all duration-500"; });
-                
+
                 if (moodTag4x4) {
                     moodTag4x4.innerHTML = "😡 MARAH!";
                     moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1 animate-pulse";
@@ -678,7 +777,7 @@
                 if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-red-400 font-bold">• Sedang Marah!</span>';
                 if (speechText) speechText.innerHTML = "<b>HEI KAMU! 💢</b> Kemana aja kok jarang buka ULMET?! Ada tugas numpuk yang kamu abaikan! Buka & kerjakan <b>SEKARANG JUGA!</b>";
                 if (bubbleEl) bubbleEl.className = "bg-red-950/40 border border-red-500/60 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-red-200 transition-all duration-300 relative shadow-inner";
-                
+
                 if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Marah! 😡";
                 if (bannerSub) bannerSub.textContent = "Jangan malas! Ada tugas atau kebiasaan yang terabaikan!";
                 if (bannerBadge) {
@@ -691,7 +790,7 @@
                 avatars.forEach(a => { if (a) a.src = mascotWorriedImg; });
                 wrappers.forEach(w => { if (w) w.classList.add('glow-worried'); });
                 moodGlowBars.forEach(b => { if (b) b.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-500 transition-all duration-500"; });
-                
+
                 if (moodTag4x4) {
                     moodTag4x4.innerHTML = "⏰ PANIK!";
                     moodTag4x4.className = "absolute -bottom-2 -right-1 bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md border border-slate-900 flex items-center gap-1";
@@ -701,7 +800,7 @@
                 if (nameBadge) nameBadge.innerHTML = '<span>🦉</span> SI ULMET <span class="text-[10px] text-orange-300 font-bold">• Deadline Mepet!</span>';
                 if (speechText) speechText.innerHTML = "<b>GAWAT! ⏰</b> Deadline tugas tinggal hitungan jam lagi! Segera selesaikan sebelum terlambat dan kena amuk dosen!";
                 if (bubbleEl) bubbleEl.className = "bg-amber-950/30 border border-orange-500/50 p-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-amber-200 transition-all duration-300 relative shadow-inner";
-                
+
                 if (bannerTitle) bannerTitle.innerHTML = "Si Ulmet Panik! ⏰";
                 if (bannerSub) bannerSub.textContent = "Ada tugas mendekati deadline! Ayo gas beresin!";
                 if (bannerBadge) {
@@ -822,7 +921,7 @@
                         tagHtml = `<span class="text-[10px] bg-orange-500/20 text-orange-300 font-bold px-2 py-0.5 rounded-full border border-orange-500/40">⏰ ${Math.max(1, Math.round(diffHours))} Jam Lagi</span>`;
                     } else if (t.deadline) {
                         const dl = new Date(t.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                        tagHtml = `<span class="text-[10px] bg-blue-900/40 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-700/30">📅 ${dl}</span>`;
+                        tagHtml = `<span class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded-full border border-slate-700/60">📅 ${dl}</span>`;
                     }
 
                     return `
@@ -835,7 +934,7 @@
                                 </button>
                                 <div class="min-w-0">
                                     <p class="font-bold text-xs ${isDone ? 'line-through text-slate-400' : 'text-white'} truncate">${escapeWidgetHtml(t.nama || t.title || 'Tugas Kuliah')}</p>
-                                    <p class="text-[10px] text-blue-300/80 truncate">${escapeWidgetHtml(t.matkul || t.course || 'Umum')}</p>
+                                    <p class="text-[10px] text-slate-400 truncate">${escapeWidgetHtml(t.matkul || t.course || 'Umum')}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
@@ -907,8 +1006,11 @@
             }
 
             if (!wasDone) {
+                if (typeof triggerHaptic === 'function') triggerHaptic('success');
                 playRewardChime();
                 fireConfetti();
+            } else {
+                if (typeof triggerHaptic === 'function') triggerHaptic('delete');
             }
 
             refreshWidgetData();
@@ -926,10 +1028,12 @@
             if (wasDone) {
                 h.lastChecked = null;
                 h.streak = Math.max(0, (Number(h.streak) || 1) - 1);
+                if (typeof triggerHaptic === 'function') triggerHaptic('delete');
             } else {
                 h.lastChecked = today;
                 h.streak = (Number(h.streak) || 0) + 1;
-                playRewardChime();
+                if (typeof feedbackAction === 'function') feedbackAction('streak');
+                else playRewardChime();
                 fireConfetti();
             }
 
@@ -1002,7 +1106,7 @@
         }
 
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./sw.js").catch(() => {});
+            navigator.serviceWorker.register("../sw.js").catch(() => { });
         }
 
         // Initialize on Load
@@ -1018,7 +1122,7 @@
                         refreshWidgetData();
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
         });
     </script>
 </body>

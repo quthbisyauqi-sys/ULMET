@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <link rel="manifest" href="../manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <title>Profil & Brankas Sertifikat Mahasiswa - ULMET</title>
+    <script src="../assets/js/local-db.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Outfit', sans-serif; background-color: #020617; color: #fff; }
+        .glass { background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(51,65,85,0.8); }
+        input, select, textarea { background: rgba(2,6,23,0.7) !important; border: 1px solid rgba(51,65,85,0.8); color: #fff !important; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #facc15; }
+        select option { background: #0f172a; }
+        .avatar-ring { box-shadow: 0 0 0 4px #facc15, 0 0 0 8px rgba(250,204,21,0.2); }
+        .btn-save { background: linear-gradient(135deg, #facc15, #f59e0b); }
+        .btn-save:hover { background: linear-gradient(135deg, #fde047, #facc15); }
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; transition: all 0.2s; color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .sidebar-link:hover { background: rgba(30,41,59,0.6); color: #fff; }
+        .sidebar-link.active { background: #1e293b; color: #fbbf24; border: 1px solid rgba(51,65,85,0.8); font-weight: 600; }
+        
+        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        .bnav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 1px; 
+            padding: 2px 1px; 
+            color: #64748b; 
+            flex: 1; 
+            position: relative;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); 
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .bnav-item.active { 
+            color: #facc15; 
+            font-weight: 700;
+        }
+        .bnav-item.active .bnav-icon {
+            transform: scale(1.08);
+        }
+        .bnav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            width: 14px;
+            height: 2px;
+            background: #facc15;
+            border-radius: 9999px;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.7);
+        }
+        .bnav-item:not(.active):active { 
+            transform: scale(0.92);
+            color: #94a3b8;
+        }
+        .bnav-label { 
+            font-size: 9px; 
+            font-weight: 600; 
+            line-height: 1; 
+            letter-spacing: -0.2px;
+        }
+        .bnav-icon { 
+            font-size: 16px; 
+            line-height: 1; 
+            margin-bottom: 0px;
+            transition: transform 0.18s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+
+<!-- SIDEBAR -->
+<aside class="hidden md:flex w-60 bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-md flex-col flex-shrink-0 h-screen sticky top-0">
+    <div class="h-16 flex items-center px-6 border-b border-slate-800/80">
+        <div class="bg-amber-400 text-slate-950 font-extrabold text-base w-8 h-8 rounded-xl flex items-center justify-center shadow mr-3">U</div>
+        <span class="text-lg font-extrabold tracking-wider text-amber-400">ULMET</span>
+    </div>
+    <nav class="p-3 space-y-1.5 mt-2 flex-1">
+        <a href="dashboard.html" class="sidebar-link"><span>📊</span><span class="font-medium text-sm">Dashboard</span></a>
+        <a href="jadwal.html" class="sidebar-link"><span>📅</span><span class="font-medium text-sm">Jadwal & Tugas</span></a>
+        <a href="materi.html" class="sidebar-link"><span>📚</span><span class="font-medium text-sm">Materi Dosen</span></a>
+        <a href="ai.html" class="sidebar-link"><span class="animate-bounce">🤖</span><span class="font-medium text-sm">AI ULMET</span></a>
+        <a href="keuangan.html" class="sidebar-link"><span>💸</span><span class="font-medium text-sm">Keuangan</span></a>
+        <a href="catatan.html" class="sidebar-link"><span>📝</span><span class="font-medium text-sm">Catatan</span></a>
+    </nav>
+    <div class="p-4 border-t border-slate-800/80">
+        <a href="profil.html" class="flex items-center gap-3 px-2 py-2 bg-slate-800/80 border border-slate-700/60 rounded-xl transition cursor-pointer">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-sm flex-shrink-0" id="sidebar-avatar">S</div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate" id="sidebar-nama">Syauqi Quthbi</p>
+                <p class="text-xs text-amber-400 font-semibold" id="sidebar-semester">Semester 1</p>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 flex flex-col min-h-screen bg-slate-950 pb-36 md:pb-12">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden h-14 flex items-center justify-between px-4 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md flex-shrink-0 sticky top-0 z-30">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-amber-400 text-slate-950 font-extrabold text-sm w-7 h-7 rounded-lg flex items-center justify-center shadow">U</div>
+            <span class="text-base font-extrabold tracking-wider text-amber-400">ULMET</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs bg-emerald-950/80 text-emerald-400 border border-emerald-700/50 px-2.5 py-1 rounded-full font-bold flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> SKPI Vault
+            </span>
+        </div>
+    </header>
+
+    <div class="p-4 sm:p-6 md:p-8 flex-1 max-w-5xl mx-auto w-full">
+        <!-- Header & Segmented Tab Switcher -->
+        <div class="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+                    <span id="page-title-icon">🏆</span> <span id="page-title-text">Brankas Sertifikat & SKPI</span>
+                </h1>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1">Kelola arsip sertifikat kejuaraan, webinar, kepengurusan organisasi, dan pelatihan pendukung ijazah</p>
+            </div>
+
+            <!-- Segmented Tab Controls -->
+            <div class="inline-flex p-1 bg-slate-900/90 rounded-2xl border border-slate-800 self-start sm:self-auto shadow-inner">
+                <button onclick="switchProfilTab('prestasi')" id="tab-btn-prestasi" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow">
+                    <span>🏆</span> Folder Sertifikat
+                    <span id="badge-prestasi-count" class="bg-slate-950 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-extrabold">7</span>
+                </button>
+                <button onclick="switchProfilTab('biodata')" id="tab-btn-biodata" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white">
+                    <span>👤</span> Biodata & Akun
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 1: BRANKAS SERTIFIKAT BERBASIS FOLDER -->
+        <!-- ============================================== -->
+        <div id="panel-prestasi" class="space-y-6">
+
+            <!-- 4 FOLDER KATEGORI UTAMA (INTERACTIVE FOLDER CARDS) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                
+                <!-- Folder 1: Kejuaraan & Lomba -->
+                <div onclick="selectCertFolder('kejuaraan')" id="folder-card-kejuaraan" class="folder-card glass rounded-2xl p-4 border-2 border-amber-400 bg-amber-400/10 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-[0_0_15px_rgba(250,204,21,0.15)]">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl p-2 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40">🏆</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950" id="badge-count-kejuaraan">2 Berkas</span>
+                    </div>
+                    <h4 class="font-extrabold text-white text-sm group-hover:text-amber-400 transition truncate">Kejuaraan & Lomba</h4>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">Piagam Juara & Finalis</p>
+                </div>
+
+                <!-- Folder 2: Webinar & Seminar -->
+                <div onclick="selectCertFolder('webinar')" id="folder-card-webinar" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-sky-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl p-2 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40">🎓</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/40" id="badge-count-webinar">2 Berkas</span>
+                    </div>
+                    <h4 class="font-extrabold text-white text-sm group-hover:text-sky-400 transition truncate">Webinar & Seminar</h4>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">Peserta & Narasumber</p>
+                </div>
+
+                <!-- Folder 3: Organisasi & Kepanitiaan -->
+                <div onclick="selectCertFolder('organisasi')" id="folder-card-organisasi" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-emerald-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🤝</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40" id="badge-count-organisasi">2 Berkas</span>
+                    </div>
+                    <h4 class="font-extrabold text-white text-sm group-hover:text-emerald-400 transition truncate">Organisasi & Panitia</h4>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">SK Pengurus & Panitia</p>
+                </div>
+
+                <!-- Folder 4: Pelatihan & Keahlian -->
+                <div onclick="selectCertFolder('pelatihan')" id="folder-card-pelatihan" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-purple-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">📜</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/40" id="badge-count-pelatihan">1 Berkas</span>
+                    </div>
+                    <h4 class="font-extrabold text-white text-sm group-hover:text-purple-400 transition truncate">Pelatihan & Skill</h4>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">TOEFL, Kursus & Lisensi</p>
+                </div>
+
+            </div>
+
+            <!-- Action Bar & Filter Pill Controls -->
+            <div class="glass rounded-2xl p-3.5 sm:p-4 border border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm">
+                
+                <!-- Filter Pills -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                    <button onclick="selectCertFolder('semua')" id="filter-btn-semua" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                        📁 Semua Folder (<span id="pill-count-semua">7</span>)
+                    </button>
+                    <button onclick="selectCertFolder('kejuaraan')" id="filter-btn-kejuaraan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm">
+                        🏆 Kejuaraan (<span id="pill-count-kejuaraan">2</span>)
+                    </button>
+                    <button onclick="selectCertFolder('webinar')" id="filter-btn-webinar" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                        🎓 Webinar (<span id="pill-count-webinar">2</span>)
+                    </button>
+                    <button onclick="selectCertFolder('organisasi')" id="filter-btn-organisasi" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                        🤝 Organisasi (<span id="pill-count-organisasi">2</span>)
+                    </button>
+                    <button onclick="selectCertFolder('pelatihan')" id="filter-btn-pelatihan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                        📜 Pelatihan (<span id="pill-count-pelatihan">1</span>)
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
+                    <button onclick="copySkpiResume()" class="bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-400/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow active:scale-95" title="Salin daftar sertifikat terstruktur untuk CV atau beasiswa">
+                        <span>📋</span> Salin Resume SKPI
+                    </button>
+                    <button onclick="openAchievementModal()" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-lg shadow-yellow-400/20 active:scale-95">
+                        <span>➕</span> Tambah Sertifikat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Folder Banner & Status Header -->
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-slate-300" id="active-folder-label">Folder Aktif:</span>
+                    <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30" id="active-folder-chip">
+                        🏆 Kejuaraan & Lomba
+                    </span>
+                </div>
+                <span class="text-xs text-slate-400" id="active-folder-stats">Menampilkan 2 berkas</span>
+            </div>
+
+            <!-- Achievement Cards Container -->
+            <div id="achievements-container" class="space-y-3.5">
+                <!-- Akan dirender dinamis via JavaScript -->
+            </div>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: BIODATA & AKUN -->
+        <!-- ============================================== -->
+        <div id="panel-biodata" class="hidden max-w-xl w-full mx-auto space-y-6">
+
+            <!-- Avatar Section -->
+            <div class="glass rounded-3xl p-6 md:p-8 text-center">
+                <div class="relative inline-block mb-4">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-slate-950 font-extrabold text-4xl avatar-ring mx-auto" id="avatar-display">S</div>
+                    <button onclick="document.getElementById('foto-input').click()" class="absolute bottom-0 right-0 w-8 h-8 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full flex items-center justify-center text-white text-sm transition shadow-lg" title="Ganti Foto">✏️</button>
+                    <input type="file" id="foto-input" accept="image/*" class="hidden" onchange="handleFotoChange(event)">
+                </div>
+                <p class="text-xl font-bold text-white" id="display-nama-header">Syauqi Quthbi</p>
+                <p class="text-sm text-slate-400" id="display-email-header">syauqi@ulmet.app</p>
+                <div class="mt-3 inline-flex items-center gap-2 bg-emerald-900/30 border border-emerald-700/40 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mahasiswa Aktif
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="glass rounded-3xl p-6 md:p-8">
+                <h2 class="text-lg font-bold text-white mb-5">✏️ Data Akademik Mahasiswa</h2>
+                <form id="form-profil" onsubmit="simpanProfil(event)" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
+                        <input type="text" id="input-nama" value="Syauqi Quthbi" class="w-full rounded-xl px-4 py-3 text-sm" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Nama Panggilan</label>
+                        <input type="text" id="input-panggilan" value="Syauqi" class="w-full rounded-xl px-4 py-3 text-sm bg-slate-950 border border-slate-800 focus:border-amber-400 text-white placeholder-slate-500 outline-none transition">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">NIM (Nomor Induk Mahasiswa)</label>
+                        <input type="text" id="input-nim" placeholder="Nomor Induk Mahasiswa..." class="w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Semester</label>
+                            <select id="input-semester" class="w-full rounded-xl px-4 py-3 text-sm">
+                                <option value="1" selected>Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Program Studi</label>
+                            <input type="text" id="input-prodi" value="Sastra Arab" class="w-full rounded-xl px-4 py-3 text-sm">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-simpan" class="btn-save w-full text-slate-950 font-extrabold py-3.5 rounded-xl text-sm transition active:scale-95 shadow-lg shadow-yellow-400/20 mt-2">
+                        💾 Simpan Perubahan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Supabase Cloud Status -->
+            <div class="glass rounded-3xl p-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-950/60 border border-emerald-800/50 rounded-xl flex items-center justify-center text-xl">⚡</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-white text-sm">Penyimpanan Terpadu ULMET</p>
+                        <p class="text-xs text-emerald-400 font-semibold" id="drive-status-text">Brankas Lokal & Penyimpanan Mandiri Aktif ✓</p>
+                    </div>
+                    <div class="w-3 h-3 rounded-full flex-shrink-0 bg-emerald-400" id="drive-status-dot"></div>
+                </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button onclick="logoutAkun()" class="w-full bg-red-900/30 hover:bg-red-900/60 border border-red-700/50 text-red-400 hover:text-red-300 font-bold py-4 rounded-2xl text-sm transition active:scale-95 flex items-center justify-center gap-2">
+                🚪 Keluar dari ULMET
+            </button>
+
+        </div>
+
+    </div>
+</main>
+
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
+    <a href="dashboard.html" class="bnav-item">
+        <span class="bnav-icon">📊</span>
+        <span class="bnav-label">Dashboard</span>
+    </a>
+    <a href="jadwal.html" class="bnav-item">
+        <span class="bnav-icon">📅</span>
+        <span class="bnav-label">Jadwal</span>
+    </a>
+    <a href="materi.html" class="bnav-item">
+        <span class="bnav-icon">📚</span>
+        <span class="bnav-label">Materi</span>
+    </a>
+    <a href="ai.html" class="bnav-item">
+        <span class="bnav-icon">🤖</span>
+        <span class="bnav-label">AI</span>
+    </a>
+    <a href="keuangan.html" class="bnav-item">
+        <span class="bnav-icon">💸</span>
+        <span class="bnav-label">Keuangan</span>
+    </a>
+    <a href="catatan.html" class="bnav-item">
+        <span class="bnav-icon">📝</span>
+        <span class="bnav-label">Catatan</span>
+    </a>
+</nav>
+
+<!-- ============================================== -->
+<!-- MODAL TAMBAH / EDIT SERTIFIKAT -->
+<!-- ============================================== -->
+<div id="modal-prestasi" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass w-full max-w-lg rounded-3xl p-6 border border-slate-700/80 shadow-2xl relative my-8">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2" id="modal-prestasi-title">
+                <span>➕</span> Tambah Berkas Sertifikat
+            </h3>
+            <button onclick="closeAchievementModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm transition">✕</button>
+        </div>
+
+        <form id="form-prestasi" onsubmit="saveAchievement(event)" class="space-y-3.5 mt-4 text-xs">
+            <input type="hidden" id="form-ach-id">
+
+            <!-- Pilih Folder Kategori -->
+            <div>
+                <label class="font-bold text-slate-300 block mb-1">Folder / Kategori Sertifikat <span class="text-amber-400">*</span></label>
+                <select id="form-ach-folder" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required onchange="updateFormRolesByCategory()">
+                    <option value="kejuaraan">🏆 Kejuaraan & Lomba (Kompetisi, Hackathon, Karya Tulis, Debat)</option>
+                    <option value="webinar">🎓 Webinar & Seminar (Seminar Nasional/Internasional, Kuliah Tamu)</option>
+                    <option value="organisasi">🤝 Organisasi & Kepanitiaan (SK BEM, HMJ, Panitia Ospek/PBAK, Relawan)</option>
+                    <option value="pelatihan">📜 Pelatihan & Keahlian (TOEFL/TOAFL, Sertifikasi BNSP, Bootcamp)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="font-bold text-slate-300 block mb-1">Nama Sertifikat / Judul Kegiatan <span class="text-red-400">*</span></label>
+                <input type="text" id="form-ach-judul" placeholder="Contoh: Juara 1 Lomba Karya Tulis Ilmiah Nasional 2026" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-bold text-slate-300 block mb-1">Capaian / Peran <span class="text-red-400">*</span></label>
+                    <select id="form-ach-capaian" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required>
+                        <option value="Juara 1">🥇 Juara 1</option>
+                        <option value="Juara 2">🥈 Juara 2</option>
+                        <option value="Juara 3">🥉 Juara 3</option>
+                        <option value="Juara Harapan">🎖️ Juara Harapan / Favorit</option>
+                        <option value="Finalis">🏅 Finalis</option>
+                        <option value="Peserta Webinar">🎓 Peserta Webinar / Seminar</option>
+                        <option value="Narasumber / Speaker">🎤 Pemateri / Narasumber</option>
+                        <option value="Pengurus Organisasi">🤝 Pengurus Inti / Anggota</option>
+                        <option value="Panitia Kegiatan">📋 Panitia Pelaksana</option>
+                        <option value="Sertifikasi Kompetensi">📜 Sertifikasi / Kelulusan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-300 block mb-1">Tingkat Cakupan <span class="text-red-400">*</span></label>
+                    <select id="form-ach-tingkat" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required>
+                        <option value="Nasional">Nasional</option>
+                        <option value="Internasional">Internasional</option>
+                        <option value="Provinsi">Provinsi / Regional</option>
+                        <option value="Kampus">Kampus / Universitas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-bold text-slate-300 block mb-1">Penyelenggara / Institusi <span class="text-red-400">*</span></label>
+                    <input type="text" id="form-ach-penyelenggara" placeholder="Contoh: Universitas Indonesia / Kemenag" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required>
+                </div>
+                <div>
+                    <label class="font-bold text-slate-300 block mb-1">Tahun Perolehan <span class="text-red-400">*</span></label>
+                    <input type="number" id="form-ach-tahun" value="2026" min="2018" max="2035" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="font-bold text-slate-300 block mb-1">Nomor Sertifikat / SKPI (Opsional)</label>
+                <input type="text" id="form-ach-nomor" placeholder="Contoh: SK-042/LKTIN/KEMENAG/2026" class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white">
+            </div>
+
+            <!-- Upload Berkas Sertifikat -->
+            <div>
+                <label class="font-bold text-slate-300 block mb-1">Unggah Berkas Sertifikat (Foto JPG/PNG atau Dokumen PDF)</label>
+                <div class="p-3 border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-2xl bg-slate-950/60 transition cursor-pointer text-center" onclick="document.getElementById('form-ach-file').click()">
+                    <input type="file" id="form-ach-file" accept="image/*,application/pdf" class="hidden" onchange="handleCertFileSelect(event)">
+                    <div id="cert-upload-placeholder">
+                        <p class="text-xl mb-1">📄</p>
+                        <p class="font-bold text-slate-300">Pilih berkas sertifikat atau foto piagam</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Format JPG, PNG, atau PDF (Maks. 5MB) • Disimpan di brankas perangkat</p>
+                    </div>
+                    <div id="cert-upload-preview" class="hidden flex items-center justify-between bg-slate-900 p-2 rounded-xl border border-slate-700">
+                        <div class="flex items-center gap-2 overflow-hidden text-left">
+                            <span class="text-xl" id="cert-preview-icon">📜</span>
+                            <div class="min-w-0">
+                                <p class="font-bold text-white truncate" id="cert-preview-name">nama_berkas.pdf</p>
+                                <p class="text-[10px] text-emerald-400" id="cert-preview-size">Siap disimpan</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="clearCertFileSelect(event)" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 font-bold">Hapus</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="font-bold text-slate-300 block mb-1">Catatan Tambahan (Opsional)</label>
+                <textarea id="form-ach-deskripsi" rows="2" placeholder="Keterangan singkat tentang kegiatan/peran ini..." class="w-full rounded-xl px-3.5 py-2 text-xs text-white"></textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+                <button type="button" onclick="closeAchievementModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-900 border border-slate-800">
+                    Batal
+                </button>
+                <button type="submit" id="btn-save-prestasi" class="px-5 py-2.5 rounded-xl text-xs font-extrabold text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 shadow-lg shadow-yellow-400/20 active:scale-95">
+                    💾 Simpan ke Folder
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL PRATINJAU SERTIFIKAT -->
+<!-- ============================================== -->
+<div id="modal-cert-viewer" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass w-full max-w-2xl rounded-3xl p-5 sm:p-6 border border-slate-700 shadow-2xl relative">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+            <h3 class="text-base font-bold text-white truncate pr-4" id="cert-modal-title">Pratinjau Sertifikat</h3>
+            <button onclick="closeCertViewer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm transition">✕</button>
+        </div>
+
+        <div id="cert-modal-content" class="my-4">
+            <!-- Konten render gambar atau dokumen -->
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">🛡️ Terarsip di Brankas Digital ULMET</span>
+            <div class="flex items-center gap-2">
+                <button onclick="closeCertViewer()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-800 hover:bg-slate-700">Tutup</button>
+                <button id="cert-modal-download-btn" class="px-4 py-2 rounded-xl text-xs font-extrabold text-slate-950 bg-amber-400 hover:bg-amber-300 flex items-center gap-1.5 shadow">
+                    <span>⬇️</span> Unduh Berkas
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="hidden"></div>
+
+<script>
+    // ==============================================
+    // DATA DEFAULT 7 SERTIFIKAT SIAP PAKAI
+    // ==============================================
+    const DEFAULT_SAMPLE_ACHIEVEMENTS = [
+        {
+            id: 'ach_demo_1',
+            judul: 'Juara 1 Lomba Karya Tulis Ilmiah Nasional (LKTIN) Mahasiswa',
+            folder: 'kejuaraan',
+            tingkat: 'Nasional',
+            capaian: 'Juara 1',
+            penyelenggara: 'Universitas Indonesia • Festival Ilmiah Nusantara',
+            tahun: 2026,
+            nomorSkpi: 'SK-088/LKTIN-UI/2026',
+            deskripsi: 'Meraih juara pertama kategori karya ilmiah integrasi sains dan humaniora.',
+            berkas: {
+                id: 'file_cert_1',
+                name: 'Sertifikat_Juara1_LKTIN_Nasional.pdf',
+                size: '1.4 MB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 3
+        },
+        {
+            id: 'ach_demo_2',
+            judul: 'Juara 2 Debat Bahasa Arab Tingkat Nasional (Festival Sastra)',
+            folder: 'kejuaraan',
+            tingkat: 'Nasional',
+            capaian: 'Juara 2',
+            penyelenggara: 'Kementerian Agama RI & Asosiasi Pengajar Bahasa Arab',
+            tahun: 2026,
+            nomorSkpi: 'SK-042/DIT-PTKI/2026',
+            deskripsi: 'Peringkat kedua kompetisi debat ilmiah bahasa Arab se-Indonesia.',
+            berkas: {
+                id: 'file_cert_2',
+                name: 'Piagam_Debat_Nasional.pdf',
+                size: '980 KB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 10
+        },
+        {
+            id: 'ach_demo_3',
+            judul: 'Peserta Seminar Internasional: AI & Islamic Civilization in Digital Era',
+            folder: 'webinar',
+            tingkat: 'Internasional',
+            capaian: 'Peserta Webinar',
+            penyelenggara: 'UIN Maulana Malik Ibrahim Malang & ISESCO',
+            tahun: 2026,
+            nomorSkpi: 'WEBINAR-AI-2026-781',
+            deskripsi: 'Seminar internasional eksplorasi etika AI dalam kemajuan literasi akademik.',
+            berkas: {
+                id: 'file_cert_3',
+                name: 'Sertifikat_Webinar_Internasional_AI.pdf',
+                size: '1.2 MB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 20
+        },
+        {
+            id: 'ach_demo_4',
+            judul: 'Workshop Nasional: Penulisan Jurnal Bereputasi Sinta & Scopus',
+            folder: 'webinar',
+            tingkat: 'Nasional',
+            capaian: 'Peserta Webinar',
+            penyelenggara: 'Lembaga Publikasi Ilmiah & Jurnal Mahasiswa',
+            tahun: 2025,
+            nomorSkpi: 'WS-SINTA-2025-104',
+            deskripsi: 'Pelatihan teknis metodologi penulisan naskah artikel ilmiah berstandar internasional.',
+            berkas: {
+                id: 'file_cert_4',
+                name: 'Sertifikat_Workshop_Publikasi.pdf',
+                size: '850 KB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 35
+        },
+        {
+            id: 'ach_demo_5',
+            judul: 'Ketua Divisi Humas & Publikasi - DEMA Fakultas Humaniora',
+            folder: 'organisasi',
+            tingkat: 'Kampus',
+            capaian: 'Pengurus Organisasi',
+            penyelenggara: 'Dewan Eksekutif Mahasiswa (DEMA) Periode 2025/2026',
+            tahun: 2026,
+            nomorSkpi: 'SK-REKTOR-019/DEMA/2026',
+            deskripsi: 'Memimpin koordinasi publikasi media sosial dan relasi kemitraan kampus.',
+            berkas: {
+                id: 'file_cert_5',
+                name: 'SK_Kepengurusan_DEMA_2026.pdf',
+                size: '1.6 MB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 45
+        },
+        {
+            id: 'ach_demo_6',
+            judul: 'Koordinator Lapangan - Pengenalan Budaya Akademik & Kemahasiswaan (PBAK)',
+            folder: 'organisasi',
+            tingkat: 'Kampus',
+            capaian: 'Panitia Kegiatan',
+            penyelenggara: 'Panitia Pusat PBAK UIN Malang',
+            tahun: 2025,
+            nomorSkpi: 'PBAK-UIN-PAN-055',
+            deskripsi: 'Koordinator lapangan orientasi mahasiswa baru tingkat universitas.',
+            berkas: {
+                id: 'file_cert_6',
+                name: 'Piagam_Panitia_PBAK_2025.pdf',
+                size: '1.1 MB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 60
+        },
+        {
+            id: 'ach_demo_7',
+            judul: 'Sertifikasi Kemahiran Bahasa Arab Internasional (TOAFL Skor 585)',
+            folder: 'pelatihan',
+            tingkat: 'Kampus',
+            capaian: 'Sertifikasi Kompetensi',
+            penyelenggara: 'Pusat Pengembangan Bahasa Universitas',
+            tahun: 2025,
+            nomorSkpi: 'TOAFL-2025-UIN-091',
+            deskripsi: 'Uji kompetensi kemahiran berbahasa Arab tingkat lanjut dengan predikat Istimewa.',
+            berkas: {
+                id: 'file_cert_7',
+                name: 'Sertifikat_TOAFL_Resmi.pdf',
+                size: '1.3 MB',
+                type: 'application/pdf',
+                dataUrl: ''
+            },
+            createdAt: Date.now() - 86400000 * 75
+        }
+    ];
+
+    // Inisialisasi data sertifikat secara sinkron (0ms latency)
+    function loadInitialAchievements() {
+        try {
+            const raw = localStorage.getItem(userKey('ulmet_achievements')) || localStorage.getItem('ulmet_achievements');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e) {}
+        
+        // Simpan default jika belum ada
+        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
+        localStorage.setItem('ulmet_achievements', JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
+        return DEFAULT_SAMPLE_ACHIEVEMENTS;
+    }
+
+    let userAchievements = loadInitialAchievements();
+    let selectedFolder = 'kejuaraan'; // Folder aktif default
+    let tempSelectedCertFile = null;
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.className = 'fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[999] font-bold px-5 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm ' + (type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-slate-950 shadow-emerald-500/20');
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 3500);
+    }
+
+    // ==============================================
+    // 1. TAB CONTROLLER (BIODATA vs SERTIFIKAT)
+    // ==============================================
+    function switchProfilTab(tab) {
+        const panelBio = document.getElementById('panel-biodata');
+        const panelPres = document.getElementById('panel-prestasi');
+        const btnBio = document.getElementById('tab-btn-biodata');
+        const btnPres = document.getElementById('tab-btn-prestasi');
+        const titleIcon = document.getElementById('page-title-icon');
+        const titleText = document.getElementById('page-title-text');
+
+        if (tab === 'biodata') {
+            panelBio.classList.remove('hidden');
+            panelPres.classList.add('hidden');
+            btnBio.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow';
+            btnPres.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white';
+            titleIcon.textContent = '👤';
+            titleText.textContent = 'Profil Saya';
+        } else {
+            panelBio.classList.add('hidden');
+            panelPres.classList.remove('hidden');
+            btnPres.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow';
+            btnBio.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white';
+            titleIcon.textContent = '🏆';
+            titleText.textContent = 'Brankas Sertifikat & SKPI';
+            renderFolderView();
+        }
+    }
+
+    // ==============================================
+    // 2. FOLDER CONTROLLER & RENDERING
+    // ==============================================
+    const FOLDER_META = {
+        kejuaraan: {
+            name: 'Kejuaraan & Lomba',
+            icon: '🏆',
+            activeBorder: 'border-2 border-amber-400 bg-amber-400/10 shadow-[0_0_15px_rgba(250,204,21,0.15)]',
+            inactiveBorder: 'border border-slate-800 hover:border-amber-400/60',
+            badgeClass: 'bg-amber-400 text-slate-950',
+            tagClass: 'bg-amber-400/20 text-amber-300 border-amber-400/30'
+        },
+        webinar: {
+            name: 'Webinar & Seminar',
+            icon: '🎓',
+            activeBorder: 'border-2 border-sky-400 bg-sky-500/10 shadow-[0_0_15px_rgba(56,189,248,0.15)]',
+            inactiveBorder: 'border border-slate-800 hover:border-sky-400/60',
+            badgeClass: 'bg-sky-400 text-slate-950',
+            tagClass: 'bg-sky-500/20 text-sky-300 border-sky-500/30'
+        },
+        organisasi: {
+            name: 'Organisasi & Kepanitiaan',
+            icon: '🤝',
+            activeBorder: 'border-2 border-emerald-400 bg-emerald-500/10 shadow-[0_0_15px_rgba(52,211,153,0.15)]',
+            inactiveBorder: 'border border-slate-800 hover:border-emerald-400/60',
+            badgeClass: 'bg-emerald-400 text-slate-950',
+            tagClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+        },
+        pelatihan: {
+            name: 'Pelatihan & Keahlian',
+            icon: '📜',
+            activeBorder: 'border-2 border-purple-400 bg-purple-500/10 shadow-[0_0_15px_rgba(192,132,252,0.15)]',
+            inactiveBorder: 'border border-slate-800 hover:border-purple-400/60',
+            badgeClass: 'bg-purple-400 text-slate-950',
+            tagClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+        }
+    };
+
+    function selectCertFolder(folder) {
+        selectedFolder = folder;
+        renderFolderView();
+    }
+
+    function renderFolderView() {
+        // Hitung jumlah per folder
+        const countKejuaraan = userAchievements.filter(a => (a.folder || 'kejuaraan') === 'kejuaraan').length;
+        const countWebinar = userAchievements.filter(a => a.folder === 'webinar').length;
+        const countOrganisasi = userAchievements.filter(a => a.folder === 'organisasi').length;
+        const countPelatihan = userAchievements.filter(a => a.folder === 'pelatihan').length;
+        const countTotal = userAchievements.length;
+
+        // Perbarui badge pada kartu folder
+        if (document.getElementById('badge-count-kejuaraan')) document.getElementById('badge-count-kejuaraan').textContent = `${countKejuaraan} Berkas`;
+        if (document.getElementById('badge-count-webinar')) document.getElementById('badge-count-webinar').textContent = `${countWebinar} Berkas`;
+        if (document.getElementById('badge-count-organisasi')) document.getElementById('badge-count-organisasi').textContent = `${countOrganisasi} Berkas`;
+        if (document.getElementById('badge-count-pelatihan')) document.getElementById('badge-count-pelatihan').textContent = `${countPelatihan} Berkas`;
+        if (document.getElementById('badge-prestasi-count')) document.getElementById('badge-prestasi-count').textContent = countTotal;
+
+        // Perbarui angka pill
+        if (document.getElementById('pill-count-semua')) document.getElementById('pill-count-semua').textContent = countTotal;
+        if (document.getElementById('pill-count-kejuaraan')) document.getElementById('pill-count-kejuaraan').textContent = countKejuaraan;
+        if (document.getElementById('pill-count-webinar')) document.getElementById('pill-count-webinar').textContent = countWebinar;
+        if (document.getElementById('pill-count-organisasi')) document.getElementById('pill-count-organisasi').textContent = countOrganisasi;
+        if (document.getElementById('pill-count-pelatihan')) document.getElementById('pill-count-pelatihan').textContent = countPelatihan;
+
+        // Perbarui tampilan border kartu folder
+        ['kejuaraan', 'webinar', 'organisasi', 'pelatihan'].forEach(f => {
+            const el = document.getElementById(`folder-card-${f}`);
+            if (el) {
+                if (selectedFolder === f) {
+                    el.className = `folder-card glass rounded-2xl p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] ${FOLDER_META[f].activeBorder}`;
+                } else {
+                    el.className = `folder-card glass rounded-2xl p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm ${FOLDER_META[f].inactiveBorder}`;
+                }
+            }
+        });
+
+        // Perbarui pill filter aktif
+        document.querySelectorAll('.filter-pill').forEach(btn => {
+            btn.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap';
+        });
+        const activePill = document.getElementById(`filter-btn-${selectedFolder}`);
+        if (activePill) {
+            activePill.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm';
+        }
+
+        // Teks folder aktif
+        const activeLabel = document.getElementById('active-folder-label');
+        const activeChip = document.getElementById('active-folder-chip');
+        const activeStats = document.getElementById('active-folder-stats');
+
+        if (selectedFolder === 'semua') {
+            activeLabel.textContent = 'Menampilkan:';
+            activeChip.textContent = '📁 Semua Folder Sertifikat';
+            activeChip.className = 'text-xs font-extrabold px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30';
+            activeStats.textContent = `Total ${countTotal} berkas terarsip`;
+        } else {
+            const m = FOLDER_META[selectedFolder];
+            activeLabel.textContent = 'Folder Aktif:';
+            activeChip.textContent = `${m.icon} ${m.name}`;
+            activeChip.className = `text-xs font-extrabold px-2.5 py-1 rounded-lg ${m.tagClass} border`;
+            const currentCount = userAchievements.filter(a => (a.folder || 'kejuaraan') === selectedFolder).length;
+            activeStats.textContent = `Menampilkan ${currentCount} berkas`;
+        }
+
+        renderCertList();
+    }
+
+    function getCapaianStyle(capaian) {
+        const c = (capaian || '').toLowerCase();
+        if (c.includes('1') || c.includes('pertama')) {
+            return { icon: '🥇', label: capaian, boxColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' };
+        }
+        if (c.includes('2') || c.includes('kedua')) {
+            return { icon: '🥈', label: capaian, boxColor: 'bg-slate-300/20 text-slate-200 border-slate-400/50' };
+        }
+        if (c.includes('3') || c.includes('ketiga')) {
+            return { icon: '🥉', label: capaian, boxColor: 'bg-amber-700/20 text-amber-300 border-amber-600/50' };
+        }
+        if (c.includes('finalis')) {
+            return { icon: '🏅', label: capaian, boxColor: 'bg-sky-500/20 text-sky-300 border-sky-500/50' };
+        }
+        if (c.includes('webinar') || c.includes('seminar') || c.includes('peserta')) {
+            return { icon: '🎓', label: capaian, boxColor: 'bg-sky-500/20 text-sky-300 border-sky-500/50' };
+        }
+        if (c.includes('organisasi') || c.includes('pengurus')) {
+            return { icon: '🤝', label: capaian, boxColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' };
+        }
+        if (c.includes('panitia')) {
+            return { icon: '📋', label: capaian, boxColor: 'bg-teal-500/20 text-teal-300 border-teal-500/50' };
+        }
+        if (c.includes('sertifik') || c.includes('toefl') || c.includes('toafl')) {
+            return { icon: '📜', label: capaian, boxColor: 'bg-purple-500/20 text-purple-300 border-purple-500/50' };
+        }
+        return { icon: '🏆', label: capaian, boxColor: 'bg-amber-500/20 text-amber-300 border-amber-500/50' };
+    }
+
+    function renderCertList() {
+        const container = document.getElementById('achievements-container');
+        if (!container) return;
+
+        let filtered = userAchievements;
+        if (selectedFolder !== 'semua') {
+            filtered = userAchievements.filter(a => (a.folder || 'kejuaraan') === selectedFolder);
+        }
+
+        if (filtered.length === 0) {
+            const meta = FOLDER_META[selectedFolder] || { name: 'Folder ini', icon: '📁' };
+            container.innerHTML = `
+                <div class="glass rounded-3xl p-10 text-center space-y-3 border border-slate-800">
+                    <p class="text-4xl">${meta.icon}</p>
+                    <h3 class="text-white font-bold text-base">Belum ada sertifikat di folder ${meta.name}</h3>
+                    <p class="text-slate-400 text-xs max-w-md mx-auto">Kumpulkan dan rapikan berkas ${meta.name.toLowerCase()} Anda di sini agar siap dipakai untuk lampiran SKPI & beasiswa.</p>
+                    <button onclick="openAchievementModal('${selectedFolder !== 'semua' ? selectedFolder : 'kejuaraan'}')" class="mt-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-4 py-2.5 rounded-xl text-xs transition inline-flex items-center gap-1.5 shadow">
+                        <span>➕</span> Tambah Sertifikat ke Folder Ini
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filtered.map(item => {
+            const folderKey = item.folder || 'kejuaraan';
+            const fMeta = FOLDER_META[folderKey] || FOLDER_META.kejuaraan;
+            const capaianStyle = getCapaianStyle(item.capaian);
+            const hasCert = item.berkas && (item.berkas.name || item.berkas.dataUrl);
+
+            return `
+            <div class="glass rounded-2xl p-4 sm:p-5 border border-slate-800/80 hover:border-amber-400/50 transition-all duration-300 group shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <!-- Info Sertifikat -->
+                <div class="flex items-start gap-3.5 min-w-0">
+                    <div class="w-12 h-12 rounded-2xl ${capaianStyle.boxColor} border flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition shadow-sm">
+                        ${capaianStyle.icon}
+                    </div>
+
+                    <div class="space-y-1.5 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Folder Tag -->
+                            <span class="${fMeta.tagClass} border text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <span>${fMeta.icon}</span> ${fMeta.name}
+                            </span>
+                            <!-- Capaian Tag -->
+                            <span class="${capaianStyle.boxColor} border text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                ${escapeHtml(item.capaian)}
+                            </span>
+                            <!-- Tingkat & Tahun -->
+                            <span class="bg-slate-800/80 text-slate-300 border border-slate-700/60 text-[10px] font-medium px-2 py-0.5 rounded-md">
+                                Tingkat ${escapeHtml(item.tingkat)} &bull; ${item.tahun}
+                            </span>
+                        </div>
+
+                        <h4 class="text-white font-extrabold text-sm sm:text-base group-hover:text-amber-400 transition leading-snug">
+                            ${escapeHtml(item.judul)}
+                        </h4>
+
+                        <p class="text-xs text-slate-300 font-medium flex items-center gap-1.5">
+                            <span class="text-amber-400">🏛️</span> ${escapeHtml(item.penyelenggara)}
+                        </p>
+
+                        ${item.nomorSkpi ? `
+                        <p class="text-[11px] text-slate-400 font-mono">
+                            <span class="text-slate-500">No. SKPI/SK:</span> ${escapeHtml(item.nomorSkpi)}
+                        </p>` : ''}
+                        
+                        ${item.deskripsi ? `
+                        <p class="text-xs text-slate-400/90 line-clamp-2 mt-1">
+                            ${escapeHtml(item.deskripsi)}
+                        </p>` : ''}
+                    </div>
+                </div>
+
+                <!-- Bagian Berkas Fisik & Aksi -->
+                <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800 flex-shrink-0">
+                    
+                    ${hasCert ? `
+                    <div class="flex items-center gap-1.5 bg-slate-950/80 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl">
+                        <span class="text-xs">📜</span>
+                        <div class="text-left">
+                            <p class="text-[11px] font-bold text-white truncate max-w-[130px] sm:max-w-[180px]">${escapeHtml(item.berkas.name || 'Sertifikat')}</p>
+                            <p class="text-[9px] text-emerald-400 font-semibold">Tersimpan di Brankas</p>
+                        </div>
+                    </div>` : `
+                    <div class="text-[10px] text-slate-500 italic px-2 py-1">Belum ada berkas</div>`}
+
+                    <!-- Tombol Aksi -->
+                    <div class="flex items-center gap-1.5">
+                        ${hasCert ? `
+                        <button onclick="viewCertificate('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-400 text-xs transition active:scale-95" title="Lihat Pratinjau Sertifikat">
+                            👁️ Pratinjau
+                        </button>
+                        <button onclick="downloadCertificate('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 text-xs transition active:scale-95" title="Unduh Sertifikat">
+                            ⬇️
+                        </button>` : ''}
+                        <button onclick="editAchievement('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs transition active:scale-95" title="Edit Data">
+                            ✏️
+                        </button>
+                        <button onclick="deleteAchievement('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-rose-950/50 border border-slate-700 hover:border-rose-700/60 text-rose-400 text-xs transition active:scale-95" title="Hapus Sertifikat">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            `;
+        }).join('');
+    }
+
+    // ==============================================
+    // 3. MODAL TAMBAH / EDIT
+    // ==============================================
+    function openAchievementModal(presetFolder = null, editId = null) {
+        tempSelectedCertFile = null;
+        document.getElementById('cert-upload-placeholder').classList.remove('hidden');
+        document.getElementById('cert-upload-preview').classList.add('hidden');
+        document.getElementById('form-ach-file').value = '';
+
+        if (editId) {
+            const item = userAchievements.find(x => x.id === editId);
+            if (!item) return;
+            document.getElementById('modal-prestasi-title').innerHTML = '<span>✏️</span> Edit Berkas Sertifikat';
+            document.getElementById('form-ach-id').value = item.id;
+            document.getElementById('form-ach-folder').value = item.folder || 'kejuaraan';
+            document.getElementById('form-ach-judul').value = item.judul || '';
+            document.getElementById('form-ach-capaian').value = item.capaian || 'Juara 1';
+            document.getElementById('form-ach-tingkat').value = item.tingkat || 'Nasional';
+            document.getElementById('form-ach-tahun').value = item.tahun || 2026;
+            document.getElementById('form-ach-penyelenggara').value = item.penyelenggara || '';
+            document.getElementById('form-ach-nomor').value = item.nomorSkpi || '';
+            document.getElementById('form-ach-deskripsi').value = item.deskripsi || '';
+
+            if (item.berkas && item.berkas.name) {
+                document.getElementById('cert-upload-placeholder').classList.add('hidden');
+                const prevBox = document.getElementById('cert-upload-preview');
+                prevBox.classList.remove('hidden');
+                document.getElementById('cert-preview-name').textContent = item.berkas.name;
+                document.getElementById('cert-preview-size').textContent = item.berkas.size || 'Berkas tersimpan';
+            }
+        } else {
+            document.getElementById('modal-prestasi-title').innerHTML = '<span>➕</span> Tambah Berkas Sertifikat';
+            document.getElementById('form-ach-id').value = '';
+            document.getElementById('form-prestasi').reset();
+            document.getElementById('form-ach-folder').value = presetFolder || (selectedFolder !== 'semua' ? selectedFolder : 'kejuaraan');
+            document.getElementById('form-ach-tahun').value = new Date().getFullYear();
+        }
+
+        updateFormRolesByCategory();
+        document.getElementById('modal-prestasi').classList.remove('hidden');
+    }
+
+    function updateFormRolesByCategory() {
+        const folder = document.getElementById('form-ach-folder').value;
+        const capaianSelect = document.getElementById('form-ach-capaian');
+        const curVal = capaianSelect.value;
+
+        if (folder === 'kejuaraan') {
+            capaianSelect.innerHTML = `
+                <option value="Juara 1">🥇 Juara 1</option>
+                <option value="Juara 2">🥈 Juara 2</option>
+                <option value="Juara 3">🥉 Juara 3</option>
+                <option value="Juara Harapan">🎖️ Juara Harapan / Favorit</option>
+                <option value="Finalis">🏅 Finalis</option>
+                <option value="Peserta Lomba">✨ Peserta Lomba</option>
+            `;
+        } else if (folder === 'webinar') {
+            capaianSelect.innerHTML = `
+                <option value="Peserta Webinar">🎓 Peserta Webinar / Seminar</option>
+                <option value="Narasumber / Speaker">🎤 Pemateri / Narasumber</option>
+                <option value="Moderator">🎙️ Moderator Acara</option>
+                <option value="Peserta Workshop">💡 Peserta Workshop</option>
+            `;
+        } else if (folder === 'organisasi') {
+            capaianSelect.innerHTML = `
+                <option value="Pengurus Organisasi">🤝 Pengurus Inti / Harian (BEM/DEMA/HMJ)</option>
+                <option value="Ketua / Koordinator Divisi">👑 Koordinator Divisi</option>
+                <option value="Panitia Kegiatan">📋 Panitia Pelaksana (PBAK/Event)</option>
+                <option value="Relawan / Volunteer">🌟 Relawan / Volunteer</option>
+            `;
+        } else {
+            capaianSelect.innerHTML = `
+                <option value="Sertifikasi Kompetensi">📜 Sertifikasi Resmi (BNSP / Vendor)</option>
+                <option value="TOEFL / TOAFL">🗣️ TOEFL / TOAFL / Bahasa</option>
+                <option value="Kelulusan Kursus / Bootcamp">💻 Kelulusan Bootcamp / Kursus IT</option>
+                <option value="Lisensi Keahlian">🛡️ Lisensi Keahlian</option>
+            `;
+        }
+    }
+
+    function closeAchievementModal() {
+        document.getElementById('modal-prestasi').classList.add('hidden');
+        tempSelectedCertFile = null;
+    }
+
+    function editAchievement(id) {
+        const item = userAchievements.find(x => x.id === id);
+        if (item) openAchievementModal(item.folder, id);
+    }
+
+    function handleCertFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('Ukuran berkas maksimal 5MB!', 'error');
+            return;
+        }
+
+        tempSelectedCertFile = file;
+        document.getElementById('cert-upload-placeholder').classList.add('hidden');
+        const prevBox = document.getElementById('cert-upload-preview');
+        prevBox.classList.remove('hidden');
+        document.getElementById('cert-preview-name').textContent = file.name;
+        document.getElementById('cert-preview-size').textContent = (file.size / 1024 > 1024 ? (file.size / (1024*1024)).toFixed(1) + ' MB' : Math.round(file.size / 1024) + ' KB');
+        document.getElementById('cert-preview-icon').textContent = file.type.startsWith('image/') ? '🖼️' : '📄';
+    }
+
+    function clearCertFileSelect(e) {
+        e.stopPropagation();
+        tempSelectedCertFile = null;
+        document.getElementById('form-ach-file').value = '';
+        document.getElementById('cert-upload-preview').classList.add('hidden');
+        document.getElementById('cert-upload-placeholder').classList.remove('hidden');
+    }
+
+    async function saveAchievement(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-prestasi');
+        btn.textContent = '⏳ Menyimpan...';
+        btn.disabled = true;
+
+        const editId = document.getElementById('form-ach-id').value;
+        const folder = document.getElementById('form-ach-folder').value;
+        const judul = document.getElementById('form-ach-judul').value.trim();
+        const capaian = document.getElementById('form-ach-capaian').value;
+        const tingkat = document.getElementById('form-ach-tingkat').value;
+        const tahun = parseInt(document.getElementById('form-ach-tahun').value) || new Date().getFullYear();
+        const penyelenggara = document.getElementById('form-ach-penyelenggara').value.trim();
+        const nomorSkpi = document.getElementById('form-ach-nomor').value.trim();
+        const deskripsi = document.getElementById('form-ach-deskripsi').value.trim();
+
+        let berkasData = null;
+
+        if (editId) {
+            const old = userAchievements.find(x => x.id === editId);
+            if (old && old.berkas) berkasData = old.berkas;
+        }
+
+        if (tempSelectedCertFile) {
+            const fileId = 'cert_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            await saveDeviceFileBlob(fileId, tempSelectedCertFile);
+
+            let dataUrl = '';
+            if (tempSelectedCertFile.type.startsWith('image/')) {
+                dataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = ev => resolve(ev.target.result);
+                    reader.readAsDataURL(tempSelectedCertFile);
+                });
+            }
+
+            berkasData = {
+                id: fileId,
+                name: tempSelectedCertFile.name,
+                size: (tempSelectedCertFile.size / 1024 > 1024 ? (tempSelectedCertFile.size / (1024*1024)).toFixed(1) + ' MB' : Math.round(tempSelectedCertFile.size / 1024) + ' KB'),
+                type: tempSelectedCertFile.type,
+                dataUrl: dataUrl
+            };
+        }
+
+        if (editId) {
+            const idx = userAchievements.findIndex(x => x.id === editId);
+            if (idx !== -1) {
+                userAchievements[idx] = {
+                    ...userAchievements[idx],
+                    folder, judul, capaian, tingkat, tahun, penyelenggara, nomorSkpi, deskripsi,
+                    berkas: berkasData
+                };
+            }
+            showToast('✅ Berkas sertifikat berhasil diperbarui!');
+        } else {
+            const newAch = {
+                id: 'ach_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                folder, judul, capaian, tingkat, tahun, penyelenggara, nomorSkpi, deskripsi,
+                berkas: berkasData,
+                createdAt: Date.now()
+            };
+            userAchievements.unshift(newAch);
+            showToast(`🎉 Sertifikat berhasil disimpan ke Folder ${FOLDER_META[folder].name}!`);
+        }
+
+        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(userAchievements));
+        localStorage.setItem('ulmet_achievements', JSON.stringify(userAchievements));
+
+        selectedFolder = folder;
+        renderFolderView();
+        closeAchievementModal();
+
+        btn.textContent = '💾 Simpan ke Folder';
+        btn.disabled = false;
+    }
+
+    async function deleteAchievement(id) {
+        const item = userAchievements.find(x => x.id === id);
+        if (!item) return;
+        if (!confirm(`Hapus sertifikat "${item.judul}" dari brankas?`)) return;
+
+        if (item.berkas && item.berkas.id) {
+            try { await deleteDeviceFileBlob(item.berkas.id); } catch(e) {}
+        }
+
+        userAchievements = userAchievements.filter(x => x.id !== id);
+        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(userAchievements));
+        localStorage.setItem('ulmet_achievements', JSON.stringify(userAchievements));
+
+        renderFolderView();
+        showToast('🗑️ Berkas sertifikat dihapus.', 'error');
+    }
+
+    // Modal Viewer
+    async function viewCertificate(id) {
+        const item = userAchievements.find(x => x.id === id);
+        if (!item || !item.berkas) {
+            showToast('Berkas sertifikat tidak ditemukan.', 'error');
+            return;
+        }
+
+        const modal = document.getElementById('modal-cert-viewer');
+        const titleEl = document.getElementById('cert-modal-title');
+        const contentEl = document.getElementById('cert-modal-content');
+        const dlBtn = document.getElementById('cert-modal-download-btn');
+
+        titleEl.textContent = item.judul;
+
+        let fileUrl = item.berkas.dataUrl;
+        if (!fileUrl && item.berkas.id) {
+            const blob = await getDeviceFileBlob(item.berkas.id);
+            if (blob) fileUrl = URL.createObjectURL(blob);
+        }
+
+        if (fileUrl && (item.berkas.type.startsWith('image/') || fileUrl.startsWith('data:image'))) {
+            contentEl.innerHTML = `
+                <div class="max-h-[65vh] overflow-auto flex items-center justify-center p-2 bg-slate-950/80 rounded-2xl border border-slate-800">
+                    <img src="${fileUrl}" alt="Sertifikat" class="max-w-full h-auto rounded-xl shadow-2xl object-contain max-h-[60vh]">
+                </div>
+                <p class="text-xs text-slate-400 mt-2 text-center">Pratinjau Berkas Fisik: <span class="text-amber-300 font-semibold">${escapeHtml(item.berkas.name)}</span></p>
+            `;
+        } else {
+            contentEl.innerHTML = `
+                <div class="py-10 px-6 text-center bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="text-5xl">📄</div>
+                    <h4 class="text-white font-bold text-base">${escapeHtml(item.berkas.name || 'Dokumen Sertifikat PDF')}</h4>
+                    <p class="text-xs text-slate-400">${item.berkas.size || 'Dokumen'} &bull; Disimpan secara lokal di perangkat ULMET</p>
+                    <div class="text-xs text-amber-300 bg-amber-950/40 border border-amber-500/30 py-2.5 px-4 rounded-xl max-w-sm mx-auto">
+                        Berkas dokumen ini siap diunduh ke ponsel atau laptop Anda untuk lampiran beasiswa atau yudisium wisuda.
+                    </div>
+                </div>
+            `;
+        }
+
+        dlBtn.onclick = () => downloadCertificate(id);
+        modal.classList.remove('hidden');
+    }
+
+    function closeCertViewer() {
+        document.getElementById('modal-cert-viewer').classList.add('hidden');
+    }
+
+    async function downloadCertificate(id) {
+        const item = userAchievements.find(x => x.id === id);
+        if (!item || !item.berkas) return;
+
+        let fileUrl = item.berkas.dataUrl;
+        if (!fileUrl && item.berkas.id) {
+            const blob = await getDeviceFileBlob(item.berkas.id);
+            if (blob) fileUrl = URL.createObjectURL(blob);
+        }
+
+        if (fileUrl) {
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = item.berkas.name || (item.judul.replace(/[^a-zA-Z0-9]/g, '_') + '_Sertifikat.pdf');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('⬇️ Mengunduh berkas sertifikat...');
+        } else {
+            showToast('Berkas sertifikat siap dalam arsip demo.', 'info');
+        }
+    }
+
+    // Ekspor Ringkasan Resume SKPI Berkelompok per Folder
+    function copySkpiResume() {
+        const p = JSON.parse(localStorage.getItem(userKey('ulmet_profile')) || localStorage.getItem('ulmet_profile') || '{}');
+        const nama = p.nama || document.getElementById('input-nama').value || 'Syauqi Quthbi';
+        const nim = p.nim || document.getElementById('input-nim').value || '-';
+        const prodi = p.prodi || document.getElementById('input-prodi').value || 'Sastra Arab';
+        const semester = p.semester || document.getElementById('input-semester').value || '1';
+
+        if (userAchievements.length === 0) {
+            showToast('Belum ada data sertifikat untuk disalin.', 'error');
+            return;
+        }
+
+        let text = `=========================================\n`;
+        text += `PORTOFOLIO DIGITAL & SKPI MAHASISWA\n`;
+        text += `Nama Mahasiswa : ${nama}\n`;
+        text += `NIM            : ${nim}\n`;
+        text += `Program Studi  : ${prodi} (Semester ${semester})\n`;
+        text += `Total Berkas   : ${userAchievements.length} Sertifikat Terverifikasi\n`;
+        text += `Platform       : ULMET (Ultimate Lecture Management Ecosystem)\n`;
+        text += `=========================================\n\n`;
+
+        const folders = ['kejuaraan', 'webinar', 'organisasi', 'pelatihan'];
+        let globalIdx = 1;
+
+        folders.forEach(fKey => {
+            const group = userAchievements.filter(a => (a.folder || 'kejuaraan') === fKey);
+            if (group.length > 0) {
+                const meta = FOLDER_META[fKey];
+                text += `[${meta.icon} ${meta.name.toUpperCase()}]\n`;
+                group.forEach(a => {
+                    text += `${globalIdx}. ${a.judul}\n`;
+                    text += `   • Capaian/Peran : ${a.capaian} (Tingkat ${a.tingkat})\n`;
+                    text += `   • Penyelenggara : ${a.penyelenggara}\n`;
+                    text += `   • Tahun         : ${a.tahun}\n`;
+                    if (a.nomorSkpi) text += `   • No. SKPI/SK   : ${a.nomorSkpi}\n`;
+                    if (a.deskripsi) text += `   • Keterangan    : ${a.deskripsi}\n`;
+                    text += `\n`;
+                    globalIdx++;
+                });
+            }
+        });
+
+        text += `-----------------------------------------\n`;
+        text += `Disusun otomatis melalui ULMET Portfolio (SKPI Ready).\n`;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('📋 Resume SKPI berhasil disalin! Siap ditempel di formulir beasiswa/CV.');
+            }).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('📋 Resume SKPI berhasil disalin ke clipboard!');
+    }
+
+    // ==============================================
+    // 4. BIODATA MAHASISWA LOGIC
+    // ==============================================
+    async function loadProfil() {
+        try {
+            const cachedProf = localStorage.getItem(userKey('ulmet_profile')) || localStorage.getItem('ulmet_profile');
+            const acc = JSON.parse(localStorage.getItem(userKey('ulmet_account')) || localStorage.getItem('ulmet_account') || '{}');
+            let p = {};
+            if (cachedProf) p = JSON.parse(cachedProf);
+
+            const nama = p.nama || acc.nama || acc.name || 'Syauqi Quthbi';
+            const email = p.email || acc.email || 'syauqi@ulmet.app';
+
+            if (p.nama) document.getElementById('input-nama').value = p.nama;
+            else document.getElementById('input-nama').value = nama;
+            if (p.panggilan) document.getElementById('input-panggilan').value = p.panggilan;
+            else document.getElementById('input-panggilan').value = nama.split(' ')[0];
+            if (p.nim) document.getElementById('input-nim').value = p.nim;
+            if (p.semester) document.getElementById('input-semester').value = p.semester;
+            if (p.prodi) document.getElementById('input-prodi').value = p.prodi;
+            else document.getElementById('input-prodi').value = 'Sastra Arab';
+
+            document.getElementById('display-nama-header').textContent = nama;
+            document.getElementById('display-email-header').textContent = email;
+            document.getElementById('avatar-display').textContent = nama.charAt(0).toUpperCase();
+
+            document.getElementById('sidebar-nama').textContent = nama;
+            document.getElementById('sidebar-semester').textContent = 'Semester ' + (p.semester || '1');
+            document.getElementById('sidebar-avatar').textContent = nama.charAt(0).toUpperCase();
+
+            const savedPhoto = localStorage.getItem(userKey('ulmet_avatar_photo')) || localStorage.getItem('ulmet_avatar_photo');
+            if (savedPhoto) {
+                const avEl = document.getElementById('avatar-display');
+                avEl.style.backgroundImage = `url(${savedPhoto})`;
+                avEl.style.backgroundSize = 'cover';
+                avEl.style.backgroundPosition = 'center';
+                avEl.textContent = '';
+            }
+        } catch(e) {}
+
+        // Tampilkan folder view awal
+        renderFolderView();
+    }
+
+    function handleFotoChange(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { showToast('Foto maksimal 2MB!', 'error'); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            localStorage.setItem(userKey('ulmet_avatar_photo'), dataUrl);
+            const avEl = document.getElementById('avatar-display');
+            avEl.style.backgroundImage = `url(${dataUrl})`;
+            avEl.style.backgroundSize = 'cover';
+            avEl.style.backgroundPosition = 'center';
+            avEl.textContent = '';
+            showToast('✅ Foto profil berhasil diperbarui!');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function simpanProfil(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-simpan');
+        btn.textContent = '⏳ Menyimpan...';
+        btn.disabled = true;
+
+        const nama = document.getElementById('input-nama').value.trim();
+        const panggilan = document.getElementById('input-panggilan').value.trim() || nama.split(' ')[0];
+        const nim = document.getElementById('input-nim').value.trim();
+        const semester = document.getElementById('input-semester').value;
+        const prodi = document.getElementById('input-prodi').value.trim();
+
+        if (!nama) { 
+            showToast('Nama tidak boleh kosong!', 'error'); 
+            btn.textContent = '💾 Simpan Perubahan'; 
+            btn.disabled = false; 
+            return; 
+        }
+
+        try {
+            const profileData = { nama, panggilan, nim, semester, prodi, avatar: nama.charAt(0).toUpperCase() };
+
+            const sb = getSupabase();
+            const session = await getSession();
+            if (sb && session && session.user) {
+                await sb.from('profiles').upsert({ id: session.user.id, ...profileData }, { onConflict: 'id' });
+            }
+
+            // Simpan ke localStorage user-scoped
+            localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(profileData));
+            localStorage.setItem('ulmet_profile', JSON.stringify(profileData));
+
+            // Update tampilan
+            document.getElementById('display-nama-header').textContent = nama;
+            document.getElementById('avatar-display').textContent = nama.charAt(0).toUpperCase();
+            document.getElementById('sidebar-nama').textContent = nama;
+            document.getElementById('sidebar-semester').textContent = 'Semester ' + semester;
+
+            showToast('✅ Profil & data akademik berhasil disimpan!');
+        } catch(err) {
+            console.error(err);
+            showToast('Gagal menyimpan: ' + err.message, 'error');
+        } finally {
+            btn.textContent = '💾 Simpan Perubahan';
+            btn.disabled = false;
+        }
+    }
+
+    async function logoutAkun() {
+        if (!confirm('Apakah kamu yakin ingin keluar dari akun ULMET?')) return;
+        await logoutUser();
+        window.location.href = 'login.html';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Inisialisasi saat halaman selesai dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProfil();
+    });
+</script>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("../sw.js").catch(() => {});
+</script>
+</body>
+</html>
