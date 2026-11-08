@@ -136,6 +136,6 @@ ULMET/
 
 ---
 
-## Tim Pengembang
+## Pengembang
 
-Aplikasi ini dikembangkan untuk mempermudah kegiatan perkuliahan, pengelolaan tugas, materi, dan keuangan mahasiswa.
+Karya ini dikembangkan secara mandiri oleh **Syauqi Quthbi** untuk mempermudah kegiatan perkuliahan, pengelolaan tugas, materi, dan keuangan mahasiswa.
