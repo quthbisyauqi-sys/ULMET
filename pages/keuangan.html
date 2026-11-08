@@ -34,7 +34,7 @@
             align-items: center; 
             justify-content: center; 
             gap: 1px; 
-            padding: 2px 1px; 
+            padding: 4px 1px 2px 1px; 
             color: #64748b; 
             flex: 1; 
             position: relative;
@@ -52,7 +52,7 @@
         .bnav-item.active::after {
             content: '';
             position: absolute;
-            bottom: 0px;
+            bottom: 1px;
             width: 14px;
             height: 2px;
             background: #facc15;
@@ -70,7 +70,7 @@
             letter-spacing: -0.2px;
         }
         .bnav-icon { 
-            font-size: 16px; 
+            font-size: 17px; 
             line-height: 1; 
             margin-bottom: 0px;
             transition: transform 0.18s ease;
@@ -706,7 +706,7 @@
 <div id="toast" class="hidden fixed bottom-16 right-4 sm:bottom-6 sm:right-6 z-[100] font-bold px-4 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm max-w-xs transition-all flex items-center gap-2"></div>
 
 <!-- BOTTOM NAVIGATION DOCK (Mobile Only) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
+<nav class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-slate-950/98 backdrop-blur-md border-t border-slate-800/80 flex items-center justify-around h-13 px-0.5 shadow-[0_-4px_25px_rgba(0,0,0,0.9)]">
     <a href="dashboard.html" class="bnav-item">
         <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>

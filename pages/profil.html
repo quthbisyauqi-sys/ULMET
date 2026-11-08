@@ -10,6 +10,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        html, body {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+            width: 100% !important;
+        }
         body { font-family: 'Outfit', sans-serif; background-color: #020617; color: #fff; }
         .glass { background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(51,65,85,0.8); }
         input, select, textarea { background: rgba(2,6,23,0.7) !important; border: 1px solid rgba(51,65,85,0.8); color: #fff !important; }
@@ -22,14 +27,14 @@
         .sidebar-link:hover { background: rgba(30,41,59,0.6); color: #fff; }
         .sidebar-link.active { background: #1e293b; color: #fbbf24; border: 1px solid rgba(51,65,85,0.8); font-weight: 600; }
         
-        /* Bottom nav mobile dock styling (DANA Modern App Style) */
+        /* Bottom nav mobile dock styling (Flush bottom - DANA Modern App Style) */
         .bnav-item { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
             gap: 1px; 
-            padding: 2px 1px; 
+            padding: 4px 1px 2px 1px; 
             color: #64748b; 
             flex: 1; 
             position: relative;
@@ -47,7 +52,7 @@
         .bnav-item.active::after {
             content: '';
             position: absolute;
-            bottom: 0px;
+            bottom: 1px;
             width: 14px;
             height: 2px;
             background: #facc15;
@@ -63,16 +68,17 @@
             font-weight: 600; 
             line-height: 1; 
             letter-spacing: -0.2px;
+            margin-top: 1px;
         }
         .bnav-icon { 
-            font-size: 16px; 
+            font-size: 17px; 
             line-height: 1; 
             margin-bottom: 0px;
             transition: transform 0.18s ease;
         }
     </style>
 </head>
-<body class="min-h-screen flex">
+<body class="min-h-screen flex flex-col md:flex-row w-full max-w-full overflow-x-hidden bg-slate-950 text-white">
 
 <!-- SIDEBAR -->
 <aside class="hidden md:flex w-60 bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-md flex-col flex-shrink-0 h-screen sticky top-0">
@@ -100,11 +106,11 @@
 </aside>
 
 <!-- MAIN CONTENT -->
-<main class="flex-1 flex flex-col min-h-screen bg-slate-950 pb-36 md:pb-12">
+<main class="flex-1 flex flex-col min-h-screen bg-slate-950 pb-20 md:pb-12 w-full max-w-full min-w-0 overflow-x-hidden">
 
     <!-- Mobile Header -->
-    <header class="md:hidden h-14 flex items-center justify-between px-4 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md flex-shrink-0 sticky top-0 z-30">
-        <div class="flex items-center gap-2.5">
+    <header class="md:hidden h-14 flex items-center justify-between px-3.5 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md flex-shrink-0 sticky top-0 z-30 w-full max-w-full">
+        <div class="flex items-center gap-2">
             <div class="bg-amber-400 text-slate-950 font-extrabold text-sm w-7 h-7 rounded-lg flex items-center justify-center shadow">U</div>
             <span class="text-base font-extrabold tracking-wider text-amber-400">ULMET</span>
         </div>
@@ -115,24 +121,24 @@
         </div>
     </header>
 
-    <div class="p-4 sm:p-6 md:p-8 flex-1 max-w-5xl mx-auto w-full">
+    <div class="p-3.5 sm:p-6 md:p-8 flex-1 max-w-5xl mx-auto w-full min-w-0 box-border overflow-x-hidden">
         <!-- Header & Segmented Tab Switcher -->
-        <div class="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="mb-5 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
                     <span id="page-title-icon">🏆</span> <span id="page-title-text">Brankas Sertifikat & SKPI</span>
                 </h1>
                 <p class="text-slate-400 text-xs sm:text-sm mt-1">Kelola arsip sertifikat kejuaraan, webinar, kepengurusan organisasi, dan pelatihan pendukung ijazah</p>
             </div>
 
-            <!-- Segmented Tab Controls -->
-            <div class="inline-flex p-1 bg-slate-900/90 rounded-2xl border border-slate-800 self-start sm:self-auto shadow-inner">
-                <button onclick="switchProfilTab('prestasi')" id="tab-btn-prestasi" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow">
-                    <span>🏆</span> Folder Sertifikat
-                    <span id="badge-prestasi-count" class="bg-slate-950 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-extrabold">7</span>
+            <!-- Segmented Tab Controls (50/50 on Mobile) -->
+            <div class="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-slate-900/90 rounded-2xl border border-slate-800 self-start sm:self-auto shadow-inner">
+                <button onclick="switchProfilTab('prestasi')" id="tab-btn-prestasi" class="px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-amber-400 text-slate-950 shadow">
+                    <span>🏆</span> <span class="truncate">Folder Sertifikat</span>
+                    <span id="badge-prestasi-count" class="bg-slate-950 text-amber-400 text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-extrabold">7</span>
                 </button>
-                <button onclick="switchProfilTab('biodata')" id="tab-btn-biodata" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white">
-                    <span>👤</span> Biodata & Akun
+                <button onclick="switchProfilTab('biodata')" id="tab-btn-biodata" class="px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white">
+                    <span>👤</span> <span class="truncate">Biodata & Akun</span>
                 </button>
             </div>
         </div>
@@ -142,93 +148,93 @@
         <!-- ============================================== -->
         <div id="panel-prestasi" class="space-y-6">
 
-            <!-- 4 FOLDER KATEGORI UTAMA (INTERACTIVE FOLDER CARDS) -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <!-- 4 FOLDER KATEGORI UTAMA (INTERACTIVE FOLDER CARDS - Mobile Friendly) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 w-full min-w-0">
                 
                 <!-- Folder 1: Kejuaraan & Lomba -->
-                <div onclick="selectCertFolder('kejuaraan')" id="folder-card-kejuaraan" class="folder-card glass rounded-2xl p-4 border-2 border-amber-400 bg-amber-400/10 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-[0_0_15px_rgba(250,204,21,0.15)]">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-2xl p-2 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40">🏆</span>
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950" id="badge-count-kejuaraan">2 Berkas</span>
+                <div onclick="selectCertFolder('kejuaraan')" id="folder-card-kejuaraan" class="folder-card glass rounded-2xl p-3 sm:p-4 border-2 border-amber-400 bg-amber-400/10 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-[0_0_15px_rgba(250,204,21,0.15)] min-w-0 overflow-hidden">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <span class="text-xl sm:text-2xl p-1.5 sm:p-2 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40">🏆</span>
+                        <span class="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 text-slate-950" id="badge-count-kejuaraan">2 Berkas</span>
                     </div>
-                    <h4 class="font-extrabold text-white text-sm group-hover:text-amber-400 transition truncate">Kejuaraan & Lomba</h4>
-                    <p class="text-[11px] text-slate-400 truncate mt-0.5">Piagam Juara & Finalis</p>
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm group-hover:text-amber-400 transition truncate">Kejuaraan & Lomba</h4>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">Piagam Juara & Finalis</p>
                 </div>
 
                 <!-- Folder 2: Webinar & Seminar -->
-                <div onclick="selectCertFolder('webinar')" id="folder-card-webinar" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-sky-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-2xl p-2 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40">🎓</span>
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/40" id="badge-count-webinar">2 Berkas</span>
+                <div onclick="selectCertFolder('webinar')" id="folder-card-webinar" class="folder-card glass rounded-2xl p-3 sm:p-4 border border-slate-800 hover:border-sky-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm min-w-0 overflow-hidden">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <span class="text-xl sm:text-2xl p-1.5 sm:p-2 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40">🎓</span>
+                        <span class="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/40" id="badge-count-webinar">2 Berkas</span>
                     </div>
-                    <h4 class="font-extrabold text-white text-sm group-hover:text-sky-400 transition truncate">Webinar & Seminar</h4>
-                    <p class="text-[11px] text-slate-400 truncate mt-0.5">Peserta & Narasumber</p>
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm group-hover:text-sky-400 transition truncate">Webinar & Seminar</h4>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">Peserta & Narasumber</p>
                 </div>
 
                 <!-- Folder 3: Organisasi & Kepanitiaan -->
-                <div onclick="selectCertFolder('organisasi')" id="folder-card-organisasi" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-emerald-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-2xl p-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🤝</span>
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40" id="badge-count-organisasi">2 Berkas</span>
+                <div onclick="selectCertFolder('organisasi')" id="folder-card-organisasi" class="folder-card glass rounded-2xl p-3 sm:p-4 border border-slate-800 hover:border-emerald-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm min-w-0 overflow-hidden">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <span class="text-xl sm:text-2xl p-1.5 sm:p-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🤝</span>
+                        <span class="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40" id="badge-count-organisasi">2 Berkas</span>
                     </div>
-                    <h4 class="font-extrabold text-white text-sm group-hover:text-emerald-400 transition truncate">Organisasi & Panitia</h4>
-                    <p class="text-[11px] text-slate-400 truncate mt-0.5">SK Pengurus & Panitia</p>
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm group-hover:text-emerald-400 transition truncate">Organisasi & Panitia</h4>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">SK Pengurus & Panitia</p>
                 </div>
 
                 <!-- Folder 4: Pelatihan & Keahlian -->
-                <div onclick="selectCertFolder('pelatihan')" id="folder-card-pelatihan" class="folder-card glass rounded-2xl p-4 border border-slate-800 hover:border-purple-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">📜</span>
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/40" id="badge-count-pelatihan">1 Berkas</span>
+                <div onclick="selectCertFolder('pelatihan')" id="folder-card-pelatihan" class="folder-card glass rounded-2xl p-3 sm:p-4 border border-slate-800 hover:border-purple-400/60 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm min-w-0 overflow-hidden">
+                    <div class="flex items-center justify-between mb-2 sm:mb-3">
+                        <span class="text-xl sm:text-2xl p-1.5 sm:p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">📜</span>
+                        <span class="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-500/40" id="badge-count-pelatihan">1 Berkas</span>
                     </div>
-                    <h4 class="font-extrabold text-white text-sm group-hover:text-purple-400 transition truncate">Pelatihan & Skill</h4>
-                    <p class="text-[11px] text-slate-400 truncate mt-0.5">TOEFL, Kursus & Lisensi</p>
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm group-hover:text-purple-400 transition truncate">Pelatihan & Skill</h4>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">TOEFL, Kursus & Lisensi</p>
                 </div>
 
             </div>
 
-            <!-- Action Bar & Filter Pill Controls -->
-            <div class="glass rounded-2xl p-3.5 sm:p-4 border border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm">
+            <!-- Action Bar & Filter Pill Controls (Responsif, Tidak Overflow di Mobile) -->
+            <div class="glass rounded-2xl p-3 sm:p-4 border border-slate-800 flex flex-col gap-3 shadow-sm w-full min-w-0 overflow-hidden">
                 
-                <!-- Filter Pills -->
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                    <button onclick="selectCertFolder('semua')" id="filter-btn-semua" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                <!-- Filter Pills (Scrollable horizontally inside parent with min-w-0) -->
+                <div class="w-full min-w-0 overflow-x-auto pb-1.5 scrollbar-none flex items-center gap-1.5">
+                    <button onclick="selectCertFolder('semua')" id="filter-btn-semua" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap flex-shrink-0">
                         📁 Semua Folder (<span id="pill-count-semua">7</span>)
                     </button>
-                    <button onclick="selectCertFolder('kejuaraan')" id="filter-btn-kejuaraan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm">
+                    <button onclick="selectCertFolder('kejuaraan')" id="filter-btn-kejuaraan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm flex-shrink-0">
                         🏆 Kejuaraan (<span id="pill-count-kejuaraan">2</span>)
                     </button>
-                    <button onclick="selectCertFolder('webinar')" id="filter-btn-webinar" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                    <button onclick="selectCertFolder('webinar')" id="filter-btn-webinar" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap flex-shrink-0">
                         🎓 Webinar (<span id="pill-count-webinar">2</span>)
                     </button>
-                    <button onclick="selectCertFolder('organisasi')" id="filter-btn-organisasi" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                    <button onclick="selectCertFolder('organisasi')" id="filter-btn-organisasi" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap flex-shrink-0">
                         🤝 Organisasi (<span id="pill-count-organisasi">2</span>)
                     </button>
-                    <button onclick="selectCertFolder('pelatihan')" id="filter-btn-pelatihan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap">
+                    <button onclick="selectCertFolder('pelatihan')" id="filter-btn-pelatihan" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap flex-shrink-0">
                         📜 Pelatihan (<span id="pill-count-pelatihan">1</span>)
                     </button>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
-                    <button onclick="copySkpiResume()" class="bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-400/30 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow active:scale-95" title="Salin daftar sertifikat terstruktur untuk CV atau beasiswa">
-                        <span>📋</span> Salin Resume SKPI
+                <!-- Action Buttons: Tumpuk rapi di mobile, tidak pernah bikin scrollbar layar -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
+                    <button onclick="copySkpiResume()" class="bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-400/30 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow active:scale-95 flex-1 sm:flex-initial" title="Salin daftar sertifikat terstruktur untuk CV atau beasiswa">
+                        <span>📋</span> <span>Salin Resume SKPI</span>
                     </button>
-                    <button onclick="openAchievementModal()" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-lg shadow-yellow-400/20 active:scale-95">
-                        <span>➕</span> Tambah Sertifikat
+                    <button onclick="openAchievementModal()" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 shadow-lg shadow-yellow-400/20 active:scale-95 flex-1 sm:flex-initial">
+                        <span>➕</span> <span>Tambah Sertifikat</span>
                     </button>
                 </div>
             </div>
 
             <!-- Active Folder Banner & Status Header -->
-            <div class="flex items-center justify-between px-1">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                 <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-slate-300" id="active-folder-label">Folder Aktif:</span>
-                    <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30" id="active-folder-chip">
+                    <span class="text-xs sm:text-sm font-bold text-slate-300" id="active-folder-label">Folder Aktif:</span>
+                    <span class="text-[11px] sm:text-xs font-extrabold px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-300 border border-amber-400/30" id="active-folder-chip">
                         🏆 Kejuaraan & Lomba
                     </span>
                 </div>
-                <span class="text-xs text-slate-400" id="active-folder-stats">Menampilkan 2 berkas</span>
+                <span class="text-[11px] sm:text-xs text-slate-400" id="active-folder-stats">Menampilkan 2 berkas</span>
             </div>
 
             <!-- Achievement Cards Container -->
@@ -320,8 +326,8 @@
     </div>
 </main>
 
-<!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
-<nav class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
+<!-- BOTTOM NAVIGATION (Mobile Only Dock - Flush Bottom Mentok Layar) -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-slate-950/98 backdrop-blur-md border-t border-slate-800/80 flex items-center justify-around h-13 px-0.5 shadow-[0_-4px_25px_rgba(0,0,0,0.9)]">
     <a href="dashboard.html" class="bnav-item">
         <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
@@ -672,15 +678,15 @@
         if (tab === 'biodata') {
             panelBio.classList.remove('hidden');
             panelPres.classList.add('hidden');
-            btnBio.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow';
-            btnPres.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white';
+            btnBio.className = 'px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-amber-400 text-slate-950 shadow';
+            btnPres.className = 'px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white';
             titleIcon.textContent = '👤';
             titleText.textContent = 'Profil Saya';
         } else {
             panelBio.classList.add('hidden');
             panelPres.classList.remove('hidden');
-            btnPres.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-amber-400 text-slate-950 shadow';
-            btnBio.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-400 hover:text-white';
+            btnPres.className = 'px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 bg-amber-400 text-slate-950 shadow';
+            btnBio.className = 'px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white';
             titleIcon.textContent = '🏆';
             titleText.textContent = 'Brankas Sertifikat & SKPI';
             renderFolderView();
@@ -757,20 +763,20 @@
             const el = document.getElementById(`folder-card-${f}`);
             if (el) {
                 if (selectedFolder === f) {
-                    el.className = `folder-card glass rounded-2xl p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] ${FOLDER_META[f].activeBorder}`;
+                    el.className = `folder-card glass rounded-2xl p-3 sm:p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] min-w-0 overflow-hidden ${FOLDER_META[f].activeBorder}`;
                 } else {
-                    el.className = `folder-card glass rounded-2xl p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm ${FOLDER_META[f].inactiveBorder}`;
+                    el.className = `folder-card glass rounded-2xl p-3 sm:p-4 cursor-pointer transition-all duration-300 group hover:scale-[1.02] shadow-sm min-w-0 overflow-hidden ${FOLDER_META[f].inactiveBorder}`;
                 }
             }
         });
 
         // Perbarui pill filter aktif
         document.querySelectorAll('.filter-pill').forEach(btn => {
-            btn.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap';
+            btn.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-white border border-slate-800 whitespace-nowrap flex-shrink-0';
         });
         const activePill = document.getElementById(`filter-btn-${selectedFolder}`);
         if (activePill) {
-            activePill.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm';
+            activePill.className = 'filter-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-amber-400 text-slate-950 whitespace-nowrap shadow-sm flex-shrink-0';
         }
 
         // Teks folder aktif
@@ -855,76 +861,76 @@
             const hasCert = item.berkas && (item.berkas.name || item.berkas.dataUrl);
 
             return `
-            <div class="glass rounded-2xl p-4 sm:p-5 border border-slate-800/80 hover:border-amber-400/50 transition-all duration-300 group shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="glass rounded-2xl p-3.5 sm:p-5 border border-slate-800/80 hover:border-amber-400/50 transition-all duration-300 group shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 w-full min-w-0 overflow-hidden">
                 
                 <!-- Info Sertifikat -->
-                <div class="flex items-start gap-3.5 min-w-0">
-                    <div class="w-12 h-12 rounded-2xl ${capaianStyle.boxColor} border flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition shadow-sm">
+                <div class="flex items-start gap-3 sm:gap-3.5 min-w-0 w-full md:w-auto flex-1">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${capaianStyle.boxColor} border flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 group-hover:scale-105 transition shadow-sm">
                         ${capaianStyle.icon}
                     </div>
 
-                    <div class="space-y-1.5 min-w-0">
-                        <div class="flex flex-wrap items-center gap-2">
+                    <div class="space-y-1.5 min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                             <!-- Folder Tag -->
-                            <span class="${fMeta.tagClass} border text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span class="${fMeta.tagClass} border text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-md flex items-center gap-1">
                                 <span>${fMeta.icon}</span> ${fMeta.name}
                             </span>
                             <!-- Capaian Tag -->
-                            <span class="${capaianStyle.boxColor} border text-[10px] font-bold px-2 py-0.5 rounded-md">
+                            <span class="${capaianStyle.boxColor} border text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md">
                                 ${escapeHtml(item.capaian)}
                             </span>
                             <!-- Tingkat & Tahun -->
-                            <span class="bg-slate-800/80 text-slate-300 border border-slate-700/60 text-[10px] font-medium px-2 py-0.5 rounded-md">
+                            <span class="bg-slate-800/80 text-slate-300 border border-slate-700/60 text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md">
                                 Tingkat ${escapeHtml(item.tingkat)} &bull; ${item.tahun}
                             </span>
                         </div>
 
-                        <h4 class="text-white font-extrabold text-sm sm:text-base group-hover:text-amber-400 transition leading-snug">
+                        <h4 class="text-white font-extrabold text-xs sm:text-base group-hover:text-amber-400 transition leading-snug break-words">
                             ${escapeHtml(item.judul)}
                         </h4>
 
-                        <p class="text-xs text-slate-300 font-medium flex items-center gap-1.5">
-                            <span class="text-amber-400">🏛️</span> ${escapeHtml(item.penyelenggara)}
+                        <p class="text-[11px] sm:text-xs text-slate-300 font-medium flex items-center gap-1.5">
+                            <span class="text-amber-400">🏛️</span> <span class="truncate">${escapeHtml(item.penyelenggara)}</span>
                         </p>
 
                         ${item.nomorSkpi ? `
-                        <p class="text-[11px] text-slate-400 font-mono">
+                        <p class="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate">
                             <span class="text-slate-500">No. SKPI/SK:</span> ${escapeHtml(item.nomorSkpi)}
                         </p>` : ''}
                         
                         ${item.deskripsi ? `
-                        <p class="text-xs text-slate-400/90 line-clamp-2 mt-1">
+                        <p class="text-[11px] sm:text-xs text-slate-400/90 line-clamp-2 mt-1">
                             ${escapeHtml(item.deskripsi)}
                         </p>` : ''}
                     </div>
                 </div>
 
-                <!-- Bagian Berkas Fisik & Aksi -->
-                <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800 flex-shrink-0">
+                <!-- Bagian Berkas Fisik & Aksi (Responsif Tumpuk di Mobile) -->
+                <div class="flex flex-wrap items-center justify-between md:justify-center gap-2 pt-2.5 md:pt-0 border-t md:border-t-0 border-slate-800/80 w-full md:w-auto">
                     
                     ${hasCert ? `
-                    <div class="flex items-center gap-1.5 bg-slate-950/80 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl">
+                    <div class="flex items-center gap-1.5 bg-slate-950/80 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl max-w-full">
                         <span class="text-xs">📜</span>
-                        <div class="text-left">
-                            <p class="text-[11px] font-bold text-white truncate max-w-[130px] sm:max-w-[180px]">${escapeHtml(item.berkas.name || 'Sertifikat')}</p>
+                        <div class="text-left min-w-0">
+                            <p class="text-[11px] font-bold text-white truncate max-w-[120px] sm:max-w-[180px]">${escapeHtml(item.berkas.name || 'Sertifikat')}</p>
                             <p class="text-[9px] text-emerald-400 font-semibold">Tersimpan di Brankas</p>
                         </div>
                     </div>` : `
                     <div class="text-[10px] text-slate-500 italic px-2 py-1">Belum ada berkas</div>`}
 
                     <!-- Tombol Aksi -->
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
                         ${hasCert ? `
-                        <button onclick="viewCertificate('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-400 text-xs transition active:scale-95" title="Lihat Pratinjau Sertifikat">
+                        <button onclick="viewCertificate('${item.id}')" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-400 text-xs font-bold transition active:scale-95" title="Lihat Pratinjau Sertifikat">
                             👁️ Pratinjau
                         </button>
-                        <button onclick="downloadCertificate('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 text-xs transition active:scale-95" title="Unduh Sertifikat">
+                        <button onclick="downloadCertificate('${item.id}')" class="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 text-xs transition active:scale-95" title="Unduh Sertifikat">
                             ⬇️
                         </button>` : ''}
-                        <button onclick="editAchievement('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs transition active:scale-95" title="Edit Data">
+                        <button onclick="editAchievement('${item.id}')" class="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs transition active:scale-95" title="Edit Data">
                             ✏️
                         </button>
-                        <button onclick="deleteAchievement('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-rose-950/50 border border-slate-700 hover:border-rose-700/60 text-rose-400 text-xs transition active:scale-95" title="Hapus Sertifikat">
+                        <button onclick="deleteAchievement('${item.id}')" class="p-1.5 rounded-xl bg-slate-900 hover:bg-rose-950/50 border border-slate-700 hover:border-rose-700/60 text-rose-400 text-xs transition active:scale-95" title="Hapus Sertifikat">
                             🗑️
                         </button>
                     </div>

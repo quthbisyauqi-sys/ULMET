@@ -1,7 +1,7 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v87';
+const CACHE_NAME = 'ulmet-v88';
 const SHARED_CACHE_NAME = 'ulmet-shared-cache';
 const ASSETS = [
     './',
