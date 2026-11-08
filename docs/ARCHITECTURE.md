@@ -69,12 +69,13 @@ ULMET/
 ├── pages/                  # Tampilan antarmuka utama (Views)
 │   ├── admin.html          # Panel monitoring & manajemen akun mahasiswa lokal
 │   ├── ai.html             # Asisten belajar cerdas bertenaga LLM
+│   ├── catatan.html        # Catatan cepat perkuliahan, ide, & materi kuliah
 │   ├── dashboard.html      # Beranda ringkasan tugas, jadwal, & status maskot
 │   ├── jadwal.html         # Manajemen jadwal matkul, tugas & habit tracker
 │   ├── keuangan.html       # Manajemen anggaran harian, expense & patungan
 │   ├── login.html          # Halaman autentikasi akun & onboarding
 │   ├── materi.html         # Pengorganisir berkas kuliah (PDF/DOC) berbasis IndexedDB
-│   ├── profil.html         # Pengaturan akun & identitas akademik
+│   ├── profil.html         # Profil mahasiswa & Portofolio Brankas Prestasi SKPI (4 Kategori)
 │   └── widget.html         # Tampilan widget responsif Si Ulmet
 ├── tools/                  # Utilitas pemeliharaan dan pengembang
 │   ├── clear.html          # Pembersihan storage lokal
