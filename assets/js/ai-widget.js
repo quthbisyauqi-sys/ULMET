@@ -27,7 +27,7 @@ const AI_WIDGET_HTML = `
             <!-- Mini Model Switcher -->
             <select id="ai-widget-header-model" onchange="aiChangeModel(this.value)" class="bg-slate-900/90 border border-blue-700/60 text-yellow-400 text-[10px] font-bold rounded-lg px-2 py-1 outline-none cursor-pointer max-w-[125px] truncate">
                 <option value="openai/gpt-5.5">🚀 GPT-5.5</option>
-                <option value="google/gemini-2.5-flash">⚡ Gemini 2.5</option>
+                <option value="google/gemini-3.7-flash">⚡ Gemini 3.7</option>
                 <option value="anthropic/claude-opus-4.7">👑 Claude Opus</option>
             </select>
             
@@ -108,7 +108,7 @@ const AI_WIDGET_HTML = `
             <label class="block text-[11px] font-semibold text-blue-200 mb-1">Pilih Model Utama:</label>
             <select id="ai-modal-model-select" class="w-full bg-slate-950 border border-blue-700/60 rounded-xl px-3 py-2 text-xs text-yellow-400 font-medium outline-none">
                 <option value="openai/gpt-5.5">🚀 GPT-5.5 (OpenAI)</option>
-                <option value="google/gemini-2.5-flash">⚡ Gemini Flash 2.5 (Google)</option>
+                <option value="google/gemini-3.7-flash">⚡ Gemini Flash 3.7 (Google)</option>
                 <option value="anthropic/claude-opus-4.7">👑 Claude Opus 4.7 (Anthropic)</option>
             </select>
         </div>
@@ -209,7 +209,7 @@ function aiGetApiKey() {
     return key.trim();
 }
 
-const AI_ALLOWED_MODELS = ['openai/gpt-5.5', 'google/gemini-2.5-flash', 'anthropic/claude-opus-4.7'];
+const AI_ALLOWED_MODELS = ['openai/gpt-5.5', 'google/gemini-3.7-flash', 'anthropic/claude-opus-4.7'];
 
 function aiGetModel() {
     const saved = localStorage.getItem("ulmet_ai_model");

@@ -151,7 +151,7 @@
             <!-- Model Selector Dropdown -->
             <div class="relative">
                 <select id="model-select" onchange="changeModel(this.value)" class="bg-slate-900 border border-slate-800 hover:border-amber-400/70 text-amber-400 text-xs font-bold rounded-xl px-3 py-2 pr-7 outline-none appearance-none cursor-pointer transition shadow-inner">
-                    <option value="google/gemini-2.5-flash">⚡ ULMET Gemini</option>
+                    <option value="google/gemini-3.7-flash">⚡ ULMET Gemini</option>
                     <option value="anthropic/claude-opus-4.7">👑 ULMET Claude</option>
                     <option value="openai/gpt-5.5">🚀 ULMET GPT</option>
                 </select>
@@ -222,7 +222,7 @@
         </div>
         <div class="hidden sm:flex items-center justify-between max-w-4xl mx-auto mt-2 px-1 text-[11px] text-slate-500">
             <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Endpoint: <code class="text-slate-400 font-mono">core.snifoxai.com</code></span>
-            <span id="footer-model-badge" class="font-semibold text-amber-400">google/gemini-2.5-flash</span>
+            <span id="footer-model-badge" class="font-semibold text-amber-400">google/gemini-3.7-flash</span>
         </div>
     </div>
 </div>
@@ -250,7 +250,7 @@
             <div>
                 <label class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 block">Model AI Utama</label>
                 <select id="modal-model-select" class="w-full bg-slate-950/80 border border-slate-800/80 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none transition cursor-pointer">
-                    <option value="google/gemini-2.5-flash">⚡ ULMET Gemini (Flash 2.5)</option>
+                    <option value="google/gemini-3.7-flash">⚡ ULMET Gemini (Flash 3.7)</option>
                     <option value="anthropic/claude-opus-4.7">👑 ULMET Claude (Opus 4.7)</option>
                     <option value="openai/gpt-5.5">🚀 ULMET GPT (GPT-5.5)</option>
                 </select>
@@ -348,7 +348,7 @@ Gunakan format markdown yang rapi, sertakan emoji secukupnya, dan berikan poin-p
     // Konfigurasi SnifoxAI
     const SNIFOX_ENDPOINT = 'https://core.snifoxai.com/v1/chat/completions';
     const DEFAULT_SNIFOX_KEY = 'snfx-rcENe1gqyQLhifbgRQjW8ajvKju8oKWjidv8fCMaQ7GMG';
-    const DEFAULT_MODEL = 'google/gemini-2.5-flash';
+    const DEFAULT_MODEL = 'google/gemini-3.7-flash';
 
     let conversationHistory = []; // format OpenAI: [{role: 'user'|'assistant'|'system', content: '...', fileName?: '...'}]
     let pendingFileBase64 = null;
@@ -708,9 +708,9 @@ Gunakan format markdown yang rapi, sertakan emoji secukupnya, dan berikan poin-p
         return key.trim();
     }
 
-    const ALLOWED_MODELS = ['google/gemini-2.5-flash', 'anthropic/claude-opus-4.7', 'openai/gpt-5.5'];
+    const ALLOWED_MODELS = ['google/gemini-3.7-flash', 'anthropic/claude-opus-4.7', 'openai/gpt-5.5'];
     const MODEL_DISPLAY_NAMES = {
-        'google/gemini-2.5-flash': '⚡ ULMET Gemini',
+        'google/gemini-3.7-flash': '⚡ ULMET Gemini',
         'anthropic/claude-opus-4.7': '👑 ULMET Claude',
         'openai/gpt-5.5': '🚀 ULMET GPT'
     };
