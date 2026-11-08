@@ -10,7 +10,7 @@ Pengujian aplikasi dapat dilakukan melalui dua cara berikut:
 
 ### 1. Akses Langsung Online (Vercel)
 Aplikasi telah di-hosting dan dapat langsung dibuka melalui tautan berikut:
-- **Tautan Aplikasi:** https://ulmet.vercel.app *(atau tautan domain Vercel yang Anda gunakan)*
+- **Tautan Aplikasi:** https://ulmet-aolb.vercel.app
 
 Aplikasi dapat dibuka langsung menggunakan browser di laptop maupun smartphone.
 
