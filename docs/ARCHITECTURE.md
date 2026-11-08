@@ -75,8 +75,7 @@ ULMET/
 │   ├── keuangan.html       # Manajemen anggaran harian, expense & patungan
 │   ├── login.html          # Halaman autentikasi akun & onboarding
 │   ├── materi.html         # Pengorganisir berkas kuliah (PDF/DOC) berbasis IndexedDB
-│   ├── profil.html         # Profil mahasiswa & Portofolio Brankas Prestasi SKPI (4 Kategori)
-│   └── widget.html         # Tampilan widget responsif Si Ulmet
+│   └── profil.html         # Profil mahasiswa & Portofolio Brankas Prestasi SKPI (4 Kategori)
 ├── tools/                  # Utilitas pemeliharaan dan pengembang
 │   ├── clear.html          # Pembersihan storage lokal
 │   └── clear-cache.html    # Pembersihan service worker & offline cache

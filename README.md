@@ -80,21 +80,18 @@ Untuk memudahkan proses evaluasi tanpa harus mendaftar dan mengisi data dari awa
 ### 6. Catatan Kuliah
 - Tempat menulis ringkasan materi kuliah, rumus, atau catatan cepat dengan fitur penyematan catatan penting di baris teratas.
 
-### 7. Mode Widget Layar
-- Tampilan widget layar penuh yang dapat dipasang di layar monitor kedua untuk memantau tugas terdekat dan waktu secara praktis.
-
 ---
 
-## Pemasangan Aplikasi di HP (PWA / WebAPK)
+## Akses dan Pemasangan ULMET di HP (Web APK)
 
-Aplikasi ini menggunakan teknologi Progressive Web App sehingga dapat dipasang langsung menjadi aplikasi di HP Android tanpa perlu mengunduh dari toko aplikasi:
+Bagi mahasiswa yang ingin menggunakan ULMET langsung dari smartphone, aplikasi ini dapat dipasang sebagai Web APK melalui browser Google Chrome:
 
-1. Buka tautan ULMET di browser Google Chrome pada HP.
+1. Buka tautan Vercel ULMET di browser Google Chrome pada HP.
 2. Tekan menu titik tiga di pojok kanan atas Chrome.
-3. Pilih **"Instal Aplikasi"** atau **"Tambahkan ke Layar Utama"**.
-4. Aplikasi ULMET akan terpasang di menu HP dan dapat dibuka secara layar penuh (tanpa bilah alamat browser) serta dapat dibuka saat offline.
+3. Pilih menu **"Instal Aplikasi"** (atau **"Tambahkan ke Layar Utama"**).
+4. Aplikasi ULMET akan otomatis terpasang di menu aplikasi HP Anda, dapat dibuka secara layar penuh (*full screen* tanpa bilah alamat browser), dan tetap berfungsi lancar saat tidak ada koneksi internet (offline).
 
-Jika panitia lomba memerlukan berkas fisik berformat `.apk`, tautan web ULMET dapat dipaketkan melalui layanan seperti [pwabuilder.com](https://www.pwabuilder.com) untuk mengunduh file installer APK-nya.
+Jika panitia lomba memerlukan berkas fisik berformat `.apk`, tautan Vercel dapat dipaketkan melalui layanan resmi [pwabuilder.com](https://www.pwabuilder.com) untuk mengunduh berkas installer APK-nya.
 
 ---
 
@@ -117,8 +114,7 @@ ULMET/
 │   ├── keuangan.html       # Keuangan dan anggaran kos
 │   ├── login.html          # Halaman masuk dan akun demo
 │   ├── materi.html         # Penyimpanan materi kuliah
-│   ├── profil.html         # Profil dan portofolio sertifikat prestasi
-│   └── widget.html         # Mode widget layar
+│   └── profil.html         # Profil dan portofolio sertifikat prestasi
 ├── tools/                  # Alat pembersih cache
 ├── _headers                # Pengaturan header web
 ├── index.html              # Halaman awal pembuka

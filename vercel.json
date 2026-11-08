@@ -7,7 +7,7 @@
       "destination": "/pages/materi.html?shared=1"
     },
     {
-      "source": "/(admin|ai|catatan|dashboard|jadwal|keuangan|login|materi|profil|widget).html",
+      "source": "/(admin|ai|catatan|dashboard|jadwal|keuangan|login|materi|profil).html",
       "destination": "/pages/$1.html"
     },
     {
