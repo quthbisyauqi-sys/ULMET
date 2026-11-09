@@ -40,3 +40,11 @@ ULMET menyatukan seluruh kebutuhan mahasiswa ke dalam satu ekosistem web progres
 ### 5. 🔔 Push Notification & Habit Tracker Offline-First
 - **Inovasi Solutif**: Service Worker background notification daemon yang tetap dapat mengirimkan alarm deadline tugas kuliah bahkan saat browser ditutup.
 
+### 6. 👑 Panel Khusus Admin (Penerbitan & Manajemen Akun Mahasiswa)
+- **Inovasi Solutif**: Panel kontrol terisolasi untuk menerbitkan akun mahasiswa baru dan mengelola data pengguna secara mandiri (*zero server maintenance*).
+- **Kapabilitas Utama**:
+  - Proteksi gerbang PIN admin (`admin123` / `ulmet123`) yang fleksibel diubah.
+  - Form pembuatan akun mahasiswa dengan validasi karakter dan generator kata sandi acak.
+  - Kartu monitoring metrik (Total Mahasiswa, Profil Lengkap, dan Status Onboarding).
+  - Manajemen daftar mahasiswa lokal dengan filter pencarian instan (*instant search*).
+

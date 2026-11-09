@@ -47,6 +47,15 @@ Untuk memudahkan proses evaluasi dewan juri tanpa harus mendaftar dan mengisi da
    - **Portofolio Sertifikat Prestasi (SKPI)**: Tersimpan rapi dalam 4 folder kategori (Kejuaraan, Webinar, Organisasi, Pelatihan) dengan tata letak responsif mobile.
    - **Catatan Perkuliahan & Kebiasaan Belajar (Habit Tracker)**.
 
+### Akses Khusus Panel Admin (Pembuatan & Manajemen Akun)
+Selain mode demo, juri dan penguji dapat mengevaluasi menu khusus administrator untuk membuat akun mahasiswa baru:
+1. Buka menu **"👑 Panel Admin"** di bilah navigasi atas web ULMET atau akses langsung: https://ulmet-aolb.vercel.app/pages/admin.html
+2. Masukkan PIN Admin default: `admin123` (atau `ulmet123`).
+3. Admin dapat:
+   - **Membuat akun mahasiswa baru** secara instan dengan username kustom, kata sandi (tersedia tombol *Acak Otomatis*), dan nama mahasiswa.
+   - Akun yang dibuat dapat langsung dicoba untuk login ke aplikasi ULMET.
+   - Memantau metrik total mahasiswa terdata, status kelengkapan profil, dan mencari akun via kotak pencarian.
+
 ---
 
 ## Fitur Utama
@@ -86,6 +95,13 @@ Untuk memudahkan proses evaluasi dewan juri tanpa harus mendaftar dan mengisi da
 
 ### 7. Catatan Kuliah
 - Tempat menulis ringkasan materi kuliah, rumus, atau catatan cepat dengan fitur penyematan catatan penting di baris teratas.
+
+### 8. Panel Khusus Admin (Manajemen & Pembuatan Akun Mahasiswa)
+- Halaman administratif khusus (`pages/admin.html`) untuk menerbitkan akun mahasiswa baru dan memantau status pengguna.
+- **Proteksi Gate PIN**: Dilindungi kode PIN admin (`admin123` / `ulmet123`) yang dapat disesuaikan sewaktu-waktu.
+- **Form Pembuatan Akun Cepat**: Dilengkapi fitur sanitasi format username otomatis dan generator kata sandi acak (*random password generator*). Akun yang dibuat dapat langsung aktif digunakan untuk login.
+- **Statistik & Monitoring Terpadu**: Kartu metrik total mahasiswa terdaftar, mahasiswa dengan profil lengkap, serta mahasiswa yang masih memerlukan onboarding biodata.
+- **Pencarian & Manajemen Akun**: Daftar seluruh akun mahasiswa lokal yang tersimpan di perangkat dengan fitur filter pencarian instan (*instant search*).
 
 ---
 
