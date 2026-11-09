@@ -249,6 +249,38 @@ function loginAsDemoJudge() {
             status: 'belum', 
             completed: false,
             catatan: 'Meringkas 3 paper IEEE tahun 2024-2025.'
+        },
+        { 
+            id: 't4_org', 
+            nama: 'Meeting Koordinasi Panitia Lomba Invofest 2026', 
+            title: 'Meeting Koordinasi Panitia Lomba Invofest 2026', 
+            matkul: 'Divisi Kreatif & Acara', 
+            course: 'Divisi Kreatif & Acara', 
+            kategori: 'organisasi',
+            category: 'organisasi',
+            deadline: new Date(today.getTime() + 86400000 * 2.5).toISOString().slice(0, 16), 
+            prioritas: 'tinggi', 
+            priority: 'tinggi', 
+            estimasi: 2,
+            status: 'belum', 
+            completed: false,
+            catatan: 'Pembahasan teknis rundown lomba dan koordinasi dewan juri di Gedung Rektorat Lt. 3.'
+        },
+        { 
+            id: 't5_org', 
+            nama: 'Rapat Pleno BEM & Evaluasi Program Kerja', 
+            title: 'Rapat Pleno BEM & Evaluasi Program Kerja', 
+            matkul: 'BEM Fakultas / Organisasi', 
+            course: 'BEM Fakultas / Organisasi', 
+            kategori: 'organisasi',
+            category: 'organisasi',
+            deadline: new Date(today.getTime() + 86400000 * 5).toISOString().slice(0, 16), 
+            prioritas: 'sedang', 
+            priority: 'sedang', 
+            estimasi: 2.5,
+            status: 'belum', 
+            completed: false,
+            catatan: 'Presentasi evaluasi program kerja bulanan bersama divisi pengurus.'
         }
     ];
     localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));

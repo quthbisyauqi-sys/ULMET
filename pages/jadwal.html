@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="../manifest.json">
     <link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
-    <title>Jadwal & Tugas - ULMET</title>
-    <meta name="description" content="Kelola jadwal dan tugas kuliahmu dengan cerdas menggunakan ULMET.">
+    <title>Agenda & Tugas - ULMET</title>
+    <meta name="description" content="Kelola agenda organisasi dan tugas kuliahmu dengan cerdas menggunakan ULMET.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -208,7 +208,7 @@
                 </a>
                 <a href="jadwal.html"
                     class="flex items-center gap-3 bg-slate-800 text-amber-400 px-3.5 py-2.5 rounded-xl border border-slate-700/60 font-semibold text-sm">
-                    <span>📅</span><span class="font-semibold text-sm">Jadwal &amp; Tugas</span>
+                    <span>📅</span><span class="font-semibold text-sm">Agenda &amp; Tugas</span>
                 </a>
                 <a href="materi.html"
                     class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
@@ -251,17 +251,17 @@
                 <a href="dashboard.html"
                     class="md:hidden bg-amber-400 text-slate-950 font-extrabold text-sm w-8 h-8 rounded-xl flex items-center justify-center shadow mr-2 flex-shrink-0">U</a>
                 <div class="min-w-0">
-                    <h1 class="text-base sm:text-lg md:text-2xl font-bold text-white truncate leading-tight">Jadwal
+                    <h1 class="text-base sm:text-lg md:text-2xl font-bold text-white truncate leading-tight">Agenda
                         &amp; Tugas 📅</h1>
-                    <p class="text-[11px] md:text-xs text-slate-400 truncate">Kelola waktu &amp; tugasmu</p>
+                    <p class="text-[11px] md:text-xs text-slate-400 truncate">Kelola agenda organisasi &amp; tugas kuliahmu</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative">
                 <button onclick="openModal()"
                     class="bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-bold px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all flex items-center gap-1.5 text-xs sm:text-sm shadow-sm">
                     <span class="text-base font-extrabold leading-none">+</span>
-                    <span class="hidden sm:inline">Tambah Tugas</span>
-                    <span class="sm:hidden">Tugas</span>
+                    <span class="hidden sm:inline">Tambah Agenda / Tugas</span>
+                    <span class="sm:hidden">+ Agenda</span>
                 </button>
                 <!-- Bell button + notification dropdown -->
                 <button id="notif-bell-btn" onclick="toggleNotifPanel()"
@@ -531,6 +531,9 @@
                                         class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50"></span>
                                     Rendah</span>
                                 <span class="flex items-center gap-1.5"><span
+                                        class="w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50"></span>
+                                    Agenda Organisasi</span>
+                                <span class="flex items-center gap-1.5"><span
                                         class="w-2 h-2 rounded-full bg-purple-400 shadow-sm shadow-purple-400/50"></span>
                                     Libur Nasional</span>
                             </div>
@@ -743,30 +746,40 @@
                     class="text-slate-400 hover:text-white hover:bg-slate-800 transition w-9 h-9 rounded-xl flex items-center justify-center text-2xl leading-none">×</button>
             </div>
             <form onsubmit="saveTask(event)" class="space-y-4">
+                <!-- Pilihan Kategori: Tugas Kuliah vs Agenda Organisasi -->
                 <div>
-                    <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Nama Tugas
-                        *</label>
+                    <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Jenis Agenda / Aktivitas</label>
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950/80 rounded-xl border border-slate-800">
+                        <button type="button" onclick="setFormKategori('tugas')" id="btn-kat-tugas" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-amber-400 text-slate-950 shadow">
+                            <span>📚</span> Tugas Kuliah
+                        </button>
+                        <button type="button" onclick="setFormKategori('organisasi')" id="btn-kat-organisasi" class="py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white">
+                            <span>🤝</span> Agenda Organisasi
+                        </button>
+                    </div>
+                    <input type="hidden" id="form-kategori" value="tugas">
+                </div>
+
+                <div>
+                    <label id="lbl-form-nama" class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Nama Tugas *</label>
                     <input id="form-nama" type="text" required placeholder="cth: Makalah Sastra Arab Kuno"
                         class="w-full bg-slate-950/70 border border-slate-800/80 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400/60 transition">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Mata
-                            Kuliah</label>
+                        <label id="lbl-form-matkul" class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Mata Kuliah</label>
                         <input id="form-matkul" type="text" placeholder="cth: Sastra Arab"
                             class="w-full bg-slate-950/70 border border-slate-800/80 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400/60 transition">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Estimasi
-                            (jam)</label>
-                        <input id="form-estimasi" type="number" min="0.5" step="0.5" placeholder="cth: 3"
+                        <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Estimasi (jam)</label>
+                        <input id="form-estimasi" type="number" min="0.5" step="0.5" placeholder="cth: 2"
                             class="w-full bg-slate-950/70 border border-slate-800/80 text-white placeholder-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400/60 transition">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 gap-3">
                     <div>
-                        <label class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Deadline
-                            *</label>
+                        <label id="lbl-form-deadline" class="text-xs font-bold text-slate-300 mb-1.5 block uppercase tracking-wide">Deadline / Waktu Pelaksanaan *</label>
                         <input id="form-deadline" type="datetime-local" required onchange="updateDeadlinePreview()"
                             class="w-full bg-slate-950/70 border border-slate-800/80 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400/60 transition">
                     </div>
@@ -856,11 +869,34 @@
                 id: 't_demo_5',
                 nama: 'Rangkuman Sejarah Peradaban Dinasti Abbasiyah',
                 matkul: 'Sejarah Kebudayaan',
+                kategori: 'tugas',
                 prioritas: 'rendah',
                 deadline: new Date(Date.now() + 86400000 * 9).toISOString().slice(0, 16),
                 estimasi: 1.5,
                 status: 'belum',
                 catatan: 'Membaca modul halaman 45-70 perpustakaan kampus.'
+            },
+            {
+                id: 't_demo_org_1',
+                nama: 'Meeting Koordinasi Panitia Lomba Invofest 2026',
+                matkul: 'Divisi Kreatif & Acara',
+                kategori: 'organisasi',
+                prioritas: 'tinggi',
+                deadline: new Date(Date.now() + 86400000 * 2.5).toISOString().slice(0, 16),
+                estimasi: 2,
+                status: 'belum',
+                catatan: 'Pembahasan teknis rundown lomba dan koordinasi dewan juri di Gedung Rektorat Lt. 3.'
+            },
+            {
+                id: 't_demo_org_2',
+                nama: 'Rapat Pleno Organisasi & Evaluasi Proker Bulanan',
+                matkul: 'BEM Fakultas / Organisasi',
+                kategori: 'organisasi',
+                prioritas: 'sedang',
+                deadline: new Date(Date.now() + 86400000 * 5).toISOString().slice(0, 16),
+                estimasi: 2.5,
+                status: 'belum',
+                catatan: 'Presentasi capaian divisi dan persiapan expo karya mahasiswa.'
             }
         ];
 
@@ -869,10 +905,20 @@
             let p = (t.prioritas || t.priority || 'sedang').toLowerCase();
             if (!['tinggi', 'sedang', 'rendah'].includes(p)) p = 'sedang';
             let st = (t.status === 'selesai' || t.completed === true) ? 'selesai' : 'belum';
+            let kat = t.kategori || t.category;
+            if (!kat) {
+                const lower = (t.nama || '').toLowerCase();
+                if (lower.includes('rapat') || lower.includes('meeting') || lower.includes('organisasi') || lower.includes('bem') || lower.includes('hmj') || lower.includes('panitia') || lower.includes('bimbingan')) {
+                    kat = 'organisasi';
+                } else {
+                    kat = 'tugas';
+                }
+            }
             return {
                 id: String(t.id || ('t_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6))),
                 nama: t.nama || t.title || 'Tugas Kuliah',
                 matkul: t.matkul || t.course || 'Umum',
+                kategori: kat,
                 prioritas: p,
                 deadline: t.deadline || new Date(Date.now() + 86400000 * 2).toISOString(),
                 estimasi: parseFloat(t.estimasi) || 1,
@@ -1654,17 +1700,49 @@
             initSupabaseData(); // Load data dari Supabase
         });
 
-        // ===== MODAL =====
+        // ===== MODAL & KATEGORI AGENDA =====
         let modalTimer = null;
+
+        function setFormKategori(kat) {
+            const input = document.getElementById('form-kategori');
+            const btnTugas = document.getElementById('btn-kat-tugas');
+            const btnOrg = document.getElementById('btn-kat-organisasi');
+            const lblNama = document.getElementById('lbl-form-nama');
+            const inputNama = document.getElementById('form-nama');
+            const lblMatkul = document.getElementById('lbl-form-matkul');
+            const inputMatkul = document.getElementById('form-matkul');
+            const lblDeadline = document.getElementById('lbl-form-deadline');
+
+            if (input) input.value = kat;
+
+            if (kat === 'organisasi') {
+                if (btnOrg) btnOrg.className = 'py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-sky-500 text-white shadow-lg shadow-sky-500/20';
+                if (btnTugas) btnTugas.className = 'py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white';
+                if (lblNama) lblNama.textContent = 'Nama Agenda / Pertemuan *';
+                if (inputNama) inputNama.placeholder = 'cth: Rapat Pleno BEM Fakultas / Meeting Divisi Acara';
+                if (lblMatkul) lblMatkul.textContent = 'Organisasi / Tempat';
+                if (inputMatkul) inputMatkul.placeholder = 'cth: BEM / Panitia Invofest / Ruang 204';
+                if (lblDeadline) lblDeadline.textContent = 'Waktu Pelaksanaan / Tanggal Pertemuan *';
+            } else {
+                if (btnTugas) btnTugas.className = 'py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 bg-amber-400 text-slate-950 shadow';
+                if (btnOrg) btnOrg.className = 'py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white';
+                if (lblNama) lblNama.textContent = 'Nama Tugas *';
+                if (inputNama) inputNama.placeholder = 'cth: Makalah Sastra Arab Kuno';
+                if (lblMatkul) lblMatkul.textContent = 'Mata Kuliah';
+                if (inputMatkul) inputMatkul.placeholder = 'cth: Sastra Arab';
+                if (lblDeadline) lblDeadline.textContent = 'Deadline Tugas *';
+            }
+        }
 
         function openModal(editId = null) {
             document.getElementById('modal-overlay').classList.remove('hidden');
-            document.getElementById('modal-title').textContent = editId ? '✏️ Edit Tugas' : '➕ Tambah Tugas Baru';
             document.getElementById('deadline-preview').classList.add('hidden');
 
             if (modalTimer) clearInterval(modalTimer);
             if (editId) {
                 const t = tasks.find(x => String(x.id) === String(editId)); if (!t) return;
+                setFormKategori(t.kategori || 'tugas');
+                document.getElementById('modal-title').textContent = t.kategori === 'organisasi' ? '✏️ Edit Agenda Organisasi' : '✏️ Edit Tugas';
                 document.getElementById('form-nama').value = t.nama;
                 document.getElementById('form-matkul').value = t.matkul || '';
                 document.getElementById('form-estimasi').value = t.estimasi || '';
@@ -1681,6 +1759,8 @@
                 document.getElementById('form-deadline').value = dlStr;
                 updateDeadlinePreview();
             } else {
+                setFormKategori('tugas');
+                document.getElementById('modal-title').textContent = '➕ Tambah Agenda / Tugas Baru';
                 ['form-nama', 'form-matkul', 'form-estimasi', 'form-catatan', 'form-edit-id', 'form-deadline'].forEach(id =>
                     document.getElementById(id).value = '');
             }
@@ -1743,19 +1823,21 @@
             if (!deadlineVal) { showToast('Deadline wajib diisi!', 'error'); return; }
             // Auto-assign prioritas & eisenhower from deadline
             const prioritas = autoPrioritas(deadlineVal);
+            const kat = document.getElementById('form-kategori') ? document.getElementById('form-kategori').value : 'tugas';
             const data = {
                 nama: document.getElementById('form-nama').value.trim(),
                 matkul: document.getElementById('form-matkul').value.trim(),
+                kategori: kat,
                 prioritas,                        // auto dari deadline
                 deadline: deadlineVal,            // simpan sebagai string lokal
                 estimasi: parseFloat(document.getElementById('form-estimasi').value) || 0,
                 eisenhower: 'do',                 // field lama, tidak dipakai lagi
                 catatan: document.getElementById('form-catatan').value.trim(),
             };
-            if (!data.nama) { showToast('Nama tugas wajib diisi!', 'error'); return; }
+            if (!data.nama) { showToast('Nama tugas / agenda wajib diisi!', 'error'); return; }
             if (editId) {
                 Object.assign(tasks.find(t => t.id == editId), data);
-                showToast('✅ Tugas berhasil diperbarui!');
+                showToast(kat === 'organisasi' ? '✅ Agenda organisasi berhasil diperbarui!' : '✅ Tugas berhasil diperbarui!');
             } else {
                 const nowTime = Date.now();
                 tasks.push({
@@ -1767,7 +1849,7 @@
                     completedAt: null,
                     completed_at: null
                 });
-                showToast('✅ Tugas baru ditambahkan!');
+                showToast(kat === 'organisasi' ? '✅ Agenda organisasi baru ditambahkan!' : '✅ Tugas baru ditambahkan!');
             }
             saveTasks(); closeModal(); renderTasks(); updateStats();
             if (!document.getElementById('panel-kalender').classList.contains('hidden')) renderCalendar();
@@ -2329,6 +2411,7 @@
                         });
                         const hasSedang = activeDayTasks.some(t => t.prioritas === 'sedang');
                         const hasRendah = activeDayTasks.some(t => t.prioritas === 'rendah');
+                        const hasAgenda = activeDayTasks.some(t => t.kategori === 'organisasi' || t.kategori === 'agenda');
 
                         if (hasUrgent) {
                             dotItems.push('<span class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-sm shadow-red-500/50" title="Tugas Urgent (Prioritas Tinggi)"></span>');
@@ -2338,6 +2421,9 @@
                         }
                         if (hasRendah) {
                             dotItems.push('<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="Tugas Prioritas Rendah"></span>');
+                        }
+                        if (hasAgenda) {
+                            dotItems.push('<span class="w-1.5 h-1.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400/50" title="Agenda Organisasi / Pertemuan"></span>');
                         }
                     }
 
@@ -2446,39 +2532,44 @@
                 html += `<div class="space-y-2.5">`;
                 sorted.forEach(t => {
                     const isDone = t.status === 'selesai';
+                    const isOrg = t.kategori === 'organisasi' || t.kategori === 'agenda';
                     const timeStr = formatDeadlineTime(t.deadline);
 
                     let prioBadge = 'bg-slate-800/50 text-slate-300 border-slate-800/80';
-                    if (t.prioritas === 'tinggi') prioBadge = 'bg-red-500/20 text-red-300 border-red-500/40';
+                    if (isOrg) prioBadge = 'bg-sky-500/20 text-sky-300 border-sky-500/40';
+                    else if (t.prioritas === 'tinggi') prioBadge = 'bg-red-500/20 text-red-300 border-red-500/40';
                     else if (t.prioritas === 'sedang') prioBadge = 'bg-yellow-400/20 text-yellow-300 border-yellow-400/40';
                     else if (t.prioritas === 'rendah') prioBadge = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
 
                     html += `
-                    <div class="bg-slate-900/90 border border-slate-800/90 hover:border-slate-700 rounded-2xl p-4 shadow-md transition-all flex items-start gap-3.5 group">
+                    <div class="bg-slate-900/90 border ${isOrg ? 'border-sky-500/40 shadow-sky-950/30' : 'border-slate-800/90'} hover:border-slate-700 rounded-2xl p-4 shadow-md transition-all flex items-start gap-3.5 group">
                         <!-- Checkbox Circle (Click to toggle status) -->
                         <button onclick="calCycleTaskStatus(${t.id})" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isDone
                             ? 'bg-emerald-500 border-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/30'
-                            : 'border-slate-600 hover:border-sky-400 text-transparent'
+                            : isOrg ? 'border-sky-400 hover:border-sky-300 text-transparent' : 'border-slate-600 hover:border-sky-400 text-transparent'
                         }" title="${isDone ? 'Batal selesai' : 'Tandai selesai'}">
                             ${isDone ? '✓' : '○'}
                         </button>
 
                         <!-- Task Details -->
                         <div class="flex-1 min-w-0 cursor-pointer" onclick="editTask(${t.id})">
+                            <div class="flex items-center gap-2 mb-1">
+                                ${isOrg ? '<span class="text-xs bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><span>🤝</span> Agenda Organisasi</span>' : ''}
+                            </div>
                             <h4 class="font-bold text-sm sm:text-base text-white ${isDone ? 'line-through text-slate-400' : ''} truncate">
                                 ${escapeHtml(t.nama)}
                             </h4>
                             
-                            <!-- Metadata line: Course dot, Time, Priority -->
+                            <!-- Metadata line: Course / Organization dot, Time, Priority -->
                             <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
-                                <span class="inline-flex items-center gap-1.5 font-semibold text-slate-300">
-                                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${matkulColor(t.matkul)}"></span>
-                                    <span class="truncate max-w-[130px] sm:max-w-[180px]">${escapeHtml(t.matkul || 'Umum')}</span>
+                                <span class="inline-flex items-center gap-1.5 font-semibold ${isOrg ? 'text-sky-300' : 'text-slate-300'}">
+                                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${isOrg ? '#38bdf8' : matkulColor(t.matkul)}"></span>
+                                    <span class="truncate max-w-[130px] sm:max-w-[180px]">${isOrg ? '🏛️ ' : ''}${escapeHtml(t.matkul || (isOrg ? 'Organisasi' : 'Umum'))}</span>
                                 </span>
                                 <span class="text-slate-600">•</span>
                                 <span class="font-medium text-slate-300">⏰ ${timeStr}</span>
                                 <span class="text-slate-600">•</span>
-                                <span class="px-2 py-0.5 rounded-md font-bold text-[10px] border ${prioBadge}">${t.prioritas.toUpperCase()}</span>
+                                <span class="px-2 py-0.5 rounded-md font-bold text-[10px] border ${prioBadge}">${isOrg ? 'AGENDA' : t.prioritas.toUpperCase()}</span>
                             </div>
 
                             ${t.catatan ? `<p class="text-xs text-slate-400 mt-2 bg-slate-950/60 rounded-xl p-2 border border-slate-800/80 italic line-clamp-2">💬 ${escapeHtml(t.catatan)}</p>` : ''}
@@ -2498,55 +2589,22 @@
                 html += `
                 <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-5 text-center">
                     <p class="text-3xl mb-1.5">${holiday ? '🎉' : '🏖️'}</p>
-                    <p class="font-bold text-sm text-slate-200">Tidak ada tugas pada tanggal ini</p>
-                    <p class="text-xs text-slate-400 mt-1 mb-3">${holiday ? 'Hari Bebas Perkuliahan Resmi. Waktu luang untuk istirahat atau belajar mandiri.' : 'Hari yang tenang untuk belajar mandiri atau bersantai.'}</p>
-                    <button onclick="openModalForDate('${dateStr}')" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95">+ Buat Tugas untuk Tanggal Ini</button>
+                    <p class="font-bold text-sm text-slate-200">Tidak ada agenda atau tugas pada tanggal ini</p>
+                    <p class="text-xs text-slate-400 mt-1 mb-3">${holiday ? 'Hari Bebas Perkuliahan Resmi. Waktu luang untuk istirahat atau aktivitas mandiri.' : 'Hari yang tenang untuk belajar mandiri, bersantai, atau berkegiatan.'}</p>
+                    <button onclick="openModalForDate('${dateStr}')" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95">+ Buat Agenda / Tugas untuk Tanggal Ini</button>
                 </div>
             `;
             }
 
-            // 4. Card 2: Catatan / Quick Add Card (Matching Card 2 in user's reference image)
+            // 4. Card 2: Catatan & Tambah Agenda / Tugas
             html += `
             <div onclick="openModalForDate('${dateStr}')" class="bg-slate-900/70 hover:bg-slate-900 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-4 cursor-pointer transition flex items-center gap-3.5 group shadow-sm">
                 <div class="w-7 h-7 rounded-full border-2 border-slate-600 group-hover:border-sky-400 flex items-center justify-center text-slate-500 group-hover:text-sky-400 font-bold text-sm transition flex-shrink-0">
                     +
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-slate-300">Catatan & Tugas</p>
-                    <p class="text-xs text-slate-500 group-hover:text-sky-400 truncate">Ketuk untuk tambah tugas pada ${dayNameShort}, ${dayNumber} ${monthShort}</p>
-                </div>
-            </div>
-        `;
-
-            // 5. Card 3: Cuaca & Suasana Kampus (Real-Time Live Weather)
-            html += `
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg relative overflow-hidden group">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-                        <span id="live-weather-city" class="text-xs font-bold text-slate-300 truncate">📍 ${escapeHtml(liveWeather.city)}</span>
-                        <span class="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.2 rounded flex-shrink-0">BMKG LIVE</span>
-                    </div>
-                    <button onclick="fetchLiveWeather(true)" id="live-weather-refresh" class="text-xs text-slate-400 hover:text-amber-400 p-1 rounded-lg hover:bg-slate-800 transition ${liveWeather.loading ? 'animate-spin' : ''}" title="Perbarui Cuaca Live BMKG">
-                        🔄
-                    </button>
-                </div>
-                <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                        <div class="flex items-baseline gap-2">
-                            <p id="live-weather-temp" class="text-3xl font-extrabold text-white tracking-tight">${liveWeather.temp}°C</p>
-                            <div class="min-w-0">
-                                <p id="live-weather-cond" class="text-xs font-bold text-slate-200 truncate">${liveWeather.icon} ${escapeHtml(liveWeather.condition)}</p>
-                                <p id="live-weather-range" class="text-[11px] text-sky-400 font-semibold">${liveWeather.tRange || '17–28 °C'} • Kelembapan ${liveWeather.huRange || '30–91%'}</p>
-                            </div>
-                        </div>
-                        <p id="live-weather-tip" class="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-2">${escapeHtml(liveWeather.tip)}</p>
-                        <p class="text-[10px] text-slate-500 mt-1">Data Resmi BMKG • Junrejo, Kota Batu</p>
-                    </div>
-                    <div class="text-right text-xs flex-shrink-0">
-                        <p class="text-slate-300 font-bold">${doneCount}/${dayTasks.length} Selesai</p>
-                        <p class="text-[11px] text-slate-500 mt-0.5">${dayTasks.length === 0 ? 'Hari Bebas Tenggat 🌴' : doneCount === dayTasks.length ? '🎉 Semua beres!' : '💪 Fokus & konsisten!'}</p>
-                    </div>
+                    <p class="text-xs font-bold text-slate-300">Catatan, Agenda &amp; Tugas</p>
+                    <p class="text-xs text-slate-500 group-hover:text-sky-400 truncate">Ketuk untuk tambah agenda organisasi atau tugas pada ${dayNameShort}, ${dayNumber} ${monthShort}</p>
                 </div>
             </div>
         `;
@@ -3062,15 +3120,14 @@
 </body>
 
 <!-- BOTTOM NAVIGATION (Mobile Only Dock - DANA Style) -->
-<nav
-    class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950 border-t border-slate-800/80 flex items-center justify-around h-14 pb-[env(safe-area-inset-bottom,4px)] px-1 shadow-[0_-4px_25px_rgba(0,0,0,0.8)]">
+<nav class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-slate-950/98 backdrop-blur-md border-t border-slate-800/80 flex items-center justify-around h-13 px-0.5 shadow-[0_-4px_25px_rgba(0,0,0,0.9)]">
     <a href="dashboard.html" class="bnav-item">
         <span class="bnav-icon">📊</span>
         <span class="bnav-label">Dashboard</span>
     </a>
     <a href="jadwal.html" class="bnav-item active">
         <span class="bnav-icon">📅</span>
-        <span class="bnav-label">Jadwal</span>
+        <span class="bnav-label">Agenda</span>
     </a>
     <a href="materi.html" class="bnav-item">
         <span class="bnav-icon">📚</span>

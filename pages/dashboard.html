@@ -126,7 +126,7 @@
                     <span>📊</span><span class="font-semibold text-sm">Dashboard</span>
                 </a>
                 <a href="jadwal.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
-                    <span>📅</span><span class="font-medium text-sm">Jadwal &amp; Tugas</span>
+                    <span>📅</span><span class="font-medium text-sm">Agenda &amp; Tugas</span>
                 </a>
                 <a href="materi.html" class="flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-white px-3.5 py-2.5 rounded-xl transition font-medium text-sm">
                     <span>📚</span><span class="font-medium text-sm">Materi Dosen</span>
@@ -190,6 +190,14 @@
                         <p class="text-xl font-extrabold text-white leading-tight" id="chip-tugas">0</p>
                     </div>
                 </div>
+                <!-- Chip: Agenda Organisasi -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-sky-950/40 border border-sky-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-sky-400/50 transition min-w-[145px]" title="Agenda Pertemuan &amp; Meeting Organisasi">
+                    <div class="text-2xl">🤝</div>
+                    <div>
+                        <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-wide">Agenda Organisasi</p>
+                        <p class="text-xl font-extrabold text-sky-400 leading-tight" id="chip-agenda">0</p>
+                    </div>
+                </div>
                 <!-- Chip: Kebiasaan Hari Ini -->
                 <div onclick="window.location.href='jadwal.html?tab=kebiasaan'" class="flex-shrink-0 snap-start bg-emerald-950/40 border border-emerald-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-emerald-400/50 transition min-w-[135px]" title="Kebiasaan Keseharian Hari Ini">
                     <div class="text-2xl">📿</div>
@@ -246,19 +254,45 @@
             <!-- Bagian Grid Utama: Tugas, Kebiasaan, Pengeluaran & Cuaca Locari Kampus 3 -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8">
 
-                <!-- 1. KIRI ATAS: Jadwal & Tugas Terdekat -->
+                <!-- 1. KIRI ATAS: Agenda & Tugas Terdekat -->
                 <div class="bg-slate-900/80 p-6 rounded-3xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
                     <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                                <span>📝</span> Tugas Terdekat
-                            </h2>
-                            <a href="jadwal.html" class="text-xs font-semibold text-amber-400 hover:underline">Lihat Jadwal</a>
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl">📅</span>
+                                <div>
+                                    <h2 class="text-base sm:text-lg font-extrabold text-white leading-tight">Agenda &amp; Tugas Terdekat</h2>
+                                    <p class="text-[11px] text-slate-400">Kuliah &amp; kegiatan organisasi mahasiswa</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="inline-flex p-0.5 bg-slate-950/90 rounded-xl border border-slate-800 text-[11px] font-bold">
+                                    <button type="button" onclick="filterDashTasks('semua')" id="dash-filter-semua" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold transition shadow-sm">Semua</button>
+                                    <button type="button" onclick="filterDashTasks('tugas')" id="dash-filter-tugas" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-bold transition">Tugas</button>
+                                    <button type="button" onclick="filterDashTasks('agenda')" id="dash-filter-agenda" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-sky-300 font-bold transition">Agenda</button>
+                                </div>
+                                <a href="jadwal.html" class="text-xs font-semibold text-amber-400 hover:underline">Kelola &rarr;</a>
+                            </div>
                         </div>
 
-                        <div class="space-y-4" id="dash-tasks-list">
-                            <!-- Tasks dynamically loaded here -->
-                            <p class="text-center text-slate-400 py-4 text-sm">Memuat tugas...</p>
+                        <!-- Highlight Rangkuman Agenda Organisasi Mendatang -->
+                        <div id="dash-agenda-summary-banner" class="hidden mb-4 p-3.5 bg-gradient-to-r from-sky-950/70 via-slate-900/90 to-sky-950/50 border border-sky-500/30 rounded-2xl flex items-center justify-between gap-3 shadow-sm">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-lg flex-shrink-0">🤝</div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Agenda Organisasi Terdekat</p>
+                                    <p class="text-xs font-bold text-white truncate" id="dash-agenda-next-title">-</p>
+                                    <p class="text-[11px] text-slate-400 truncate" id="dash-agenda-next-meta">-</p>
+                                </div>
+                            </div>
+                            <a href="jadwal.html" class="flex-shrink-0 text-[11px] bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/40 text-sky-300 font-bold px-3 py-1.5 rounded-xl transition">
+                                Buka Kalender
+                            </a>
+                        </div>
+
+                        <div class="space-y-3" id="dash-tasks-list">
+                            <!-- Tasks & Agendas dynamically loaded here -->
+                            <p class="text-center text-slate-400 py-4 text-sm">Memuat agenda &amp; tugas...</p>
                         </div>
                     </div>
                 </div>
@@ -458,61 +492,166 @@
             }
         };
 
+        let currentDashTasksRaw = [];
+        let currentDashFilter = 'semua';
+
+        function isAgendaTask(t) {
+            if (!t) return false;
+            if (t.kategori === 'organisasi' || t.category === 'organisasi') return true;
+            const str = ((t.nama || t.title || '') + ' ' + (t.matkul || t.course || '') + ' ' + (t.catatan || '')).toLowerCase();
+            return str.includes('rapat') || str.includes('meeting') || str.includes('organisasi') || str.includes('bem') || str.includes('hmj') || str.includes('panitia') || str.includes('dema') || str.includes('ukm') || str.includes('pleno') || str.includes('evaluasi proker');
+        }
+
+        function filterDashTasks(type) {
+            currentDashFilter = type;
+            const btnSemua = document.getElementById('dash-filter-semua');
+            const btnTugas = document.getElementById('dash-filter-tugas');
+            const btnAgenda = document.getElementById('dash-filter-agenda');
+
+            if (btnSemua) {
+                btnSemua.className = type === 'semua'
+                    ? 'px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold transition shadow-sm'
+                    : 'px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-bold transition';
+            }
+            if (btnTugas) {
+                btnTugas.className = type === 'tugas'
+                    ? 'px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold transition shadow-sm'
+                    : 'px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-bold transition';
+            }
+            if (btnAgenda) {
+                btnAgenda.className = type === 'agenda'
+                    ? 'px-2.5 py-1 rounded-lg bg-sky-400 text-slate-950 font-bold transition shadow-sm'
+                    : 'px-2.5 py-1 rounded-lg text-slate-400 hover:text-sky-300 font-bold transition';
+            }
+
+            renderDashboardTasksList();
+        }
+
+        function renderDashboardTasksList() {
+            const tasksListContainer = document.getElementById('dash-tasks-list');
+            if (!tasksListContainer) return;
+
+            const allActive = (currentDashTasksRaw || []).filter(t => t.status !== 'selesai' && t.status !== 'completed');
+            allActive.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
+
+            let filtered = allActive;
+            if (currentDashFilter === 'tugas') {
+                filtered = allActive.filter(t => !isAgendaTask(t));
+            } else if (currentDashFilter === 'agenda') {
+                filtered = allActive.filter(t => isAgendaTask(t));
+            }
+
+            if (filtered.length === 0) {
+                const emptyMsg = currentDashFilter === 'agenda'
+                    ? 'Belum ada agenda organisasi mendatang.'
+                    : (currentDashFilter === 'tugas' ? 'Tidak ada tugas kuliah aktif.' : 'Semua agenda &amp; tugas selesai!');
+                tasksListContainer.innerHTML = `
+                    <div class="text-center py-6">
+                        <p class="text-2xl mb-1">${currentDashFilter === 'agenda' ? '🤝' : '🎉'}</p>
+                        <p class="text-slate-400 font-semibold text-xs">${emptyMsg}</p>
+                        <a href="jadwal.html" class="inline-block mt-2.5 text-[11px] bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700/60 px-3 py-1.5 rounded-lg transition font-medium">Buka Agenda &amp; Kalender</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const topItems = filtered.slice(0, 4);
+
+            tasksListContainer.innerHTML = topItems.map(t => {
+                const isOrg = isAgendaTask(t);
+                const title = t.nama || t.title || (isOrg ? 'Agenda Organisasi' : 'Tugas Kuliah');
+                const course = t.matkul || t.course || (isOrg ? 'Organisasi Mahasiswa' : 'Umum');
+                const deadlineRaw = t.deadline || t.date || '';
+                const urgency = getUrgencyInfo(deadlineRaw);
+                const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
+
+                if (isOrg) {
+                    return `
+                    <div onclick="window.location.href='jadwal.html'" class="bg-gradient-to-r from-sky-950/30 to-slate-900/70 p-3.5 rounded-2xl border border-sky-800/50 hover:border-sky-400/70 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
+                        <div class="space-y-1 min-w-0 pr-3">
+                            <h4 class="font-bold text-white text-xs sm:text-sm group-hover:text-sky-300 transition flex items-center gap-1.5 truncate">
+                                <span class="flex-shrink-0">🤝</span> <span class="truncate">${escapeHtml(title)}</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
+                                <span class="bg-sky-500/20 text-sky-300 font-bold px-2 py-0.5 rounded text-[10px] border border-sky-500/40">Agenda Organisasi</span>
+                                <span class="bg-slate-800/80 px-2 py-0.5 rounded text-[10px] text-slate-300 border border-slate-700/60 truncate max-w-[150px]">${escapeHtml(course)}</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end space-y-1 flex-shrink-0">
+                            <span class="bg-sky-500/20 text-sky-300 border-sky-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
+                            <span class="text-[11px] text-sky-400/90 font-medium">📅 ${deadlineFormatted}</span>
+                        </div>
+                    </div>
+                    `;
+                }
+
+                return `
+                <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800/80 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
+                    <div class="space-y-1 min-w-0 pr-3">
+                        <h4 class="font-bold text-white text-xs sm:text-sm group-hover:text-amber-400 transition flex items-center gap-1.5 truncate">
+                            <span class="flex-shrink-0">📌</span> <span class="truncate">${escapeHtml(title)}</span>
+                        </h4>
+                        <div class="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
+                            <span class="bg-slate-800/80 px-2 py-0.5 rounded text-[10px] text-slate-300 border border-slate-700/60 truncate max-w-[150px]">${escapeHtml(course)}</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex flex-col items-end space-y-1 flex-shrink-0">
+                        <span class="${urgency.class} px-2 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
+                        <span class="text-[11px] text-slate-400/90 font-medium">📅 ${deadlineFormatted}</span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
         function renderDashboardTasks(tasks) {
-            const activeTasks = (tasks || []).filter(t => t.status !== 'selesai' && t.status !== 'completed');
-            const completedTasks = (tasks || []).filter(t => t.status === 'selesai' || t.status === 'completed');
+            currentDashTasksRaw = Array.isArray(tasks) ? tasks : [];
+            const activeTasks = currentDashTasksRaw.filter(t => t.status !== 'selesai' && t.status !== 'completed');
+            const completedTasks = currentDashTasksRaw.filter(t => t.status === 'selesai' || t.status === 'completed');
             const now2 = new Date();
             const overdueTasks = activeTasks.filter(t => t.deadline && new Date(t.deadline) < now2);
 
-            document.getElementById('chip-tugas').innerText = activeTasks.length;
-            document.getElementById('chip-selesai').innerText = completedTasks.length;
-            document.getElementById('chip-overdue').innerText = overdueTasks.length;
+            const activeOrg = activeTasks.filter(isAgendaTask);
+            const activeCourseTasks = activeTasks.filter(t => !isAgendaTask(t));
+
+            const chipTugas = document.getElementById('chip-tugas');
+            if (chipTugas) chipTugas.innerText = activeCourseTasks.length;
+
+            const chipAgenda = document.getElementById('chip-agenda');
+            if (chipAgenda) chipAgenda.innerText = activeOrg.length;
+
+            const chipSelesai = document.getElementById('chip-selesai');
+            if (chipSelesai) chipSelesai.innerText = completedTasks.length;
+
+            const chipOverdue = document.getElementById('chip-overdue');
+            if (chipOverdue) chipOverdue.innerText = overdueTasks.length;
 
             const streak = parseInt(localStorage.getItem(userKey('ulmet_streak')) || '0');
             const chipStreak = document.getElementById('chip-streak');
             if (chipStreak) chipStreak.innerText = streak;
 
-            updateDashboardMascotWidget(tasks);
+            updateDashboardMascotWidget(currentDashTasksRaw);
 
-            const tasksListContainer = document.getElementById('dash-tasks-list');
-            if (activeTasks.length === 0) {
-                tasksListContainer.innerHTML = `
-                    <div class="text-center py-8">
-                        <p class="text-3xl mb-2">🎉</p>
-                        <p class="text-slate-400 font-semibold text-sm">Semua tugas selesai!</p>
-                        <p class="text-xs text-slate-400/80 mt-1">Tidak ada tanggungan tugas saat ini.</p>
-                        <a href="jadwal.html" class="inline-block mt-3 text-xs bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700/60 px-3 py-1.5 rounded-lg transition font-medium">Buat Tugas Baru</a>
-                    </div>
-                `;
-            } else {
-                activeTasks.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
-                const topTasks = activeTasks.slice(0, 4);
+            // Update Banner Rangkuman Agenda Organisasi Mendatang
+            const bannerEl = document.getElementById('dash-agenda-summary-banner');
+            if (bannerEl) {
+                if (activeOrg.length > 0) {
+                    activeOrg.sort((a, b) => new Date(a.deadline || a.date || 0) - new Date(b.deadline || b.date || 0));
+                    const nextOrg = activeOrg[0];
+                    const nextTitle = nextOrg.nama || nextOrg.title || 'Meeting Organisasi';
+                    const nextMeta = nextOrg.matkul || nextOrg.course || 'Agenda Kampus';
+                    const urg = getUrgencyInfo(nextOrg.deadline || nextOrg.date);
+                    const dFormat = formatDeadlineDisplay(nextOrg.deadline || nextOrg.date);
 
-                tasksListContainer.innerHTML = topTasks.map(t => {
-                    const title = t.nama || t.title || 'Tugas Kuliah';
-                    const course = t.matkul || t.course || 'Umum';
-                    const deadlineRaw = t.deadline || t.date || '';
-                    const urgency = getUrgencyInfo(deadlineRaw);
-                    const deadlineFormatted = formatDeadlineDisplay(deadlineRaw);
-
-                    return `
-                    <div onclick="window.location.href='jadwal.html'" class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 hover:border-yellow-400/60 hover:bg-slate-900/90 transition cursor-pointer flex justify-between items-center group shadow-sm">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-white text-sm group-hover:text-amber-400 transition flex items-center gap-2">
-                                <span>📌</span> ${title}
-                            </h4>
-                            <div class="flex items-center gap-2 text-xs text-slate-400">
-                                <span class="bg-slate-800/80 px-2 py-0.5 rounded text-[11px] text-slate-300 border border-slate-700/60">${course}</span>
-                            </div>
-                        </div>
-                        <div class="text-right flex flex-col items-end space-y-1.5">
-                            <span class="${urgency.class} px-2.5 py-0.5 rounded-full text-[10px] font-bold border">${urgency.text}</span>
-                            <span class="text-xs text-slate-400/90 font-medium">📅 ${deadlineFormatted}</span>
-                        </div>
-                    </div>
-                    `;
-                }).join('');
+                    document.getElementById('dash-agenda-next-title').innerText = nextTitle;
+                    document.getElementById('dash-agenda-next-meta').innerHTML = `<span class="text-sky-300 font-semibold">${escapeHtml(nextMeta)}</span> • 📅 ${dFormat} <span class="ml-1 text-[10px] text-sky-400 font-bold">(${urg.text})</span>`;
+                    bannerEl.classList.remove('hidden');
+                } else {
+                    bannerEl.classList.add('hidden');
+                }
             }
+
+            renderDashboardTasksList();
         }
 
         function getCategoryMeta(catName) {
@@ -1336,7 +1475,7 @@
         </a>
         <a href="jadwal.html" class="bnav-item">
             <span class="bnav-icon">📅</span>
-            <span class="bnav-label">Jadwal</span>
+            <span class="bnav-label">Agenda</span>
         </a>
         <a href="materi.html" class="bnav-item">
             <span class="bnav-icon">📚</span>
