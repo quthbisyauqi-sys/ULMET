@@ -1,7 +1,7 @@
 {
-  "name": "ULMET — Manajemen Waktu Mahasiswa",
+  "name": "ULMET (Ulet Lepas Mumet) — Ekosistem Digital Mahasiswa",
   "short_name": "ULMET",
-  "description": "Aplikasi manajemen jadwal, tugas, catatan, portofolio SKPI, dan keuangan mahasiswa",
+  "description": "Ekosistem digital cerdas mahasiswa untuk manajemen akademik, agenda organisasi, portofolio SKPI, dan keuangan kos",
   "id": "./pages/dashboard.html",
   "start_url": "./pages/dashboard.html",
   "scope": "./",
@@ -90,8 +90,8 @@
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Jadwal & Tugas",
-      "short_name": "Jadwal",
+      "name": "Agenda & Tugas",
+      "short_name": "Agenda",
       "url": "./pages/jadwal.html",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
