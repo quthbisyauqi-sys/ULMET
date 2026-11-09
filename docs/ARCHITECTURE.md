@@ -39,7 +39,7 @@ Dokumen ini menjelaskan rancangan arsitektur teknis, aliran data, dan integrasi 
 +-------------------+     +-------------------+     +-------------------+
 |      Pages        |     |  Local DB Engine  |     |  Background SW    |
 | - Dashboard       |     | - IndexedDB Files |     | - Push Deadline   |
-| - Jadwal & Tugas  |     | - Scoped LocalStrg|     | - Habit Reminders |
+| - Agenda & Tugas  |     | - Scoped LocalStrg|     | - Habit Reminders |
 | - Materi Kuliah   |     | - 0ms Latency     |     | - Cache Storage   |
 | - Keuangan        |     | - 100% Standalone |     |                   |
 | - AI ULMET        |     | - Zero Server Cost|     |                   |
@@ -56,7 +56,7 @@ Struktur folder ULMET menerapkan pemisahan tugas (*separation of concerns*) yang
 ULMET/
 ├── assets/                 # Berkas statis pendukung
 │   ├── icons/              # Ikon resolusi PWA (192x192, 512x512 maskable)
-│   ├── img/                # Visual maskot interaktif (happy, angry, worried)
+│   ├── img/                # Aset visual & grafis antarmuka
 │   └── js/                 # Modul JavaScript & Database Engine
 │       ├── local-db.js     # Engine database lokal perangkat (IndexedDB + Scoped Storage)
 │       └── ai-widget.js    # Widget floating AI & integrasi model
@@ -70,10 +70,10 @@ ULMET/
 │   ├── admin.html          # Panel monitoring & manajemen akun mahasiswa lokal
 │   ├── ai.html             # Asisten belajar cerdas bertenaga LLM
 │   ├── catatan.html        # Catatan cepat perkuliahan, ide, & materi kuliah
-│   ├── dashboard.html      # Beranda ringkasan tugas, jadwal, & status maskot
-│   ├── jadwal.html         # Manajemen jadwal matkul, tugas & habit tracker
+│   ├── dashboard.html      # Beranda ringkasan tugas, agenda terdekat, & countdown
+│   ├── jadwal.html         # Agenda & tugas, kalender organisasi 5 warna, countdown deadline
 │   ├── keuangan.html       # Manajemen anggaran harian, expense & patungan
-│   ├── login.html          # Halaman autentikasi akun & onboarding
+│   ├── login.html          # Halaman autentikasi akun & onboarding demo 1-klik
 │   ├── materi.html         # Pengorganisir berkas kuliah (PDF/DOC) berbasis IndexedDB
 │   └── profil.html         # Profil mahasiswa & Portofolio Brankas Prestasi SKPI (4 Kategori)
 ├── tools/                  # Utilitas pemeliharaan dan pengembang

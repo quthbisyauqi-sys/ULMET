@@ -33,51 +33,58 @@ Bagi yang ingin menguji dan memeriksa kode sumber secara langsung di laptop:
 
 ---
 
-## Panduan Penjurian (Akun Demo)
+## Panduan Penjurian (Akun Demo 1-Klik)
 
-Untuk memudahkan proses evaluasi tanpa harus mendaftar dan mengisi data dari awal, telah disediakan akun demo yang sudah memiliki data simulasi lengkap:
+Untuk memudahkan proses evaluasi dewan juri tanpa harus mendaftar dan mengisi data dari awal, telah disediakan akun demo yang sudah memiliki data simulasi lengkap:
 
-1. Buka halaman masuk di `pages/login.html`.
-2. Klik tombol **"Mode Penjurian Demo"** yang berada di bawah formulir login.
-3. Akun demo akan langsung terbuka dengan data terisi:
-   - Jadwal dan tugas kuliah aktif dengan indikator prioritas (Urgent, Sedang, Rendah, Libur Nasional).
-   - Dokumen materi perkuliahan format PDF yang tersimpan di dalam folder mata kuliah.
-   - Laporan keuangan kos lengkap dengan simulasi batas jatah belanja harian dan catatan patungan.
-   - Portofolio sertifikat prestasi yang terorganisir di dalam 4 kategori folder.
-   - Catatan perkuliahan dan pelacak kebiasaan belajar harian.
+1. Buka halaman utama ULMET di https://ulmet-aolb.vercel.app.
+2. Klik tombol utama di tengah hero: **"🚀 Buka Workspace Mahasiswa (Demo 1-Klik Juri)"** (atau melalui tombol demo di halaman `pages/login.html`).
+3. Akun demo akan langsung terbuka dengan data terisi lengkap:
+   - **Agenda & Tugas Kuliah**: Kalender interaktif dengan 5 indikator warna visual (Urgent, Sedang, Rendah, Agenda Organisasi, Libur Nasional).
+   - **Dashboard Terpadu**: Rangkuman agenda & tugas terdekat, filter cepat [Semua | Tugas | Agenda], banner sorotan rapat ormawa terdekat, dan alarm proaktif.
+   - **Dokumen Materi Perkuliahan**: Berkas format PDF yang tersimpan rapi di dalam folder mata kuliah (IndexedDB).
+   - **Laporan Keuangan Kos**: Lengkap dengan simulasi batas jatah belanja harian otomatis, evaluasi kategori pengeluaran terbesar, dan catatan patungan.
+   - **Portofolio Sertifikat Prestasi (SKPI)**: Tersimpan rapi dalam 4 folder kategori (Kejuaraan, Webinar, Organisasi, Pelatihan) dengan tata letak responsif mobile.
+   - **Catatan Perkuliahan & Kebiasaan Belajar (Habit Tracker)**.
 
 ---
 
 ## Fitur Utama
 
-### 1. Materi Kuliah dan Penerima File WhatsApp
+### 1. Materi Kuliah dan Penerima File WhatsApp (Web Share Target 2.0)
 - Mahasiswa dapat mengirimkan berkas materi (PDF, Word, PPT) dari grup WhatsApp langsung ke ULMET menggunakan fitur Share di HP.
 - File otomatis tersimpan di penyimpanan browser (IndexedDB) dan masuk ke folder mata kuliah yang sesuai, sehingga dokumen tidak hilang meskipun obrolan chat terhapus.
 
-### 2. Jadwal, Tugas, dan Kalender Prioritas
-- Kalender kuliah dengan pembagian warna prioritas:
-  - Merah: Tugas Urgent (deadline mendesak)
-  - Kuning: Prioritas Sedang
-  - Hijau: Prioritas Rendah
-  - Ungu: Hari Libur Nasional
-- Dilengkapi timer Pomodoro untuk fokus belajar dan pencatat kebiasaan harian.
+### 2. Agenda, Tugas, dan Kalender 5 Warna
+- Manajemen waktu terpadu untuk perkuliahan sekaligus aktivitas kemahasiswaan.
+- Kalender interaktif dengan 5 indikator warna visual status:
+  - 🔴 **Merah**: Tugas Urgent (deadline mendesak / < 24 jam)
+  - 🟡 **Kuning**: Prioritas Sedang
+  - 🟢 **Hijau**: Prioritas Rendah
+  - 🔵 **Biru Langit**: Agenda Organisasi & Pertemuan/Rapat (BEM, HMJ, Panitia)
+  - 🟣 **Ungu**: Hari Libur Nasional Resmi
+- Dilengkapi filter kategori instan, timer Pomodoro fokus belajar, dan pelacak kebiasaan harian (Habit Tracker).
 
-### 3. Asisten Belajar AI
-- Membantu mahasiswa memahami materi kuliah, membuat ringkasan bab penting, dan dapat membaca langsung isi dokumen yang dilampirkan.
+### 3. Asisten Belajar AI (Multi-Model & Pembaca PDF Modul)
+- Asisten cerdas bertenaga SnifoxAI Gateway multi-model yang dapat membaca berkas PDF modul perkuliahan secara langsung di peramban, membuat rangkuman konsep, flashcards ujian, dan kuis latihan mandiri.
 
-### 4. Portofolio Sertifikat dan Prestasi (SKPI)
+### 4. Portofolio Sertifikat dan Brankas Prestasi (SKPI)
 - Tempat menyimpan dan merapikan sertifikat ke dalam 4 folder kategori:
   - Kejuaraan dan Lomba
   - Webinar dan Seminar
   - Organisasi dan Kepanitiaan
   - Pelatihan dan Keahlian
-- Berkas asli tersimpan aman di penyimpanan lokal, dilengkapi pratinjau dokumen dan fitur salin ringkasan prestasi untuk pengajuan beasiswa atau SKPI wisuda.
+- Berkas asli tersimpan aman di penyimpanan lokal (IndexedDB), dilengkapi pratinjau dokumen, antarmuka mobile yang pas di layar HP (tanpa geser horizontal), serta fitur salin ringkasan prestasi untuk pengajuan beasiswa atau SKPI wisuda.
 
-### 5. Manajemen Keuangan Kos
+### 5. Manajemen Keuangan Kos & Kalkulator Jatah Harian
 - Menghitung sisa kuota uang belanja harian secara otomatis berdasarkan sisa hari dalam bulan agar uang saku tidak habis di awal.
-- Fitur pencatat tagihan patungan bersama teman kos dan target tabungan barang impian (wishlist).
+- Dilengkapi visualisasi kategori pengeluaran terbesar untuk evaluasi finansial, pencatat tagihan patungan bersama teman kos, dan target tabungan barang impian (wishlist).
 
-### 6. Catatan Kuliah
+### 6. Push Notification & Alarm Deadline Proaktif
+- Notifikasi latar belakang berbasis Service Worker yang mengirimkan peringatan H-1 hari dan H-2 jam sebelum batas waktu deadline tugas berakhir.
+- Dilengkapi alarm pengingat audio sintetis berbasis Web Audio API langsung di peramban.
+
+### 7. Catatan Kuliah
 - Tempat menulis ringkasan materi kuliah, rumus, atau catatan cepat dengan fitur penyematan catatan penting di baris teratas.
 
 ---
@@ -101,7 +108,7 @@ Jika panitia lomba memerlukan berkas fisik berformat `.apk`, tautan Vercel dapat
 ULMET/
 ├── assets/                 # Aset pendukung
 │   ├── icons/              # Ikon aplikasi
-│   ├── img/                # Gambar visual maskot
+│   ├── img/                # Aset visual & grafis antarmuka
 │   └── js/                 # Modul JavaScript dan database lokal perangkat
 ├── database/               # Skema dan dokumentasi database
 ├── docs/                   # Dokumen teknis dan penjelasan sistem
@@ -109,17 +116,17 @@ ULMET/
 │   ├── admin.html          # Panel admin
 │   ├── ai.html             # Ruang belajar asisten AI
 │   ├── catatan.html        # Catatan kuliah
-│   ├── dashboard.html      # Beranda utama mahasiswa
-│   ├── jadwal.html         # Jadwal kuliah, kalender, dan tugas
+│   ├── dashboard.html      # Beranda utama & rangkuman agenda
+│   ├── jadwal.html         # Agenda & tugas, kalender organisasi 5 warna, countdown deadline
 │   ├── keuangan.html       # Keuangan dan anggaran kos
-│   ├── login.html          # Halaman masuk dan akun demo
+│   ├── login.html          # Halaman masuk dan akun demo 1-klik
 │   ├── materi.html         # Penyimpanan materi kuliah
 │   └── profil.html         # Profil dan portofolio sertifikat prestasi
 ├── tools/                  # Alat pembersih cache
 ├── _headers                # Pengaturan header web
-├── index.html              # Halaman awal pembuka
+├── index.html              # Halaman awal pembuka (Demo 1-Klik Juri)
 ├── manifest.json           # Konfigurasi PWA dan ikon
-├── sw.js                   # Service worker untuk mode offline
+├── sw.js                   # Service worker offline-first & background push notification
 └── vercel.json             # Pengaturan routing hosting Vercel
 ```
 
