@@ -976,7 +976,7 @@
 
         function getCountdown(deadline) {
             const diff = parseAsWIB(deadline) - new Date();
-            if (diff <= 0) return { text: 'OVERDUE', isOverdue: true, isUrgent: false, isWarning: false };
+            if (diff <= 0) return { text: 'LEWAT DEADLINE', isOverdue: true, isUrgent: false, isWarning: false };
             const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000);
 
             let isUrgent = false, isWarning = false;
@@ -1720,7 +1720,7 @@
 
             let icon, label, sub, color;
             if (diff <= 0) {
-                icon = '🚨'; label = 'OVERDUE — Deadline sudah lewat!'; color = 'text-red-400'; sub = 'Segera selesaikan!';
+                icon = '🚨'; label = 'LEWAT DEADLINE — Waktu pengumpulan sudah habis!'; color = 'text-red-400'; sub = 'Segera selesaikan tugas ini!';
             } else if (d === 0) {
                 icon = '🔴'; label = 'Darurat — ' + h + 'j ' + m + 'm ' + s + 'd lagi'; color = 'text-red-400'; sub = 'Prioritas: Tinggi • Waktu terus berjalan!';
             } else if (d <= 4) {
@@ -2752,7 +2752,7 @@
             let msg, color;
             if (overdue.length > 0) {
                 color = 'bg-red-950/40 border-red-500/50';
-                msg = `🚨 <strong class="text-red-400">${overdue.length} tugas overdue!</strong> `
+                msg = `🚨 <strong class="text-red-400">${overdue.length} tugas lewat deadline!</strong> `
                     + overdue.map(n => `<span class="text-red-300">${n.task.nama}</span>`).join(', ')
                     + (urgent.length ? ` &amp; <strong class="text-orange-400">${urgent.length} darurat</strong>` : '');
             } else {
@@ -2799,7 +2799,7 @@
                 // Play alert sound for unseen urgent tasks
                 urgentUnseen.forEach(n => {
                     playBeep('urgent');
-                    showToast(n.icon + ' ' + (n.level === 'overdue' ? 'OVERDUE' : 'Darurat') + ': ' + n.task.nama, 'error');
+                    showToast(n.icon + ' ' + (n.level === 'overdue' ? 'Lewat Deadline' : 'Darurat') + ': ' + n.task.nama, 'error');
                 });
             }
             updateNotifBadge();

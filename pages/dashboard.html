@@ -225,15 +225,7 @@
                         <p class="text-sm font-extrabold text-white leading-tight truncate" id="dash-balance-amount">Rp 0</p>
                     </div>
                 </div>
-                <!-- Chip: Streak -->
-                <div onclick="window.location.href='jadwal.html?tab=kebiasaan'" class="flex-shrink-0 snap-start bg-orange-900/30 border border-orange-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-orange-400/50 transition min-w-[130px]">
-                    <div class="text-2xl">🔥</div>
-                    <div>
-                        <p class="text-[10px] text-orange-400 font-semibold uppercase tracking-wide">Streak</p>
-                        <p class="text-xl font-extrabold text-orange-400 leading-tight" id="chip-streak">0</p>
-                    </div>
-                </div>
-                <!-- Chip: File -->
+                <!-- Chip: File Tersimpan -->
                 <div onclick="window.location.href='materi.html'" class="flex-shrink-0 snap-start bg-indigo-900/30 border border-indigo-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-indigo-400/50 transition min-w-[130px]">
                     <div class="text-2xl">📚</div>
                     <div>
@@ -241,11 +233,11 @@
                         <p class="text-xl font-extrabold text-white leading-tight"><span id="dash-files-count">0</span></p>
                     </div>
                 </div>
-                <!-- Chip: Overdue -->
-                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-red-900/30 border border-red-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-red-400/50 transition min-w-[130px]">
+                <!-- Chip: Lewat Deadline (Tetap Berfungsi, Nama Jelas Dipahami Mahasiswa) -->
+                <div onclick="window.location.href='jadwal.html'" class="flex-shrink-0 snap-start bg-red-900/30 border border-red-700/40 rounded-2xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-red-400/50 transition min-w-[140px]" title="Tugas yang telah melewati batas deadline pengumpulan">
                     <div class="text-2xl">⚠️</div>
                     <div>
-                        <p class="text-[10px] text-red-400 font-semibold uppercase tracking-wide">Overdue</p>
+                        <p class="text-[10px] text-red-400 font-semibold uppercase tracking-wide">Lewat Deadline</p>
                         <p class="text-xl font-extrabold text-red-400 leading-tight" id="chip-overdue">0</p>
                     </div>
                 </div>
@@ -477,7 +469,8 @@
             document.getElementById('chip-overdue').innerText = overdueTasks.length;
 
             const streak = parseInt(localStorage.getItem(userKey('ulmet_streak')) || '0');
-            document.getElementById('chip-streak').innerText = streak;
+            const chipStreak = document.getElementById('chip-streak');
+            if (chipStreak) chipStreak.innerText = streak;
 
             updateDashboardMascotWidget(tasks);
 
