@@ -27,11 +27,11 @@ ULMET menyatukan seluruh kebutuhan mahasiswa ke dalam satu ekosistem web progres
 - **Inovasi Solutif**: Integrasi SnifoxAI Gateway dengan model cerdas (GPT-5.5, Gemini 2.5, Claude Opus).
 - **Kapabilitas**: Dilengkapi kemampuan ekstraksi teks dari berkas PDF langsung di sisi peramban (*client-side PDF parsing via PDF.js*), pembuatan flashcards, kuis latihan, dan ringkasan konsep inti.
 
-### 3. 🎭 Gamifikasi Maskot Adaptif ("Si Ulmet")
-- **Inovasi Solutif**: Maskot emosional yang bereaksi terhadap kedisiplinan mahasiswa.
-  - 🏆 **Happy (Reward)**: Ketika tugas selesai tepat waktu dan streak belajar terjaga.
-  - ⏰ **Worried (Panik)**: Ketika deadline mendekat dalam waktu kurang dari 24 jam.
-  - 😡 **Angry (Marah)**: Ketika mahasiswa mengabaikan tugas dan lama tidak membuka aplikasi.
+### 3. 📅 Agenda Organisasi & Kalender Cerdas
+- **Inovasi Solutif**: Manajemen terintegrasi antara perkuliahan akademik dengan agenda kegiatan mahasiswa (rapat, kepanitiaan lomba, evaluasi proker ormawa).
+  - 🔵 **Agenda Organisasi**: Indikator warna visual baru pada kalender untuk membedakan kegiatan ormawa dengan tugas kuliah.
+  - 📋 **Countdown & Filter Interaktif**: Menghitung mundur sisa hari deadline serta filter instan antara tugas kuliah vs agenda rapat.
+  - 🤝 **Rangkuman Dashboard**: Banner sorotan terdekat di beranda dashboard untuk memastikan mahasiswa tidak ketinggalan rapat penting.
 
 ### 4. 💸 Manajemen Keuangan & Kalkulator Jatah Harian
 - **Inovasi Solutif**: Menghitung secara otomatis sisa pagu anggaran dibagi jumlah hari tersisa hingga akhir bulan.

@@ -137,21 +137,16 @@
 
             <!-- Subtitle -->
             <p class="text-sm sm:text-base text-slate-300 font-sans-body max-w-2xl mx-auto leading-relaxed">
-                Platform PWA <strong class="text-white">100% Local-First Offline</strong> dengan integrasi <strong class="text-yellow-300">WhatsApp Web Share Target</strong> materi dosen, asisten AI pembaca PDF materi kuliah, alarm deadline proaktif, dan gamifikasi maskot emosional adaptif.
+                Platform PWA <strong class="text-white">100% Local-First Offline</strong> dengan integrasi <strong class="text-yellow-300">WhatsApp Web Share Target</strong> materi dosen, asisten AI pembaca PDF materi kuliah, alarm deadline proaktif, dan kalender agenda organisasi kampus.
             </p>
 
-            <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+            <!-- CTA Button (Satu Tombol Saja untuk Dewan Juri) -->
+            <div class="flex items-center justify-center pt-2">
                 <button onclick="launchJudgeDemo()"
-                   class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:brightness-110 text-slate-950 font-black text-sm shadow-[0_10px_35px_rgba(250,204,21,0.35)] transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span class="text-base">🚀</span>
-                    <span>Buka Workspace Mahasiswa (Demo 1-Klik)</span>
+                   class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:brightness-110 text-slate-950 font-black text-sm sm:text-base shadow-[0_10px_35px_rgba(250,204,21,0.35)] transition-all active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer">
+                    <span class="text-xl">🚀</span>
+                    <span>Buka Workspace Mahasiswa (Demo 1-Klik Juri)</span>
                 </button>
-                <a href="pages/login.html"
-                   class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-white font-bold text-sm transition active:scale-95 flex items-center justify-center gap-2">
-                    <span>🔑</span>
-                    <span>Masuk Portal Mahasiswa</span>
-                </a>
             </div>
 
             <!-- Metric Badges -->
@@ -185,19 +180,21 @@
                 
                 <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-800/80">
                     <div class="flex items-center gap-4">
-                        <img src="assets/img/mascot-happy.jpg" alt="Si Ulmet Mascot" class="w-16 h-16 rounded-2xl object-cover border-2 border-yellow-400 shadow-lg shadow-yellow-500/20">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-950 font-black text-2xl flex items-center justify-center shadow-lg shadow-yellow-500/20 flex-shrink-0">
+                            U
+                        </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="text-lg font-black text-white">Si Ulmet</span>
-                                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">Reward Mood 🏆</span>
+                                <span class="text-lg font-black text-white">Workspace Mahasiswa ULMET</span>
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">100% Siap Digunakan ✨</span>
                             </div>
-                            <p class="text-xs text-slate-300 mt-0.5">"Keren banget! 3 tugas minggu ini sudah beres tepat waktu. Pertahankan konsistensi belajarmu!"</p>
+                            <p class="text-xs text-slate-300 mt-0.5">Agenda kuliah teratur, meeting organisasi terpantau, dan finansial aman tanpa stres.</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="text-center px-4 py-2 rounded-xl bg-slate-950/80 border border-slate-800/80">
-                            <div class="text-lg font-black text-amber-400">7 Hari 🔥</div>
-                            <div class="text-[10px] text-slate-400">Konsistensi Belajar</div>
+                            <div class="text-lg font-black text-sky-400">2 Agenda 🤝</div>
+                            <div class="text-[10px] text-slate-400">Organisasi &amp; Rapat</div>
                         </div>
                         <div class="text-center px-4 py-2 rounded-xl bg-slate-950/80 border border-slate-800/80">
                             <div class="text-lg font-black text-emerald-400">Rp 50.000</div>
@@ -281,15 +278,15 @@
 
                 <!-- Card 3 -->
                 <div class="glass-card p-6 rounded-3xl space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-2xl text-yellow-400">
-                        🎭
+                    <div class="w-12 h-12 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-2xl text-sky-400">
+                        📅
                     </div>
-                    <h3 class="text-lg font-black text-white">Maskot Gamifikasi Emosional ("Si Ulmet")</h3>
+                    <h3 class="text-lg font-black text-white">Agenda Organisasi &amp; Kalender Cerdas</h3>
                     <p class="text-xs text-slate-300 leading-relaxed font-sans-body">
-                        Karakter maskot hidup yang ekspresinya berubah adaptif sesuai ketuntasan tugas: <em>Reward Mood</em> (bangga), <em>Worried Mood</em> (deadline mepet), dan <em>Angry Mood</em> (tugas menumpuk) untuk mencegah prokrastinasi.
+                        Kelola jadwal kuliah, deadline tugas, rapat organisasi, dan kepanitiaan dalam satu kalender interaktif berindikator warna visual cerdas, filter instan, dan countdown otomatis.
                     </p>
-                    <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">
-                        ✓ Pendekatan Behavioral Psychology
+                    <div class="text-[11px] font-bold text-sky-400 flex items-center gap-1">
+                        ✓ Ekosistem Terpadu Kuliah &amp; Organisasi
                     </div>
                 </div>
 
@@ -386,7 +383,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-emerald-400 mt-0.5">•</span>
-                            <span>Maskot "Si Ulmet" dan alarm background aktif mengingatkan jadwal jauh sebelum deadline tiba.</span>
+                            <span>Alarm background dan kalender agenda aktif mengingatkan jadwal kuliah serta tugas jauh sebelum batas waktu.</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-emerald-400 mt-0.5">•</span>
