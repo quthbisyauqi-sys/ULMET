@@ -196,9 +196,21 @@ const DEFAULT_STUDENT_SEEDS = [
 
 function ensureLocalStudentsSeeded() {
     try {
+        let list = [];
         const stored = localStorage.getItem('ulmet_local_students');
-        if (!stored || stored === '[]') {
-            localStorage.setItem('ulmet_local_students', JSON.stringify(DEFAULT_STUDENT_SEEDS));
+        if (stored) {
+            try { list = JSON.parse(stored); } catch(e) { list = []; }
+        }
+        if (!Array.isArray(list)) list = [];
+        let updated = false;
+        DEFAULT_STUDENT_SEEDS.forEach(seed => {
+            if (!list.some(s => s && s.username && s.username.toLowerCase() === seed.username.toLowerCase())) {
+                list.push(seed);
+                updated = true;
+            }
+        });
+        if (updated || !stored) {
+            localStorage.setItem('ulmet_local_students', JSON.stringify(list));
         }
     } catch (e) { }
 }

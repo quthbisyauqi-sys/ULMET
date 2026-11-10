@@ -219,11 +219,6 @@
                     <span id="btn-login-label">Masuk ke ULMET 🚀</span>
                 </button>
 
-                <!-- Info Akun Bawaan -->
-                <p class="text-[11px] text-slate-400 text-center">
-                    💡 Akun mahasiswa: <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded font-mono">mahasiswa</code> (sandi: <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded font-mono">mahasiswa123</code>) atau daftar akun baru di tab atas.
-                </p>
-
                 <!-- Tombol Khusus Dewan Juri / Penilai Lomba (1-Klik Tanpa Perlu Daftar) -->
                 <div class="relative flex py-2 items-center">
                     <div class="flex-grow border-t border-slate-800"></div>
@@ -638,12 +633,22 @@
             }
 
             // 2. Verifikasi Akun Mahasiswa di Database Lokal Perangkat
+            if (typeof ensureLocalStudentsSeeded === 'function') {
+                ensureLocalStudentsSeeded();
+            }
             let localStudents = [];
             try {
                 localStudents = JSON.parse(localStorage.getItem('ulmet_local_students') || '[]');
             } catch (e) { }
+            if (typeof DEFAULT_STUDENT_SEEDS !== 'undefined' && Array.isArray(DEFAULT_STUDENT_SEEDS)) {
+                DEFAULT_STUDENT_SEEDS.forEach(seed => {
+                    if (!localStudents.some(s => s && s.username && s.username.toLowerCase() === seed.username.toLowerCase())) {
+                        localStudents.push(seed);
+                    }
+                });
+            }
 
-            const localUser = localStudents.find(s => s.username.toLowerCase() === username && s.password === password);
+            const localUser = localStudents.find(s => s && s.username && s.username.toLowerCase() === username && s.password === password);
             if (localUser) {
                 label.textContent = 'Masuk ke Akun... 🚀';
                 setCurrentUserId(localUser.id);
