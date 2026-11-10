@@ -1345,8 +1345,9 @@
                     localTasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
                 }
                 const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
-                if (!isJudge && Array.isArray(localTasks) && localTasks.length > 0 && localTasks.every(t => t.id && String(t.id).startsWith('t_demo_'))) {
-                    localTasks = [];
+                const SAMPLE_TASK_IDS = ['t_demo_1', 't_demo_2', 't_demo_3', 't_demo_4', 't_demo_5', 't_demo_org_1', 't_demo_org_2'];
+                if (!isJudge && Array.isArray(localTasks) && localTasks.some(t => SAMPLE_TASK_IDS.includes(t.id))) {
+                    localTasks = localTasks.filter(t => !SAMPLE_TASK_IDS.includes(t.id));
                 }
                 renderDashboardTasks(localTasks || []);
             } catch(e) {

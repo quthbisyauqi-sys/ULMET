@@ -398,6 +398,8 @@
         }
     ];
 
+    const DUMMY_NOTE_IDS = ['note_1', 'note_2', 'note_3', 'note_4'];
+
     function isJudgeAccount() {
         return (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
     }
@@ -413,10 +415,11 @@
             return [];
         }
         try {
-            const list = JSON.parse(stored) || [];
-            if (!isJudgeAccount() && Array.isArray(list) && list.length > 0 && list.every(n => n.id && String(n.id).startsWith('note_'))) {
-                localStorage.setItem(userKey('ulmet_notes'), JSON.stringify([]));
-                return [];
+            let list = JSON.parse(stored) || [];
+            // Hanya bersihkan catatan sampel bawaan jika akun mahasiswa/non-juri
+            if (!isJudgeAccount() && Array.isArray(list) && list.some(n => DUMMY_NOTE_IDS.includes(n.id))) {
+                list = list.filter(n => !DUMMY_NOTE_IDS.includes(n.id));
+                localStorage.setItem(userKey('ulmet_notes'), JSON.stringify(list));
             }
             return list;
         } catch (e) {
@@ -442,11 +445,11 @@
             return [];
         }
         try {
-            const list = JSON.parse(stored) || [];
+            let list = JSON.parse(stored) || [];
             if (!isJudgeAccount() && Array.isArray(list) && 
                 list.length === 4 && list[0] === 'Hutang' && list[1] === 'LKP2M' && list[2] === 'Matkul' && list[3] === 'Pribadi') {
+                list = [];
                 localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify([]));
-                return [];
             }
             return list;
         } catch (e) {
@@ -494,10 +497,14 @@
     // Render Folder Chips Bar (Atas)
     function renderFolderChips() {
         const folders = getFoldersList();
+        const allNotes = getNotesList();
+        const usedFolders = [...new Set(allNotes.map(n => n.folder).filter(Boolean))];
+        const combinedFolders = [...new Set([...folders, ...usedFolders])];
+
         const container = document.getElementById('folder-chips-container');
         if (!container) return;
 
-        const allChips = ['Semua', ...folders];
+        const allChips = ['Semua', ...combinedFolders];
 
         container.innerHTML = `
             ${allChips.map(f => {
@@ -655,8 +662,9 @@
 
         // Isi dropdown folder di editor
         const folders = getFoldersList();
-        folderSel.innerHTML = folders.map(f => `
-            <option value="${f}" ${currentFolderFilter === f ? 'selected' : ''}>${f}</option>
+        const displayFolders = folders.length > 0 ? folders : ['Umum'];
+        folderSel.innerHTML = displayFolders.map(f => `
+            <option value="${escapeHtml(f)}" ${(currentFolderFilter === f || (!folders.length && f === 'Umum')) ? 'selected' : ''}>${escapeHtml(f)}</option>
         `).join('');
 
         if (noteId) {
@@ -667,7 +675,7 @@
                 contentInp.value = n.content || '';
                 dateText.textContent = formatNoteDate(n.updatedAt || n.createdAt);
                 charCount.textContent = (n.content ? n.content.length : 0) + ' karakter';
-                folderSel.value = n.folder || folders[0];
+                folderSel.value = n.folder || displayFolders[0];
                 pinBtn.textContent = n.pinned ? '📌' : '📍';
                 pinBtn.className = n.pinned 
                     ? 'p-2 rounded-xl text-amber-400 bg-amber-400/10 border border-amber-400/30 transition text-base' 
@@ -675,7 +683,7 @@
             }
         } else {
             // Catatan Baru Kosong
-            const activeFolder = (currentFolderFilter !== 'Semua') ? currentFolderFilter : folders[0];
+            const activeFolder = (currentFolderFilter !== 'Semua' && currentFolderFilter) ? currentFolderFilter : displayFolders[0];
             titleInp.value = '';
             contentInp.value = '';
             dateText.textContent = 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
@@ -706,14 +714,21 @@
         editorView.classList.remove('active-view');
         editorView.classList.add('hidden-view');
         if (typeof triggerHaptic === 'function') triggerHaptic('tap');
+        renderFolderChips();
         renderNotes();
+        const titleVal = document.getElementById('editor-title')?.value.trim();
+        const contentVal = document.getElementById('editor-content')?.value.trim();
+        if (titleVal || contentVal) {
+            showToast('💾 Catatan tersimpan!');
+        }
     }
 
     function autoSaveCurrentNote(immediate = false) {
         const titleVal = document.getElementById('editor-title').value.trim();
         const contentVal = document.getElementById('editor-content').value;
         const charCount = document.getElementById('editor-char-count');
-        const folderVal = document.getElementById('editor-folder-select').value;
+        const folderSel = document.getElementById('editor-folder-select');
+        const folderVal = folderSel && folderSel.value ? folderSel.value : 'Umum';
         
         if (charCount) {
             charCount.textContent = (contentVal ? contentVal.length : 0) + ' karakter';
@@ -762,7 +777,7 @@
             performSave();
         } else {
             if (autoSaveTimer) clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(performSave, 400);
+            autoSaveTimer = setTimeout(performSave, 300);
         }
     }
 

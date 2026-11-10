@@ -968,14 +968,13 @@
             localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
         }
 
-        // Bersihkan tugas demo jika akun non-juri secara tidak sengaja terisi tugas contoh bawaan
-        if (!isJudge && Array.isArray(tasks) && tasks.length > 0) {
-            if (tasks.every(t => t.id && String(t.id).startsWith('t_demo_'))) {
-                tasks = [];
-                try {
-                    localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify([]));
-                } catch (e) { }
-            }
+        // Bersihkan tugas demo bawaan jika akun mahasiswa/non-juri
+        const SAMPLE_TASK_IDS = ['t_demo_1', 't_demo_2', 't_demo_3', 't_demo_4', 't_demo_5', 't_demo_org_1', 't_demo_org_2'];
+        if (!isJudge && Array.isArray(tasks) && tasks.some(t => SAMPLE_TASK_IDS.includes(t.id))) {
+            tasks = tasks.filter(t => !SAMPLE_TASK_IDS.includes(t.id));
+            try {
+                localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
+            } catch (e) { }
         }
 
         let pomodoroSessions = parseInt(localStorage.getItem(userKey('ulmet_pomo_sessions')) || '0');

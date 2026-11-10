@@ -643,15 +643,16 @@
     // Inisialisasi data sertifikat secara sinkron (0ms latency)
     function loadInitialAchievements() {
         const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
+        const SAMPLE_ACH_IDS = ['ach_demo_1', 'ach_demo_2', 'ach_demo_3', 'ach_demo_4', 'ach_demo_5', 'ach_demo_6', 'ach_demo_7'];
         try {
             const raw = localStorage.getItem(userKey('ulmet_achievements')) || localStorage.getItem('ulmet_achievements');
             if (raw) {
-                const parsed = JSON.parse(raw);
+                let parsed = JSON.parse(raw);
                 if (Array.isArray(parsed)) {
-                    if (!isJudge && parsed.length > 0 && parsed.every(a => a.id && String(a.id).startsWith('ach_demo_'))) {
-                        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify([]));
-                        localStorage.setItem('ulmet_achievements', JSON.stringify([]));
-                        return [];
+                    if (!isJudge && parsed.some(a => SAMPLE_ACH_IDS.includes(a.id))) {
+                        parsed = parsed.filter(a => !SAMPLE_ACH_IDS.includes(a.id));
+                        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(parsed));
+                        localStorage.setItem('ulmet_achievements', JSON.stringify(parsed));
                     }
                     return parsed;
                 }
