@@ -133,9 +133,40 @@
                 </div>
             </div>
 
+            <!-- Banner Sesi Aktif (Jika sebelumnya sudah login) -->
+            <div id="active-session-banner" class="hidden mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-xs flex items-center justify-between gap-2.5">
+                <div class="min-w-0">
+                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Sesi Sedang Aktif</p>
+                    <p id="active-session-name" class="font-extrabold text-white truncate text-sm">Mahasiswa</p>
+                </div>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <a href="dashboard.html" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs transition shadow-sm">Dashboard ➔</a>
+                    <button type="button" onclick="logoutUser('login.html?logout=true')" class="px-2.5 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 rounded-xl border border-red-700/50 text-xs transition font-bold" title="Ganti Akun">Ganti Akun</button>
+                </div>
+            </div>
+
+            <!-- Tab Switcher: Masuk vs Daftar Akun Baru -->
+            <div class="flex p-1 bg-slate-900/90 border border-slate-800 rounded-2xl mb-4 text-xs font-bold">
+                <button type="button" id="tab-login" onclick="switchAuthTab('login')"
+                    class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black transition shadow-sm">
+                    🔑 Masuk Akun
+                </button>
+                <button type="button" id="tab-register" onclick="switchAuthTab('register')"
+                    class="flex-1 py-2.5 rounded-xl text-slate-400 hover:text-white transition font-bold">
+                    📝 Daftar Akun Baru
+                </button>
+            </div>
+
+            <!-- Alert Success -->
+            <div id="login-success"
+                class="hidden mb-4 p-3.5 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-200 text-xs flex items-start gap-2.5">
+                <span class="shrink-0 mt-0.5">✅</span>
+                <span id="login-success-msg">Berhasil!</span>
+            </div>
+
             <!-- Alert Error -->
             <div id="login-err"
-                class="hidden mb-5 p-3.5 rounded-xl bg-red-950/70 border border-red-500/50 text-red-200 text-xs flex items-start gap-2.5">
+                class="hidden mb-4 p-3.5 rounded-xl bg-red-950/70 border border-red-500/50 text-red-200 text-xs flex items-start gap-2.5">
                 <span class="shrink-0 mt-0.5">⚠️</span>
                 <span id="login-err-msg">Username atau kata sandi tidak cocok.</span>
             </div>
@@ -188,6 +219,11 @@
                     <span id="btn-login-label">Masuk ke ULMET 🚀</span>
                 </button>
 
+                <!-- Info Akun Bawaan -->
+                <p class="text-[11px] text-slate-400 text-center">
+                    💡 Akun mahasiswa: <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded font-mono">mahasiswa</code> (sandi: <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded font-mono">mahasiswa123</code>) atau daftar akun baru di tab atas.
+                </p>
+
                 <!-- Tombol Khusus Dewan Juri / Penilai Lomba (1-Klik Tanpa Perlu Daftar) -->
                 <div class="relative flex py-2 items-center">
                     <div class="flex-grow border-t border-slate-800"></div>
@@ -203,6 +239,56 @@
                     <span>Masuk Cepat Mode Juri / Demo (1-Klik)</span>
                     <span class="bg-yellow-400 text-slate-950 px-2 py-0.5 rounded-full text-[10px] font-black">INVOFEST
                         2026</span>
+                </button>
+            </form>
+
+            <!-- Form Pendaftaran Mandiri Mahasiswa Baru -->
+            <form id="form-register" class="space-y-3.5 hidden">
+                <div>
+                    <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">Nama Lengkap</label>
+                    <input type="text" id="reg-nama" required class="w-full bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition" placeholder="Contoh: Syauqi Quthbi">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">Username</label>
+                        <input type="text" id="reg-username" required autocomplete="username" class="w-full bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition" placeholder="syauqi">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">Kata Sandi</label>
+                        <input type="password" id="reg-password" required autocomplete="new-password" class="w-full bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition" placeholder="Minimal 4 huruf">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">NIM / NPM</label>
+                        <input type="text" id="reg-nim" required class="w-full bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition" placeholder="210102001">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">Semester</label>
+                        <select id="reg-semester" required class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition cursor-pointer">
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5" selected>Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                            <option value="9+">Semester 9+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1 ml-0.5">Program Studi</label>
+                    <input type="text" id="reg-prodi" required class="w-full bg-slate-900/90 border border-slate-800 text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-amber-400 transition" placeholder="Cth: Sastra Arab / Informatika">
+                </div>
+
+                <button type="submit" id="btn-register"
+                    class="w-full mt-2 bg-gradient-to-r from-yellow-400 to-amber-400 hover:brightness-110 text-slate-950 font-black py-3.5 rounded-xl shadow-[0_4px_20px_rgba(250,204,21,0.3)] transition active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span id="btn-register-label">Daftar &amp; Buka Dashboard 🚀</span>
                 </button>
             </form>
 
@@ -332,11 +418,45 @@
         }
 
         function showLoginErr(msg) {
+            hideLoginSuccess();
             const box = document.getElementById('login-err');
             document.getElementById('login-err-msg').textContent = msg;
             box.classList.remove('hidden');
         }
         function hideLoginErr() { document.getElementById('login-err').classList.add('hidden'); }
+
+        function showLoginSuccess(msg) {
+            hideLoginErr();
+            const box = document.getElementById('login-success');
+            if (!box) return;
+            document.getElementById('login-success-msg').textContent = msg;
+            box.classList.remove('hidden');
+        }
+        function hideLoginSuccess() {
+            const box = document.getElementById('login-success');
+            if (box) box.classList.add('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            hideLoginErr();
+            hideLoginSuccess();
+            const tabLogin = document.getElementById('tab-login');
+            const tabReg = document.getElementById('tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formReg = document.getElementById('form-register');
+
+            if (tab === 'register') {
+                tabReg.className = 'flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black transition shadow-sm';
+                tabLogin.className = 'flex-1 py-2.5 rounded-xl text-slate-400 hover:text-white font-bold transition';
+                formLogin.classList.add('hidden');
+                formReg.classList.remove('hidden');
+            } else {
+                tabLogin.className = 'flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black transition shadow-sm';
+                tabReg.className = 'flex-1 py-2.5 rounded-xl text-slate-400 hover:text-white font-bold transition';
+                formReg.classList.add('hidden');
+                formLogin.classList.remove('hidden');
+            }
+        }
 
         function updateAvatar() {
             const v = document.getElementById('ob-nama').value.trim();
@@ -375,12 +495,21 @@
 
         // ─── CEK SESI SAAT HALAMAN DIBUKA ───
         document.addEventListener('DOMContentLoaded', async () => {
-            // Cek apakah ada request logout eksplisit
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('logout') === 'true') {
+            const isLogout = urlParams.get('logout') === 'true' || urlParams.has('logout');
+
+            if (isLogout) {
+                setCurrentUserId(null);
+                _cachedUserId = null;
+                localStorage.removeItem('ulmet_current_uid');
+                localStorage.removeItem('ulmet_account');
+                localStorage.removeItem('ulmet_profile');
+                localStorage.removeItem('u_demo_juri_invofest_ulmet_account');
+                localStorage.removeItem('u_demo_juri_invofest_ulmet_profile');
                 sessionStorage.removeItem('ulmet_admin_ok');
                 localStorage.removeItem('ulmet_admin_session');
-                try { await logoutUser(); } catch (e) { }
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showLoginSuccess('✅ Anda telah berhasil keluar dari akun ULMET.');
                 return;
             }
 
@@ -388,8 +517,33 @@
                 const sb = getSb();
                 if (!sb) return;
                 const { data: { session } } = await sb.auth.getSession();
+
+                // JIKA SESI ADALAH DEMO JURI: Hapus otomatis dari sesi aktif!
+                // Jangan sampai mode juri menyandera form login saat mahasiswa ingin masuk ke akunnya!
+                if (session?.user?.id === 'demo_juri_invofest') {
+                    setCurrentUserId(null);
+                    _cachedUserId = null;
+                    localStorage.removeItem('ulmet_current_uid');
+                    localStorage.removeItem('ulmet_account');
+                    localStorage.removeItem('ulmet_profile');
+                    localStorage.removeItem('u_demo_juri_invofest_ulmet_account');
+                    localStorage.removeItem('u_demo_juri_invofest_ulmet_profile');
+                    return;
+                }
+
+                // Jika ada sesi mahasiswa/admin nyata yang aktif, tampilkan info banner tanpa redirect paksa
                 if (session?.user) {
-                    await routeAfterAuth(session.user);
+                    let prof = null;
+                    try {
+                        prof = JSON.parse(localStorage.getItem(userKey('ulmet_profile')) || localStorage.getItem('ulmet_profile') || '{}');
+                    } catch (e) { }
+                    const nama = prof?.nama || session.user.user_metadata?.full_name || session.user.email;
+                    const banner = document.getElementById('active-session-banner');
+                    const bannerName = document.getElementById('active-session-name');
+                    if (banner && bannerName) {
+                        bannerName.textContent = nama;
+                        banner.classList.remove('hidden');
+                    }
                 }
             } catch (e) {
                 console.warn('Gagal baca sesi:', e);
@@ -543,9 +697,88 @@
             }
 
             // 3. Gagal login
-            showLoginErr('Username atau kata sandi tidak cocok. Pastikan akun sudah dibuat oleh Admin.');
+            showLoginErr('Username atau kata sandi tidak cocok. Silakan periksa kembali atau daftar akun baru di tab atas.');
             btn.disabled = false;
             label.textContent = 'Masuk ke ULMET 🚀';
+        });
+
+        // ─── SUBMIT REGISTRASI MANDIRI MAHASISWA BARU ───
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideLoginErr();
+            hideLoginSuccess();
+
+            const nama = document.getElementById('reg-nama').value.trim();
+            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const nim = document.getElementById('reg-nim').value.trim();
+            const prodi = document.getElementById('reg-prodi').value.trim();
+            const semester = document.getElementById('reg-semester').value;
+
+            if (!username || !password || !nama) {
+                showLoginErr('Harap lengkapi semua kolom pendaftaran.');
+                return;
+            }
+
+            let localStudents = [];
+            try {
+                localStudents = JSON.parse(localStorage.getItem('ulmet_local_students') || '[]');
+            } catch(e) {}
+
+            if (localStudents.some(s => s.username.toLowerCase() === username)) {
+                showLoginErr('Username "' + username + '" sudah digunakan. Silakan gunakan username lain atau langsung masuk di tab Masuk.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-register');
+            const label = document.getElementById('btn-register-label');
+            btn.disabled = true;
+            label.textContent = 'Mendaftarkan Akun... ⏳';
+
+            const newId = 'std_' + Date.now();
+            const newStudent = {
+                id: newId,
+                username,
+                password,
+                email: `${username}@ulmet.app`,
+                nama,
+                nim: nim || '-',
+                prodi: prodi || 'Umum',
+                semester: semester || '1',
+                avatar: nama ? nama[0].toUpperCase() : '🎓'
+            };
+
+            localStudents.push(newStudent);
+            localStorage.setItem('ulmet_local_students', JSON.stringify(localStudents));
+
+            // Langsung set akun aktif
+            setCurrentUserId(newId);
+            clearLegacyLocalStorage();
+
+            const accountData = {
+                id: newId,
+                username,
+                email: newStudent.email,
+                nama
+            };
+            localStorage.setItem(userKey('ulmet_account'), JSON.stringify(accountData));
+            localStorage.setItem('ulmet_account', JSON.stringify(accountData));
+
+            const profileData = {
+                id: newId,
+                nama,
+                panggilan: nama.split(' ')[0],
+                nim: newStudent.nim,
+                prodi: newStudent.prodi,
+                semester: newStudent.semester,
+                avatar: newStudent.avatar
+            };
+            localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(profileData));
+            localStorage.setItem('ulmet_profile', JSON.stringify(profileData));
+
+            label.textContent = 'Berhasil! Membuka Dashboard... ✨';
+            showLoginSuccess('Pendaftaran berhasil! Mengalihkan ke Dashboard...');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
         });
 
         // ─── SUBMIT ONBOARDING (100% LOCAL-FIRST) ───

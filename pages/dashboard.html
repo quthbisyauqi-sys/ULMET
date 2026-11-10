@@ -148,14 +148,17 @@
         </div>
 
         <!-- Profil User Bawah -->
-        <div class="p-4 border-t border-slate-800/80">
-            <a href="profil.html" class="flex items-center gap-3 px-2 py-2 hover:bg-slate-800/60 rounded-xl transition cursor-pointer">
-                <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-sm flex-shrink-0">A</div>
-                <div class="min-w-0">
-                    <p id="sidebar-nama" class="text-sm font-bold text-white truncate">Mahasiswa</p>
-                    <p id="sidebar-semester" class="text-xs text-slate-400 truncate">Semester -</p>
+        <div class="p-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+            <a href="profil.html" class="flex items-center gap-2.5 px-2 py-1.5 hover:bg-slate-800/60 rounded-xl transition cursor-pointer min-w-0 flex-1" title="Buka Profil">
+                <div id="sidebar-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 border border-amber-300/40 flex items-center justify-center text-slate-950 font-bold text-xs flex-shrink-0">A</div>
+                <div class="min-w-0 flex-1">
+                    <p id="sidebar-nama" class="text-xs font-bold text-white truncate">Mahasiswa</p>
+                    <p id="sidebar-semester" class="text-[10px] text-slate-400 truncate">Semester -</p>
                 </div>
             </a>
+            <button onclick="handleLogout()" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-950/40 rounded-xl transition border border-transparent hover:border-red-800/40 flex-shrink-0 cursor-pointer" title="Keluar dari Akun">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            </button>
         </div>
     </aside>
 
@@ -1411,20 +1414,14 @@
             });
         }
 
+        function handleLogout() {
+            if (confirm('Apakah kamu yakin ingin keluar (Logout) dari akun ULMET?')) {
+                logoutUser('login.html?logout=true');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initDashboard();
-
-            // Klik profile section untuk logout
-            const profileSectionEl = document.querySelector('.profile-section');
-            if (profileSectionEl) {
-                profileSectionEl.style.cursor = 'pointer';
-                profileSectionEl.addEventListener('click', async () => {
-                    if (confirm('Apakah kamu yakin ingin keluar (Logout)?')) {
-                        await logoutUser();
-                        window.location.href = 'login.html';
-                    }
-                });
-            }
         });
 
         let audioCtx;

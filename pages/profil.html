@@ -1405,8 +1405,7 @@
 
     async function logoutAkun() {
         if (!confirm('Apakah kamu yakin ingin keluar dari akun ULMET?')) return;
-        await logoutUser();
-        window.location.href = 'login.html';
+        await logoutUser('login.html?logout=true');
     }
 
     function escapeHtml(str) {

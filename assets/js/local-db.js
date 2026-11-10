@@ -22,24 +22,13 @@ function getCurrentUserId() {
         _cachedUserId = cached;
         return cached;
     }
-    // Fallback sinkron dari session/account/profile lokal yang tersimpan
+    // Fallback sinkron HANYA dari session account lokal yang sah jika ada
     try {
         const accStr = localStorage.getItem('ulmet_account');
         if (accStr) {
             const acc = JSON.parse(accStr);
             if (acc && acc.id) {
                 _cachedUserId = String(acc.id);
-                localStorage.setItem('ulmet_current_uid', _cachedUserId);
-                return _cachedUserId;
-            }
-        }
-    } catch (e) { }
-    try {
-        const profStr = localStorage.getItem('ulmet_profile');
-        if (profStr) {
-            const prof = JSON.parse(profStr);
-            if (prof && prof.id) {
-                _cachedUserId = String(prof.id);
                 localStorage.setItem('ulmet_current_uid', _cachedUserId);
                 return _cachedUserId;
             }
@@ -52,9 +41,9 @@ function getCurrentUserId() {
  * Simpan user ID aktif saat login
  */
 function setCurrentUserId(uid) {
-    _cachedUserId = uid;
-    if (uid) {
-        localStorage.setItem('ulmet_current_uid', uid);
+    _cachedUserId = uid ? String(uid) : null;
+    if (_cachedUserId) {
+        localStorage.setItem('ulmet_current_uid', _cachedUserId);
     } else {
         localStorage.removeItem('ulmet_current_uid');
     }
@@ -182,11 +171,60 @@ async function loginWithUsername(username, password) {
     return { data: { user: null }, error: new Error('Username atau kata sandi tidak cocok.') };
 }
 
-async function logoutUser() {
+const DEFAULT_STUDENT_SEEDS = [
+    {
+        id: 'std_demo_1',
+        username: 'mahasiswa',
+        password: 'mahasiswa123',
+        nama: 'Ahmad Baihaqi',
+        nim: '210102003',
+        prodi: 'Sastra Arab',
+        semester: '5',
+        avatar: 'A'
+    },
+    {
+        id: 'std_demo_2',
+        username: 'syauqi',
+        password: 'syauqi123',
+        nama: 'Syauqi Quthbi',
+        nim: '210102001',
+        prodi: 'Teknik Informatika',
+        semester: '5',
+        avatar: 'S'
+    }
+];
+
+function ensureLocalStudentsSeeded() {
+    try {
+        const stored = localStorage.getItem('ulmet_local_students');
+        if (!stored || stored === '[]') {
+            localStorage.setItem('ulmet_local_students', JSON.stringify(DEFAULT_STUDENT_SEEDS));
+        }
+    } catch (e) { }
+}
+ensureLocalStudentsSeeded();
+
+async function logoutUser(redirectTo = 'login.html') {
+    const currentUid = getCurrentUserId();
     setCurrentUserId(null);
+    _cachedUserId = null;
+    localStorage.removeItem('ulmet_current_uid');
     localStorage.removeItem('ulmet_account');
+    localStorage.removeItem('ulmet_profile');
+    if (currentUid) {
+        localStorage.removeItem(`u_${currentUid}_ulmet_account`);
+        localStorage.removeItem(`u_${currentUid}_ulmet_profile`);
+    }
+    // Bersihkan residu sesi demo juri secara tuntas
+    localStorage.removeItem('u_demo_juri_invofest_ulmet_account');
+    localStorage.removeItem('u_demo_juri_invofest_ulmet_profile');
     sessionStorage.removeItem('ulmet_admin_ok');
-    window.location.href = 'login.html';
+    localStorage.removeItem('ulmet_admin_session');
+
+    if (redirectTo) {
+        const sep = redirectTo.includes('?') ? '&' : '?';
+        window.location.href = `${redirectTo}${sep}logout=true`;
+    }
 }
 
 /**
