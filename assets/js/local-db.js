@@ -22,6 +22,29 @@ function getCurrentUserId() {
         _cachedUserId = cached;
         return cached;
     }
+    // Fallback sinkron dari session/account/profile lokal yang tersimpan
+    try {
+        const accStr = localStorage.getItem('ulmet_account');
+        if (accStr) {
+            const acc = JSON.parse(accStr);
+            if (acc && acc.id) {
+                _cachedUserId = String(acc.id);
+                localStorage.setItem('ulmet_current_uid', _cachedUserId);
+                return _cachedUserId;
+            }
+        }
+    } catch (e) { }
+    try {
+        const profStr = localStorage.getItem('ulmet_profile');
+        if (profStr) {
+            const prof = JSON.parse(profStr);
+            if (prof && prof.id) {
+                _cachedUserId = String(prof.id);
+                localStorage.setItem('ulmet_current_uid', _cachedUserId);
+                return _cachedUserId;
+            }
+        }
+    } catch (e) { }
     return null;
 }
 

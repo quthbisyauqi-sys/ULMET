@@ -1,11 +1,13 @@
 // =============================================
 // ULMET Service Worker — Notifikasi Background & Network First
 // =============================================
-const CACHE_NAME = 'ulmet-v92';
+const CACHE_NAME = 'ulmet-v93';
 const SHARED_CACHE_NAME = 'ulmet-shared-cache';
 const ASSETS = [
     './',
     './index.html',
+    './favicon.ico',
+    './favicon.png',
     './pages/jadwal.html',
     './pages/dashboard.html',
     './pages/catatan.html',
@@ -18,9 +20,11 @@ const ASSETS = [
     './manifest.json',
     './assets/icons/icon-192.png',
     './assets/icons/icon-512.png',
+    './assets/icons/favicon-32.png',
     './assets/img/mascot-happy.jpg',
     './assets/img/mascot-angry.jpg',
     './assets/img/mascot-worried.jpg',
+    './assets/js/tailwind.js',
     './assets/js/local-db.js',
     './assets/js/ai-widget.js'
 ];
@@ -173,7 +177,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         fetch(event.request)
             .then(response => {
-                if (response && response.status === 200 && response.type === 'basic') {
+                if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
                     const responseToCache = response.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, responseToCache);
@@ -181,7 +185,7 @@ self.addEventListener('fetch', event => {
                 }
                 return response;
             })
-            .catch(() => caches.match(event.request))
+            .catch(() => caches.match(event.request, { ignoreSearch: true }))
     );
 });
 

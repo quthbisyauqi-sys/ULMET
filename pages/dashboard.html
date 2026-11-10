@@ -2,6 +2,10 @@
 <html lang="id">
 
 <head>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
     <link rel="manifest" href="../manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,11 +14,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Dashboard ULMET - Workspace</title>
     <script src="../assets/js/local-db.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/tailwind.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        html, body { background-color: #020617; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -892,7 +896,7 @@
                 return `
                     <div class="p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${done ? 'bg-emerald-950/25 border-emerald-500/40' : 'bg-slate-900/60 border-slate-800/80 hover:border-amber-400/40'}">
                         <div class="flex items-center gap-3 min-w-0">
-                            <button onclick="toggleDashHabit(${h.id})" title="${done ? 'Batal centang' : 'Tandai selesai'}"
+                            <button onclick="toggleDashHabit('${escapeHtml(String(h.id))}')" title="${done ? 'Batal centang' : 'Tandai selesai'}"
                                 class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition-all active:scale-90
                                 ${done ? 'bg-emerald-500 border-emerald-400 text-white shadow-md shadow-emerald-500/30' : 'border-dashed border-slate-700 hover:border-emerald-400 hover:bg-emerald-900/20 text-slate-400'}">
                                 ${done ? '<span class="text-lg font-bold">✓</span>' : `<span class="text-base">${h.icon || '📌'}</span>`}
@@ -907,7 +911,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 flex-shrink-0">
-                            <button onclick="toggleDashHabit(${h.id})"
+                            <button onclick="toggleDashHabit('${escapeHtml(String(h.id))}')"
                                 class="text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold transition active:scale-95 whitespace-nowrap
                                 ${done ? 'bg-slate-800/70 text-slate-400 hover:text-white border border-slate-700/50' : 'bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/40'}">
                                 ${done ? 'Batal' : '✓ Selesai'}
@@ -920,7 +924,7 @@
 
         function toggleDashHabit(id) {
             let habits = getHabitsList();
-            const h = habits.find(x => x.id === id);
+            const h = habits.find(x => String(x.id) === String(id));
             if (!h) return;
             const today = todayStr();
 
@@ -1326,10 +1330,10 @@
             // 4. Tugas Kuliah Terdekat
             try {
                 let localTasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || 'null');
-                if (!Array.isArray(localTasks) || localTasks.length === 0) {
+                if (!Array.isArray(localTasks)) {
                     localTasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
                 }
-                renderDashboardTasks(localTasks);
+                renderDashboardTasks(localTasks || []);
             } catch(e) {
                 console.warn('Gagal render tasks lokal:', e);
             }
