@@ -642,18 +642,32 @@
 
     // Inisialisasi data sertifikat secara sinkron (0ms latency)
     function loadInitialAchievements() {
+        const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
         try {
             const raw = localStorage.getItem(userKey('ulmet_achievements')) || localStorage.getItem('ulmet_achievements');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                if (Array.isArray(parsed)) {
+                    if (!isJudge && parsed.length > 0 && parsed.every(a => a.id && String(a.id).startsWith('ach_demo_'))) {
+                        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify([]));
+                        localStorage.setItem('ulmet_achievements', JSON.stringify([]));
+                        return [];
+                    }
+                    return parsed;
+                }
             }
         } catch(e) {}
         
-        // Simpan default jika belum ada
-        localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
-        localStorage.setItem('ulmet_achievements', JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
-        return DEFAULT_SAMPLE_ACHIEVEMENTS;
+        // Simpan default hanya jika akun juri
+        if (isJudge) {
+            localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
+            localStorage.setItem('ulmet_achievements', JSON.stringify(DEFAULT_SAMPLE_ACHIEVEMENTS));
+            return DEFAULT_SAMPLE_ACHIEVEMENTS;
+        } else {
+            localStorage.setItem(userKey('ulmet_achievements'), JSON.stringify([]));
+            localStorage.setItem('ulmet_achievements', JSON.stringify([]));
+            return [];
+        }
     }
 
     let userAchievements = loadInitialAchievements();

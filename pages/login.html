@@ -654,6 +654,23 @@
                 setCurrentUserId(localUser.id);
                 clearLegacyLocalStorage();
 
+                // Untuk akun mahasiswa/non-juri: pastikan data awal kosong jika belum pernah diset
+                if (localUser.id !== 'demo_juri_invofest') {
+                    if (localStorage.getItem(userKey('ulmet_tasks')) === null) {
+                        localStorage.setItem(userKey('ulmet_tasks'), '[]');
+                        localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
+                    }
+                    if (localStorage.getItem(userKey('ulmet_courses')) === null) {
+                        localStorage.setItem(userKey('ulmet_courses'), '[]');
+                    }
+                    if (localStorage.getItem(userKey('ulmet_note_folders')) === null) {
+                        localStorage.setItem(userKey('ulmet_note_folders'), '[]');
+                    }
+                    if (localStorage.getItem(userKey('ulmet_notes')) === null) {
+                        localStorage.setItem(userKey('ulmet_notes'), '[]');
+                    }
+                }
+
                 const accountData = {
                     id: localUser.id,
                     username: localUser.username,
@@ -780,6 +797,20 @@
             };
             localStorage.setItem(userKey('ulmet_profile'), JSON.stringify(profileData));
             localStorage.setItem('ulmet_profile', JSON.stringify(profileData));
+
+            // Inisialisasi akun baru: 100% kosong tanpa tugas atau folder bawaan
+            localStorage.setItem(userKey('ulmet_tasks'), '[]');
+            localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
+            localStorage.setItem(userKey('ulmet_courses'), '[]');
+            localStorage.setItem(userKey('ulmet_files'), '[]');
+            localStorage.setItem(userKey('ulmet_note_folders'), '[]');
+            localStorage.setItem(userKey('ulmet_notes'), '[]');
+            localStorage.setItem(userKey('ulmet_achievements'), '[]');
+            localStorage.setItem(userKey('ulmet_habits'), '[]');
+            localStorage.setItem(userKey('ulmet_keuangan_expenses'), '[]');
+            localStorage.setItem(userKey('ulmet_keuangan_patungan'), '[]');
+            localStorage.setItem(userKey('ulmet_keuangan_wishlist'), '[]');
+            localStorage.setItem(userKey('ulmet_streak'), '0');
 
             label.textContent = 'Berhasil! Membuka Dashboard... ✨';
             showLoginSuccess('Pendaftaran berhasil! Mengalihkan ke Dashboard...');

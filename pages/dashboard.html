@@ -830,13 +830,21 @@
         // ===== KEBIASAAN KESEHARIAN (HABITS) INTEGRATION =====
         function getHabitsList() {
             let habits = JSON.parse(localStorage.getItem(userKey('ulmet_habits')) || 'null');
+            const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
             if (!habits || !Array.isArray(habits)) {
-                habits = [
-                    { id: 1, nama: 'Setoran Hafalan', icon: '📖', target: 'Setiap hari', reminderJam: '07:00', streak: 0, lastChecked: null },
-                    { id: 2, nama: 'Sholat 5 Waktu', icon: '🕌', target: 'Setiap hari', reminderJam: '05:00', streak: 0, lastChecked: null },
-                    { id: 3, nama: 'Olahraga Pagi', icon: '🏃', target: 'Setiap hari', reminderJam: '06:30', streak: 0, lastChecked: null },
-                ];
+                if (isJudge) {
+                    habits = [
+                        { id: 1, nama: 'Setoran Hafalan', icon: '📖', target: 'Setiap hari', reminderJam: '07:00', streak: 0, lastChecked: null },
+                        { id: 2, nama: 'Sholat 5 Waktu', icon: '🕌', target: 'Setiap hari', reminderJam: '05:00', streak: 0, lastChecked: null },
+                        { id: 3, nama: 'Olahraga Pagi', icon: '🏃', target: 'Setiap hari', reminderJam: '06:30', streak: 0, lastChecked: null },
+                    ];
+                } else {
+                    habits = [];
+                }
                 localStorage.setItem(userKey('ulmet_habits'), JSON.stringify(habits));
+            } else if (!isJudge && habits.length === 3 && habits[0].nama === 'Setoran Hafalan' && habits[1].nama === 'Sholat 5 Waktu' && habits[2].nama === 'Olahraga Pagi' && habits.every(h => !h.lastChecked && (h.streak === 0 || !h.streak))) {
+                habits = [];
+                localStorage.setItem(userKey('ulmet_habits'), JSON.stringify([]));
             }
             return habits;
         }
@@ -1335,6 +1343,10 @@
                 let localTasks = JSON.parse(localStorage.getItem(userKey('ulmet_tasks')) || 'null');
                 if (!Array.isArray(localTasks)) {
                     localTasks = JSON.parse(localStorage.getItem('ulmet_tasks') || '[]');
+                }
+                const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
+                if (!isJudge && Array.isArray(localTasks) && localTasks.length > 0 && localTasks.every(t => t.id && String(t.id).startsWith('t_demo_'))) {
+                    localTasks = [];
                 }
                 renderDashboardTasks(localTasks || []);
             } catch(e) {

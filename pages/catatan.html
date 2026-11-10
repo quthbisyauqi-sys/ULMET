@@ -398,14 +398,27 @@
         }
     ];
 
+    function isJudgeAccount() {
+        return (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
+    }
+
     function getNotesList() {
         const stored = localStorage.getItem(userKey('ulmet_notes'));
         if (!stored) {
-            localStorage.setItem(userKey('ulmet_notes'), JSON.stringify(DEFAULT_NOTES));
-            return DEFAULT_NOTES;
+            if (isJudgeAccount()) {
+                localStorage.setItem(userKey('ulmet_notes'), JSON.stringify(DEFAULT_NOTES));
+                return DEFAULT_NOTES;
+            }
+            localStorage.setItem(userKey('ulmet_notes'), JSON.stringify([]));
+            return [];
         }
         try {
-            return JSON.parse(stored) || [];
+            const list = JSON.parse(stored) || [];
+            if (!isJudgeAccount() && Array.isArray(list) && list.length > 0 && list.every(n => n.id && String(n.id).startsWith('note_'))) {
+                localStorage.setItem(userKey('ulmet_notes'), JSON.stringify([]));
+                return [];
+            }
+            return list;
         } catch (e) {
             return [];
         }
@@ -421,13 +434,23 @@
     function getFoldersList() {
         const stored = localStorage.getItem(userKey('ulmet_note_folders'));
         if (!stored) {
-            localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify(DEFAULT_FOLDERS));
-            return DEFAULT_FOLDERS;
+            if (isJudgeAccount()) {
+                localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify(DEFAULT_FOLDERS));
+                return DEFAULT_FOLDERS;
+            }
+            localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify([]));
+            return [];
         }
         try {
-            return JSON.parse(stored) || DEFAULT_FOLDERS;
+            const list = JSON.parse(stored) || [];
+            if (!isJudgeAccount() && Array.isArray(list) && 
+                list.length === 4 && list[0] === 'Hutang' && list[1] === 'LKP2M' && list[2] === 'Matkul' && list[3] === 'Pribadi') {
+                localStorage.setItem(userKey('ulmet_note_folders'), JSON.stringify([]));
+                return [];
+            }
+            return list;
         } catch (e) {
-            return DEFAULT_FOLDERS;
+            return [];
         }
     }
 

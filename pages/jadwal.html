@@ -937,6 +937,7 @@
         }
 
         let tasks = [];
+        const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
         try {
             const cached = localStorage.getItem(userKey('ulmet_tasks'));
             if (cached !== null) {
@@ -947,16 +948,34 @@
             }
         } catch (e) { }
 
-        // Inisialisasi default hanya jika key ulmet_tasks belum pernah dibuat sama sekali
+        // Inisialisasi default hanya untuk akun Juri. Akun mahasiswa baru dimulai dalam kondisi bersih tanpa tugas bawaan.
         const isTasksSeeded = localStorage.getItem(userKey('ulmet_tasks_seeded'));
         if (localStorage.getItem(userKey('ulmet_tasks')) === null && !isTasksSeeded) {
-            tasks = DEFAULT_SAMPLE_TASKS.map(normalizeTask);
-            try {
-                localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
-                localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
-            } catch (e) { }
+            if (isJudge) {
+                tasks = DEFAULT_SAMPLE_TASKS.map(normalizeTask);
+                try {
+                    localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
+                    localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
+                } catch (e) { }
+            } else {
+                tasks = [];
+                try {
+                    localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify([]));
+                    localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
+                } catch (e) { }
+            }
         } else if (!isTasksSeeded && localStorage.getItem(userKey('ulmet_tasks')) !== null) {
             localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
+        }
+
+        // Bersihkan tugas demo jika akun non-juri secara tidak sengaja terisi tugas contoh bawaan
+        if (!isJudge && Array.isArray(tasks) && tasks.length > 0) {
+            if (tasks.every(t => t.id && String(t.id).startsWith('t_demo_'))) {
+                tasks = [];
+                try {
+                    localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify([]));
+                } catch (e) { }
+            }
         }
 
         let pomodoroSessions = parseInt(localStorage.getItem(userKey('ulmet_pomo_sessions')) || '0');
@@ -1016,7 +1035,7 @@
                     updateStats();
                 }
 
-                const loadedCourses = await loadCourses(['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']);
+                const loadedCourses = await loadCourses(isJudge ? ['Kecerdasan Buatan', 'Rekayasa Perangkat Lunak', 'Sistem Terdistribusi'] : []);
                 if (Array.isArray(loadedCourses) && loadedCourses.length > 0) {
                     userCourses = loadedCourses;
                 }
@@ -1358,16 +1377,22 @@
         }
 
         // ===== MATERI DOSEN & SUPABASE STORAGE =====
-        let currentCourse = 'Sastra Arab';
+        let currentCourse = null;
 
         // Data materi (di-load dari Supabase, fallback localStorage)
         let userCourses = JSON.parse(localStorage.getItem(userKey('ulmet_courses')) || 'null');
-        if (!Array.isArray(userCourses) || userCourses.length === 0) {
-            userCourses = ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
+        if (!Array.isArray(userCourses)) {
+            userCourses = isJudge ? ['Kecerdasan Buatan', 'Rekayasa Perangkat Lunak', 'Sistem Terdistribusi'] : [];
+        } else if (!isJudge && userCourses.length === 3 && 
+                   userCourses[0] === 'Sastra Arab' && 
+                   userCourses[1] === 'Filsafat Ilmu' && 
+                   userCourses[2] === 'Sejarah Kebudayaan') {
+            userCourses = [];
         } else {
             userCourses = userCourses.map(c => typeof c === 'string' ? c : (c && c.name ? c.name : String(c))).filter(Boolean);
         }
         localStorage.setItem(userKey('ulmet_courses'), JSON.stringify(userCourses));
+        if (userCourses.length > 0) currentCourse = typeof userCourses[0] === 'string' ? userCourses[0] : userCourses[0].name;
 
         let userFiles = JSON.parse(localStorage.getItem(userKey('ulmet_files')) || '[]');
 

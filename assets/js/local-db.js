@@ -239,6 +239,10 @@ async function logoutUser(redirectTo = 'login.html') {
     }
 }
 
+function isDemoJudgeSession() {
+    return (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
+}
+
 /**
  * Otentikasi Khusus Dewan Juri / Mode Demo 1-Klik
  * Mengisi data percontohan lengkap (Jadwal, Tugas, Keuangan, Kebiasaan, Maskot)
@@ -357,6 +361,7 @@ function loginAsDemoJudge() {
         }
     ];
     localStorage.setItem(userKey('ulmet_tasks'), JSON.stringify(tasks));
+    localStorage.setItem(userKey('ulmet_tasks_seeded'), '1');
 
     const budgetConfig = { budget: 1500000, days: 30 };
     localStorage.setItem(userKey('ulmet_keuangan_config'), JSON.stringify(budgetConfig));
@@ -709,7 +714,7 @@ async function syncCourses(courses) {
     return syncArrayToSupabase('courses', 'ulmet_courses', courses);
 }
 
-async function loadCourses(defaultCourses = ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']) {
+async function loadCourses(defaultCourses = []) {
     return loadArrayFromSupabase('courses', 'ulmet_courses', defaultCourses);
 }
 
@@ -737,7 +742,7 @@ async function syncNoteFolders(folders) {
     return syncArrayToSupabase('note_folders', 'ulmet_note_folders', folders);
 }
 
-async function loadNoteFolders(defaultFolders = ['Kuliah', 'Riset & KKI', 'Organisasi', 'Pribadi']) {
+async function loadNoteFolders(defaultFolders = []) {
     return loadArrayFromSupabase('note_folders', 'ulmet_note_folders', defaultFolders);
 }
 

@@ -567,20 +567,27 @@ let currentCourse = null;
 let currentViewingFileId = null;
 
 // Data sinkron Supabase & localStorage cache
-const DEFAULT_COURSES = ['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan'];
+const isJudge = (typeof getCurrentUserId === 'function' && getCurrentUserId() === 'demo_juri_invofest');
+const DEFAULT_COURSES = isJudge ? ['Kecerdasan Buatan', 'Rekayasa Perangkat Lunak', 'Sistem Terdistribusi'] : [];
 let userCourses = JSON.parse(localStorage.getItem(userKey("ulmet_courses")) || "null");
-if (!Array.isArray(userCourses) || userCourses.length === 0) {
-    userCourses = DEFAULT_COURSES;
-} else {
-    userCourses = userCourses.map(c => typeof c === 'string' ? c : (c && c.name ? c.name : String(c))).filter(Boolean);
-}
-localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
-
 let userFiles = JSON.parse(localStorage.getItem(userKey("ulmet_files")) || "null");
 if (!Array.isArray(userFiles)) {
     userFiles = [];
     localStorage.setItem(userKey("ulmet_files"), JSON.stringify(userFiles));
 }
+
+if (!Array.isArray(userCourses)) {
+    userCourses = isJudge ? DEFAULT_COURSES : [];
+} else if (!isJudge && userCourses.length === 3 && 
+           userCourses[0] === 'Sastra Arab' && 
+           userCourses[1] === 'Filsafat Ilmu' && 
+           userCourses[2] === 'Sejarah Kebudayaan' &&
+           (!userFiles || userFiles.length === 0)) {
+    userCourses = [];
+} else {
+    userCourses = userCourses.map(c => typeof c === 'string' ? c : (c && c.name ? c.name : String(c))).filter(Boolean);
+}
+localStorage.setItem(userKey("ulmet_courses"), JSON.stringify(userCourses));
 
 // === Load profil ke sidebar ===
 (function() {
@@ -1234,7 +1241,7 @@ async function initSupabaseData() {
             } catch(pe) {}
         }
 
-        const loadedCourses = await loadCourses(['Sastra Arab', 'Filsafat Ilmu', 'Sejarah Kebudayaan']);
+        const loadedCourses = await loadCourses(isJudge ? ['Kecerdasan Buatan', 'Rekayasa Perangkat Lunak', 'Sistem Terdistribusi'] : []);
         if (Array.isArray(loadedCourses) && loadedCourses.length > 0) userCourses = loadedCourses;
         const loadedFiles = await loadFiles();
         userFiles = Array.isArray(loadedFiles) ? loadedFiles : [];
